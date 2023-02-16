@@ -1,22 +1,21 @@
 from functionality import *
 
 class Nim():
-    def __init__(self, rows = [1, 2, 3, 4]):
+    def __init__(self, rows: list[int] = [1, 2, 3, 4]):
         self.winner: int = None
         self.rows: list[int] = rows
-        self.min_take = 1
-        self.max_take = max(self.rows)
+        self.min_take: int = 1
+        self.max_take: int = max(self.rows)
     
     def move(self, move: int, player: int):
-        row, take_amount = cantor_decode(move)
-        self.update_state(row, take_amount)
+        self.update_state(move)
         self.check_state(player)
-        return True
 
-    def update_state(self, row: int, take_amount: int):
+    def update_state(self, move: int):
+        row, take_amount = cantor_decode(move)
         self.rows[row] -= take_amount
     
-    def check_state(self, player):
+    def check_state(self, player: int):
         if sum(self.rows) <= 0:
             self.winner = 1 - player
     
