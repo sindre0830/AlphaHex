@@ -2,13 +2,15 @@ from node import *
 from game_manager.nim import *
 from functionality import *
 import random
+import math
 
 class MCTS():
-    def __init__(self, game_manager: Nim, max_games: int, max_game_variations: int):
+    def __init__(self, game_manager: Nim, max_games: int, max_game_variations: int, c: float = math.sqrt(2)):
         self.game_manager = game_manager
         self.root = Node(state=game_manager.initial_state)
         self.max_games = max_games
         self.max_game_variations = max_game_variations
+        self.c = c # Exploration parameter
     
     def run(self):
         pass
@@ -16,6 +18,9 @@ class MCTS():
     #  Traversing the tree from the root to a leaf node by using the tree policy.
     def tree_search(self):
         pass
+    
+    def evaluate_node(self, node: Node):
+        return node.wins/node.visits + self.c * math.sqrt((math.log(node.parent.wins))/node.visits)
 
     # Generating k or all child states of a parent state, and then connecting the tree node housing
     # the parent state (a.k.a. parent node) to the nodes housing the child states (a.k.a. child nodes).
