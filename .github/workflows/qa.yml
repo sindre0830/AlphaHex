@@ -1,0 +1,39 @@
+# source: https://github.com/sindre0830/Workflow-Templates
+name: Python workflow
+# when to run the workflow
+on:
+  push:
+    paths:
+    - '.github/workflows/python.yml'
+    - 'src/**'
+  pull_request:
+  workflow_dispatch:
+# instructions the workflow will perform
+jobs:
+  build:
+    # environment to run on
+    runs-on: ubuntu-latest
+    # steps to perform
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9.10'
+        cache: 'pip'
+
+    - name: Install dependencies
+      working-directory: src
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Build program
+      working-directory: src
+      run: python -m py_compile ./main.py
+
+    - name: Syntax checker
+      working-directory: src
+      run: |
+        pip install flake8
+        flake8 . --max-line-length 150 --ignore=E712,W504
