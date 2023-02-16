@@ -5,22 +5,32 @@ import random
 import math
 
 class MCTS():
-    def __init__(self, game_manager: Nim, max_games: int, max_game_variations: int, c: float = math.sqrt(2)):
+    def __init__(self, game_manager: Nim, max_games: int, max_game_variations: int, c: float = 1.0):
         self.game_manager = game_manager
         self.root = Node(state=game_manager.initial_state)
         self.max_games = max_games
         self.max_game_variations = max_game_variations
         self.c = c # Exploration parameter
     
-    def run(self):
-        pass
-
     #  Traversing the tree from the root to a leaf node by using the tree policy.
-    def tree_search(self):
-        pass
-    
+    def tree_search(self, root: Node):
+        if node.children == []
+            return node
+        choices = []
+        for node in root.children:
+            node_evaluation = self.evaluate_node(node)
+            choices.append((node, node_evaluation))
+        choices = sorted(choices, key=lambda choice: choice[1], reverse=True)
+        return self.tree_search(choices[0])
+
+    # https://en.wikipedia.org/wiki/Monte_Carlo_tree_search#Exploration_and_exploitation
     def evaluate_node(self, node: Node):
-        return node.wins/node.visits + self.c * math.sqrt((math.log(node.parent.wins))/node.visits)
+        q = 0 if node.visits == 0 else node.wins/node.visits
+        u = self.upper_confidence_bound(node)
+        return q + u
+
+    def upper_confidence_bound(self, node:Node):
+        return self.c * math.sqrt((math.log(node.parent.visits)) / (1 + node.visits))
 
     # Generating k or all child states of a parent state, and then connecting the tree node housing
     # the parent state (a.k.a. parent node) to the nodes housing the child states (a.k.a. child nodes).
@@ -39,5 +49,5 @@ class MCTS():
 
     # Passing the evaluation of a final state back up the tree, updating relevant data (see course
     # lecture notes) at all nodes and edges on the path from the final state to the tree root.
-    def backpropagation(self):
+    def backpropagation(self, node: Node):
         pass
