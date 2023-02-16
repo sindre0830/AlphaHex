@@ -10,7 +10,7 @@ class Nim():
             [1, 1, 1, 1],
         ]
     ):
-        self.initial_state = initial_state
+        self.initial_state: list[list[int]] = initial_state
         self.min_take: int = 1
         self.max_take: int = len(initial_state)
 
@@ -39,7 +39,7 @@ class Nim():
         else:
             return None
     
-    def get_legal_moves(self, state):
+    def get_legal_moves(self, state: list[list[int]]):
         legal_moves: list[int] = []
         for row in range(len(state)):
             for take_amount in range(sum(state[row])):
@@ -47,14 +47,13 @@ class Nim():
         return legal_moves
 
     def visualize_board(self, state: list[list[int]]):
-        text = ""
+        board_str = ""
         for row in state:
-            string = ""
+            row_str = ""
             for elem in row:
                 if elem == 0: 
-                    string += "0 "
+                    row_str += "0 "
                 else:
-                    string += "1 "
-            string += "\n"
-            text += string
-        print(text)
+                    row_str += "1 "
+            board_str += row_str + "\n"
+        print(board_str)
