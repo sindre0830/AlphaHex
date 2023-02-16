@@ -1,4 +1,4 @@
-from game_manager.Nim import *
+from game_manager.nim import *
 from functionality import *
 
 def main():
