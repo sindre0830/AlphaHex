@@ -44,10 +44,29 @@ class MCTS():
 
     # Estimating the value of a leaf node in the tree by doing a rollout simulation using the default
     # policy from the leaf node's state to a final state.
-    def leaf_evaluation(self):
-        pass
+    def leaf_evaluation(self, leaf):
+        node = leaf
+        legal_moves = self.game_manager.get_legal_moves()
+    
+        if legal_moves == []: # Change later
+            self.backpropagate_win(node)
 
     # Passing the evaluation of a final state back up the tree, updating relevant data (see course
     # lecture notes) at all nodes and edges on the path from the final state to the tree root.
-    def backpropagation(self, node: Node):
-        pass
+    def backpropagate_win(self, node: Node):
+        node.increment_visits()
+        node.increment_wins()
+        if node.parent.parent == None:
+            node.parent.increment_visits()
+        else:
+            self.backpropagate_loss(node.parent)
+            
+    def backpropagate_loss(self, node: Node):
+        node.increment_visits()
+        if node.parent.parent == None:
+            node.parent.increment_visits()
+            node.increment_wins()
+        else:
+            self.backpropagate_win(node.parent)
+            
+            
