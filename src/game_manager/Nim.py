@@ -9,8 +9,6 @@ class Nim():
     
     def move(self, move: int, player: int):
         row, take_amount = cantor_decode(move)
-        if self.is_illegal(row, take_amount):
-            return False
         self.update_state(row, take_amount)
         self.check_state(player)
         return True
@@ -21,15 +19,13 @@ class Nim():
     def check_state(self, player):
         if sum(self.rows) <= 0:
             self.winner = 1 - player
-
-    def is_illegal(self, row, take_amount):
-        if row < 0 or row > len(self.rows):
-            return True
-        if take_amount < self.min_take or take_amount > self.max_take:
-            return True
-        if self.rows[row] < take_amount:
-            return True
-        return False
+    
+    def get_legal_moves(self):
+        legal_moves: list[int] = []
+        for row in range(len(self.rows)):
+            for take_amount in range(self.rows[row]):
+                legal_moves.append(cantor_encode(row, take_amount + 1))
+        return legal_moves
 
     def visualize_board(self):
         for row in self.rows:
