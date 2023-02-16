@@ -4,7 +4,7 @@ name: Python workflow
 on:
   push:
     paths:
-    - '.github/workflows/python.yml'
+    - '.github/workflows/qa.yml'
     - 'src/**'
   pull_request:
   workflow_dispatch:
