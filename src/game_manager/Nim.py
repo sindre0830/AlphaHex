@@ -16,7 +16,6 @@ class Nim():
 
     def update_state(self, state: list[list[int]], move: int):
         row_index, take_amount = cantor_decode(move)
-
         row: list[int] = state[row_index].copy()
         row.reverse()
 
@@ -27,7 +26,6 @@ class Nim():
                     break
         row.reverse()
         state[row_index] = row
-
         return state
     
     def get_win_state(self, state: list[list[int]], player: int):
