@@ -14,7 +14,7 @@ class MCTS():
     
     #  Traversing the tree from the root to a leaf node by using the tree policy.
     def tree_search(self, root: Node):
-        if node.children == []
+        if node.children == []:
             return node
         choices = []
         for node in root.children:
@@ -27,7 +27,7 @@ class MCTS():
     def evaluate_node(self, node: Node):
         q = 0 if node.visits == 0 else node.wins/node.visits
         u = self.upper_confidence_bound(node)
-        return q + u
+        return max(q, u)
 
     def upper_confidence_bound(self, node:Node):
         return self.c * math.sqrt((math.log(node.parent.visits)) / (1 + node.visits))
@@ -45,10 +45,11 @@ class MCTS():
     # Estimating the value of a leaf node in the tree by doing a rollout simulation using the default
     # policy from the leaf node's state to a final state.
     def leaf_evaluation(self, leaf):
-        node = leaf
-        legal_moves = self.game_manager.get_legal_moves()
-    
-        if legal_moves == []: # Change later
+        self.node_expansion(leaf)
+        for _ in range(self.max_games)
+            
+
+        if self.game_manager.legal_moves == []: # Change later
             self.backpropagate_win(node)
 
     # Passing the evaluation of a final state back up the tree, updating relevant data (see course

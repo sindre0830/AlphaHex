@@ -8,11 +8,10 @@ def main():
     """
     game_manager = Nim()
     mcts = MCTS(game_manager, 500, 3)
-    game_manager.visualize_board(mcts.root.state)
+    mcts.root.increment_visits()
     mcts.node_expansion(mcts.root)
-    for node in mcts.root.children:
-        game_manager.visualize_board(node.state)
-        print()
+    number = mcts.evaluate_node(mcts.root.children[0])
+    print(number)
 
 
 # run main program when file is executed
