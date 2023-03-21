@@ -40,7 +40,10 @@ class Node():
         This method updates u our exploration value, through default tree policy, UCT.
         https://en.wikipedia.org/wiki/Monte_Carlo_tree_search#Exploration_and_exploitation
         """
-        if self.visits == 0 or self.parent is None:
-           self.U = float('inf')
+        if self.parent is None:
+            self.U = float('inf')
+        elif self.visits == 0 or self.parent.visits == 0:
+            self.U = float('inf')
         else:
             self.U = exploration_constant * math.sqrt(math.log(self.parent.visits) / self.visits)
+
