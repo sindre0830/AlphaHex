@@ -3,6 +3,7 @@ from game_manager.Nim import *
 from functionality import *
 from anet import *
 import random
+import queue
 import numpy as np
 
 class MCTS():
@@ -20,10 +21,14 @@ class MCTS():
         Perform the MCTS search by running through the specified number of games, tree searching, simulating, and
         backpropagating
         """
-        for _ in range(self.max_games):
+        for i in range(self.max_games):
+            print(f"Iteration: {i + 1}/{self.max_games}")
             leaf = self.tree_search(self.root)
             reward = self.simulate(leaf)
             self.backpropagate(leaf, reward)
+            
+        # Print the tree after each iteration
+        self.print_tree()
     
     
     def tree_search(self, root: Node) -> Node:
@@ -74,7 +79,7 @@ class MCTS():
         for _ in range(self.max_game_variations):
             num_simulations += 1
             while not self.game_manager.is_terminal(state):
-                if (anet == null):
+                if (self.anet == None):
                     action = random.choice(self.game_manager.get_legal_actions(state))
                 else:
                     legal_actions = self.game_manager.get_legal_actions(state)
@@ -94,7 +99,7 @@ class MCTS():
             current_node.increment_visits()
             if current_node.player == reward:
                 current_node.increment_wins()
-            current_node.update_score(self.c)
+            current_node.update_score(self.exploration_constant)
             current_node = current_node.parent
 
 
@@ -109,3 +114,16 @@ class MCTS():
                 return self.game_manager.get_legal_actions(self.root.state)[i]
             
             
+            
+    def print_tree(self):
+        """
+        Method to print MCTS tree
+        """
+        print("MCTS Tree:")
+        q = queue.Queue()
+        q.put((self.root, 0))
+        while not q.empty():
+            node, depth = q.get()
+            print(f"{'  ' * depth}Node: visits={node.visits}, wins={node.wins}, player={node.player}")
+            for child in node.children:
+                q.put((child, depth + 1))

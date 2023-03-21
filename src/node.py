@@ -21,23 +21,26 @@ class Node():
     def add_child(self, node) -> None:
         self.children.append(node)
         
-    def update_score(self, exploration_constant) -> None:
+    def update_score(self, exploration_constant: float) -> None:
         self.__update_Q()
         self.__update_U(exploration_constant)
-        self.score = self.q + self.u
+        self.score = self.Q + self.U
         
-    def __update_q(self) -> None:
+    def __update_Q(self) -> None:
         """
         This method updates the win ratio for a node.
         """
-        self.Q = self.wins / self.visits
+        if self.visits == 0:
+            self.Q = 0.0
+        else:
+            self.Q = self.wins / self.visits
         
-    def __update_u(self, exploration_constant: float = 1.0) -> None:
+    def __update_U(self, exploration_constant: float = 1.0) -> None:
         """
         This method updates u our exploration value, through default tree policy, UCT.
         https://en.wikipedia.org/wiki/Monte_Carlo_tree_search#Exploration_and_exploitation
         """
         if self.visits == 0 or self.parent is None:
-           self.u = float('inf')
+           self.U = float('inf')
         else:
             self.U = exploration_constant * math.sqrt(math.log(self.parent.visits) / self.visits)
