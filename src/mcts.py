@@ -114,7 +114,6 @@ class MCTS():
                 return self.game_manager.get_legal_actions(self.root.state)[i]
             
             
-            
     def print_tree(self):
         """
         Method to print MCTS tree
