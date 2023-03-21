@@ -36,7 +36,7 @@ class Main:
             if current_player == 0:
                 # AI's turn
                 print("AI's turn")
-                self.mcts.sear2ch(current_state)
+                self.mcts.search(current_state)
                 best_move = self.mcts.get_best_move()
                 print(f"AI's move: {best_move}")
             else:
