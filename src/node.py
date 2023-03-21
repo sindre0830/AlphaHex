@@ -11,6 +11,7 @@ class Node():
         self.wins: int = 0
         self.visits: int = 0
         self.player: int = 0 if self.parent is None else 1 - self.parent.player
+        self.child_actions: list[tuple[int, int]] = []
         
     def increment_wins(self) -> None:
         self.wins += 1
@@ -18,8 +19,9 @@ class Node():
     def increment_visits(self) -> None:
         self.visits += 1
 
-    def add_child(self, node) -> None:
+    def add_child(self, node, action) -> None:
         self.children.append(node)
+        self.child_actions.append(action)
         
     def update_score(self, exploration_constant: float) -> None:
         self.__update_Q()

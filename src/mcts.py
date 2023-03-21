@@ -16,19 +16,17 @@ class MCTS():
         self.exploration_constant = exploration_constant
         
         
-    def search(self) -> None:
+    def search(self, current_state: list[int]) -> None:
         """
         Perform the MCTS search by running through the specified number of games, tree searching, simulating, and
         backpropagating
         """
+        self.root = Node(state=current_state)  # Update the root with the current state
         for i in range(self.max_games):
             print(f"Iteration: {i + 1}/{self.max_games}")
             leaf = self.tree_search(self.root)
             reward = self.simulate(leaf)
             self.backpropagate(leaf, reward)
-            
-        # Print the tree after each iteration
-        self.print_tree()
     
     
     def tree_search(self, root: Node) -> Node:
@@ -59,7 +57,7 @@ class MCTS():
         for action in legal_actions:
             next_state = self.game_manager.next_state(node.state, action)
             child_node = Node(state=next_state, parent=node)
-            node.add_child(child_node)
+            node.add_child(child_node, action)
 
 
     def select_best_child(self, node: Node) -> Node:
@@ -102,16 +100,15 @@ class MCTS():
             current_node.update_score(self.exploration_constant)
             current_node = current_node.parent
 
-
     def get_best_move(self) -> tuple[int, int]:
         """
         Get the best move to make from the root node by selecting the child node with the highest score and returning the
         action that led to that child node
         """
         best_child = self.select_best_child(self.root)
-        for i, child in enumerate(self.root.children):
+        for child, action in zip(self.root.children, self.root.child_actions):
             if child == best_child:
-                return self.game_manager.get_legal_actions(self.root.state)[i]
+                return action
             
             
     def print_tree(self):
