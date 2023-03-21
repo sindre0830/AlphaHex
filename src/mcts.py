@@ -1,15 +1,17 @@
 from node import *
 from game_manager.nim import *
 from functionality import *
+from anet import *
 import random
 import math
 
 class MCTS():
-    def __init__(self, game_manager: Nim, max_games: int, max_game_variations: int, c: float = 1.0):
+    def __init__(self, game_manager: Nim, max_games: int, max_game_variations: int, anet: ANET, c: float = 1.0):
         self.game_manager = game_manager
         self.root = Node(state=game_manager.initial_state)
         self.max_games = max_games
         self.max_game_variations = max_game_variations
+        self.anet = anet
         self.c = c # Exploration parameter
     
     #  Traversing the tree from the root to a leaf node by using the tree policy.
