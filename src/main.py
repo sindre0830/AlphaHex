@@ -1,4 +1,4 @@
-from game_manager.nim import *
+from game_manager.Nim import *
 from functionality import *
 from mcts import *
 from anet import *

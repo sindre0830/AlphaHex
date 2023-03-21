@@ -1,75 +1,111 @@
 from node import *
-from game_manager.nim import *
+from game_manager.Nim import *
 from functionality import *
 from anet import *
 import random
-import math
+import numpy as np
 
 class MCTS():
-    def __init__(self, game_manager: Nim, max_games: int, max_game_variations: int, anet: ANET, c: float = 1.0):
+    def __init__(self, game_manager: Nim, max_games: int, max_game_variations: int, anet: ANET = None, exploration_constant: float = 1.0):
         self.game_manager = game_manager
         self.root = Node(state=game_manager.initial_state)
         self.max_games = max_games
         self.max_game_variations = max_game_variations
         self.anet = anet
-        self.c = c # Exploration parameter
+        self.exploration_constant = exploration_constant
+        
+        
+    def search(self) -> None:
+        """
+        Perform the MCTS search by running through the specified number of games, tree searching, simulating, and
+        backpropagating
+        """
+        for _ in range(self.max_games):
+            leaf = self.tree_search(self.root)
+            reward = self.simulate(leaf)
+            self.backpropagate(leaf, reward)
     
-    #  Traversing the tree from the root to a leaf node by using the tree policy.
-    def tree_search(self, root: Node):
-        if node.children == []:
-            return node
-        choices = []
-        for node in root.children:
-            node_evaluation = self.evaluate_node(node)
-            choices.append((node, node_evaluation))
-        choices = sorted(choices, key=lambda choice: choice[1], reverse=True)
-        return self.tree_search(choices[0])
+    
+    def tree_search(self, root: Node) -> Node:
+        """
+        Traverse the tree from the root node to a leaf node, selecting the best child node at each level
+        """
+        node = root
+        while not self.game_manager.is_terminal(node.state):
+            if len(node.children) == 0:
+                self.expand(node)
+            node = self.select_best_child(node)
+        return node
+    
 
-    # https://en.wikipedia.org/wiki/Monte_Carlo_tree_search#Exploration_and_exploitation
-    def evaluate_node(self, node: Node):
-        q = 0 if node.visits == 0 else node.wins/node.visits
-        u = self.upper_confidence_bound(node)
-        return max(q, u)
+    def evaluate_node(self, node: Node) -> float:
+        """
+        Evaluate the score of a node using the UCT algorithm
+        """
+        node.update_score(self.exploration_constant)
+        return node.score
+    
+    
+    def expand(self, node: Node) -> None:
+        """
+        Expand the tree by adding child nodes to a given node for each legal action in the current game state
+        """
+        legal_actions = self.game_manager.get_legal_actions(node.state)
+        for action in legal_actions:
+            next_state = self.game_manager.next_state(node.state, action)
+            child_node = Node(state=next_state, parent=node)
+            node.add_child(child_node)
 
-    def upper_confidence_bound(self, node:Node):
-        return self.c * math.sqrt((math.log(node.parent.visits)) / (1 + node.visits))
 
-    # Generating k or all child states of a parent state, and then connecting the tree node housing
-    # the parent state (a.k.a. parent node) to the nodes housing the child states (a.k.a. child nodes).
-    def node_expansion(self, parent: Node):
-        legal_moves = self.game_manager.get_legal_moves(parent.state)
-        random.shuffle(legal_moves) # use ANET
-        for move in legal_moves[:self.max_game_variations]:
-            new_state = self.game_manager.update_state(parent.state.copy(), move)
-            leaf = Node(new_state, parent)
-            parent.add_child(leaf)
+    def select_best_child(self, node: Node) -> Node:
+        """
+        Select the child node with the highest score based on the UCT algorithm
+        """        
+        best_child = max(node.children, key=lambda child: self.evaluate_node(child))
+        return best_child
+    
 
-    # Estimating the value of a leaf node in the tree by doing a rollout simulation using the default
-    # policy from the leaf node's state to a final state.
-    def leaf_evaluation(self, leaf):
-        self.node_expansion(leaf)
-        for _ in range(self.max_games)
-            
+    def simulate(self, node: Node) -> int:
+        """        
+        Simulate a game from the current game state, choosing random actions until the game is over, and return the winner
+        """        
+        state = node.state.copy()
+        num_simulations = 0
+        for _ in range(self.max_game_variations):
+            num_simulations += 1
+            while not self.game_manager.is_terminal(state):
+                if (anet == null):
+                    action = random.choice(self.game_manager.get_legal_actions(state))
+                else:
+                    legal_actions = self.game_manager.get_legal_actions(state)
+                    action_values = self.anet.predict(state, legal_actions)
+                    action = legal_actions[np.argmax(action_values)]                
+                    state = self.game_manager.next_state(state, action)
+        winner = node.player
+        return winner
+    
 
-        if self.game_manager.legal_moves == []: # Change later
-            self.backpropagate_win(node)
+    def backpropagate(self, node: Node, reward: int) -> None:
+        """
+        Backpropagate the results of a game simulation up the tree, incrementing visit counts and win counts as necessary
+        """
+        current_node = node
+        while current_node is not None:
+            current_node.increment_visits()
+            if current_node.player == reward:
+                current_node.increment_wins()
+            current_node.update_score(self.c)
+            current_node = current_node.parent
 
-    # Passing the evaluation of a final state back up the tree, updating relevant data (see course
-    # lecture notes) at all nodes and edges on the path from the final state to the tree root.
-    def backpropagate_win(self, node: Node):
-        node.increment_visits()
-        node.increment_wins()
-        if node.parent.parent == None:
-            node.parent.increment_visits()
-        else:
-            self.backpropagate_loss(node.parent)
-            
-    def backpropagate_loss(self, node: Node):
-        node.increment_visits()
-        if node.parent.parent == None:
-            node.parent.increment_visits()
-            node.increment_wins()
-        else:
-            self.backpropagate_win(node.parent)
+
+    def get_best_move(self) -> tuple[int, int]:
+        """
+        Get the best move to make from the root node by selecting the child node with the highest score and returning the
+        action that led to that child node
+        """
+        best_child = self.select_best_child(self.root)
+        for i, child in enumerate(self.root.children):
+            if child == best_child:
+                return self.game_manager.get_legal_actions(self.root.state)[i]
             
             
