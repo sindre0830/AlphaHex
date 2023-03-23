@@ -10,6 +10,10 @@
 #### Tasks
 - Add main loop (T)
 - Add Hex game manager (T)
+- Add hidden layers based parameter
+- Add activation function based on parameter
+- Add optimizer function based on parameter
+- Move parameters to JSON file and load them on startup (T)
 - Add model save interval (S)
 - Add RBUF (S)
 - Add model visualization (S)
@@ -21,7 +25,6 @@
 - Add game state visualization (S)
     - Used to verify the final game state
 - Find out what we actually need for the project (S, T)
-- Move parameters to JSON file and load them on startup (T)
 
 #### Variables
 I_s = Save interval
