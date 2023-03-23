@@ -17,10 +17,8 @@
 - Add model save interval (S)
 - Add RBUF (S)
 - Add model visualization (S)
-- Add tournament program between the different saves
+- Add tournament program between the different models
     - The aim is to see a gradual improvement from the first save to the last save
-- Add the thing where different AIs play against themselves
-- Add the whole tournament thing
 
 - Add game state visualization (S)
     - Used to verify the final game state
