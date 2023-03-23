@@ -8,11 +8,20 @@
 
 ### Project
 #### Tasks
-- Move variables to JSON file and load them on startup
-- Add RBUF
-- Add save interval
-- Add tournment program between the different saves
+- Add main loop (T)
+- Add Hex game manager (T)
+- Add model save interval (S)
+- Add RBUF (S)
+- Add model visualization (S)
+- Add tournament program between the different saves
     - The aim is to see a gradual improvement from the first save to the last save
+- Add the thing where different AIs play against themselves
+- Add the whole tournament thing
+
+- Add game state visualization (S)
+    - Used to verify the final game state
+- Find out what we actually need for the project (S, T)
+- Move parameters to JSON file and load them on startup (T)
 
 #### Variables
 I_s = Save interval
