@@ -7,6 +7,12 @@
 3. Install the packages required by this project `pip install -r requirements.txt`
 
 ### Project
+#### Tasks
+- Move variables to JSON file and load them on startup
+- Add RBUF
+- Add save interval
+- Add tournment program between the different saves
+    - The aim is to see a gradual improvement from the first save to the last save
 
 #### Variables
 I_s = Save interval
