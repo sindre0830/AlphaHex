@@ -19,6 +19,7 @@ class ANET(nn.Module):
 
     def predict(self, state, legal_actions):
         state_tensor = torch.tensor(state, dtype=torch.float32)
+        state_tensor = state_tensor.view(-1)  # Flatten the input tensor
         output = self.forward(state_tensor)
 
         action_values = []

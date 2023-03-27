@@ -1,7 +1,7 @@
 import math
 
 class Node():
-    def __init__(self, state: list[int], parent = None):
+    def __init__(self, state: list[int], parent = None, player=1, child_actions = [], legal_actions=[]):
         self.Q: float = 0.0 # exploitation term
         self.U: float = 0.0 # exploration term
         self.score: float = 0.0
@@ -10,8 +10,9 @@ class Node():
         self.children: list[Node]= []
         self.wins: int = 0
         self.visits: int = 0
-        self.player: int = 0 if self.parent is None else 1 - self.parent.player
-        self.child_actions: list[tuple[int, int]] = []
+        self.player = player
+        self.child_actions: list[tuple[int, int]] = child_actions
+        self.legal_actions = legal_actions
         
     def increment_wins(self) -> None:
         self.wins += 1
