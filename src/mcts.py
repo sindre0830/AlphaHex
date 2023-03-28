@@ -66,15 +66,11 @@ class MCTS():
         action_values = self.anet.predict(state, legal_actions)
         sorted_actions = sorted(zip(action_values, legal_actions), key=lambda x: x[0], reverse=True)
 
-        if random.random() < 0.3:
-            print("Random choice!")
-            return random.choice(legal_actions)
+        # if random.random() < 0.3:
+        #     return random.choice(legal_actions)
         
         for action_value, action in sorted_actions:
             if action in legal_actions:
-                length_of_legal_actions = len(legal_actions)
-                self.print_state(self.game_manager.next_state(state, action, player))
-                print()
                 return action
 
         return random.choice(legal_actions)  # Fallback if no valid action is found
@@ -143,11 +139,20 @@ class MCTS():
         # Sort child_action_pairs by the score of the child node in descending order
         sorted_child_action_pairs = sorted(child_action_pairs, key=lambda x: x[0].score, reverse=True)
 
+        print(f"get_best_move() - Choosing from these {len(sorted_child_action_pairs)} moves:")
         for child, action in sorted_child_action_pairs:
-            if self.game_manager.is_valid_action(child.state, action):
+            print(child.score, action)
+            
+        print(f"Board looks like this for {sorted_child_action_pairs[0][1]}: ")
+        self.print_state(sorted_child_action_pairs[0][0].parent.state)
+            
+        for child, action in sorted_child_action_pairs:
+            if self.game_manager.is_valid_action(child.parent.state, action):
+                print("Choosing: " + str(action))
                 return action
 
         # If no legal moves are found (should not happen in a normal game), return None
+        print("No move found.")
         return None
             
             
