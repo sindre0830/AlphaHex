@@ -14,20 +14,25 @@ class Node():
         self.child_actions: list[tuple[int, int]] = child_actions
         self.legal_actions = legal_actions
         
+        
     def increment_wins(self) -> None:
         self.wins += 1
 
+
     def increment_visits(self) -> None:
         self.visits += 1
+
 
     def add_child(self, node, action) -> None:
         self.children.append(node)
         self.child_actions.append(action)
         
+        
     def update_score(self, exploration_constant: float) -> None:
         self.__update_Q()
         self.__update_U(exploration_constant)
         self.score = self.Q + self.U
+        
         
     def __update_Q(self) -> None:
         """
@@ -37,6 +42,7 @@ class Node():
             self.Q = 0.0
         else:
             self.Q = self.wins / self.visits
+        
         
     def __update_U(self, exploration_constant: float = 1.0) -> None:
         """
@@ -50,3 +56,11 @@ class Node():
         else:
             self.U = exploration_constant * math.sqrt(math.log(self.parent.visits) / self.visits)
 
+
+    def get_distribution(self):
+        distribution = [child.visits for child in self.children]
+        total_visits = sum(distribution)
+        if total_visits == 0:
+            return [0] * len(distribution)
+        else:
+            return [x / total_visits for x in distribution]
