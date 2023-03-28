@@ -78,7 +78,6 @@ class MCTS():
 
     def simulate(self, node: Node) -> int:
         print("Starting simulation from this state:")
-        self.print_state(node.state)
         # Simulate a game from the current game state, choosing random actions until the game is over, and return the winner
         num_simulations = 0
         initial_player = node.player
@@ -105,8 +104,8 @@ class MCTS():
             
             player_that_won=2 if player==1 else 1
             if self.game_manager.is_terminal(state):
-                print(f"In this simulation {player_that_won} won!")
-                self.print_state(state)
+                # print(f"In this simulation {player_that_won} won!")
+                # self.game_manager.print_state(state)
                 continue
 
         winner = node.player
@@ -144,7 +143,7 @@ class MCTS():
             print(child.score, action)
             
         print(f"Board looks like this for {sorted_child_action_pairs[0][1]}: ")
-        self.print_state(sorted_child_action_pairs[0][0].parent.state)
+        self.game_manager.print_state(sorted_child_action_pairs[0][0].parent.state)
             
         for child, action in sorted_child_action_pairs:
             if self.game_manager.is_valid_action(child.parent.state, action):
@@ -168,17 +167,8 @@ class MCTS():
             print(f"{'  ' * depth}Node: visits={node.visits}, wins={node.wins}, player={node.player}")
             for child in node.children:
                 q.put((child, depth + 1))
-                
-    
-    def print_state(self, state: list[list[int]]) -> None:
-        """
-        Method to print the current game state
-        """
-        for i, row in enumerate(state):
-            print(' ' * i, end='')  # Add spaces before each row to create a diagonal offset
-            print(' '.join(str(x) for x in row))
-                
-                
+
+
     def is_legal_move(self, board, move):
         x, y = move
         return board[x][y] == 0
