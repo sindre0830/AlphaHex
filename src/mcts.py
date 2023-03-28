@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 class MCTS():
-    def __init__(self, game_manager: Hex, max_games: int, max_game_variations: int, anet: ANET = None, exploration_constant: float = 1.0, starting_player=1):
+    def __init__(self, game_manager: Hex, max_games: int, max_game_variations: int, anet: ANET = None, exploration_constant: float = 1.0, starting_player=1, epsilon=0.0):
         self.game_manager = game_manager  # The game manager, which handles game logic
         self.root = Node(state=game_manager.initial_state)  # The root of the MCTS tree
         self.max_games = max_games  # The maximum number of games to search through
@@ -16,6 +16,8 @@ class MCTS():
         self.anet = anet  # The Action-Value Neural Network (ANET)
         self.exploration_constant = exploration_constant  # The exploration constant for the UCT algorithm
         self.starting_player = starting_player
+        self.epsilon = epsilon
+        
 
 
     def search(self, current_state: list[list[int]]) -> None:
@@ -30,12 +32,20 @@ class MCTS():
 
     def tree_search(self, root: Node) -> Node:
         # Traverse the tree from the root node to a leaf node, selecting the best child node at each level
+        # node = root
+        # if not self.game_manager.is_terminal(node.state):
+        #     if len(node.children) == 0:
+        #         self.expand(node)
+        #     leaf = self.select_best_child(node)
+        # return leaf
+    
         node = root
-        if not self.game_manager.is_terminal(node.state):
+        while not self.game_manager.is_terminal(node.state):
             if len(node.children) == 0:
                 self.expand(node)
-            leaf = self.select_best_child(node)
-        return leaf
+                return node
+            node = self.select_best_child(node)
+        return node
 
 
     def evaluate_node(self, node: Node) -> float:
@@ -62,12 +72,12 @@ class MCTS():
         return best_child
     
     
-    def get_valid_action(self, state, legal_actions, player):
+    def get_best_valid_action(self, state, legal_actions, player):
         action_values = self.anet.predict(state, legal_actions)
         sorted_actions = sorted(zip(action_values, legal_actions), key=lambda x: x[0], reverse=True)
 
-        # if random.random() < 0.3:
-        #     return random.choice(legal_actions)
+        if random.random() < self.epsilon:
+            return random.choice(legal_actions)
         
         for action_value, action in sorted_actions:
             if action in legal_actions:
@@ -95,20 +105,16 @@ class MCTS():
                 if (self.anet == None):
                     action = random.choice(legal_actions)
                 else:
-                    action = self.get_valid_action(state, legal_actions, player)
-                    # action_values = self.anet.predict(state, legal_actions)
-                    # action = legal_actions[np.argmax(action_values)]
+                    action = self.get_best_valid_action(state, legal_actions, player)
                 state = self.game_manager.next_state(state, action, player)
                 player = 2 if player == 1 else 1
-                #node = Node(state=state, parent=node, player=2 if player == 1 else 1, legal_actions=[], child_actions=node.child_actions)
             
             player_that_won=2 if player==1 else 1
             if self.game_manager.is_terminal(state):
-                # print(f"In this simulation {player_that_won} won!")
-                # self.game_manager.print_state(state)
-                continue
+                winner = player_that_won
+                break
 
-        winner = node.player
+        # winner = node.player
         print("Finished simulating")
         return winner
 
@@ -140,7 +146,7 @@ class MCTS():
 
         print(f"get_best_move() - Choosing from these {len(sorted_child_action_pairs)} moves:")
         for child, action in sorted_child_action_pairs:
-            print(child.score, action)
+            print(child.score, action, child.wins, child.visits)
             
         print(f"Board looks like this for {sorted_child_action_pairs[0][1]}: ")
         self.game_manager.print_state(sorted_child_action_pairs[0][0].parent.state)
@@ -153,22 +159,3 @@ class MCTS():
         # If no legal moves are found (should not happen in a normal game), return None
         print("No move found.")
         return None
-            
-            
-    def print_tree(self):
-        """
-        Method to print MCTS tree
-        """
-        print("MCTS Tree:")
-        q = queue.Queue()
-        q.put((self.root, 0))
-        while not q.empty():
-            node, depth = q.get()
-            print(f"{'  ' * depth}Node: visits={node.visits}, wins={node.wins}, player={node.player}")
-            for child in node.children:
-                q.put((child, depth + 1))
-
-
-    def is_legal_move(self, board, move):
-        x, y = move
-        return board[x][y] == 0
