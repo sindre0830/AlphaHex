@@ -1,13 +1,28 @@
 from typing import List, Tuple
 from termcolor import colored 
 
+
 class Hex:
     def __init__(self, board_size: int):
         self.board_size = board_size
+        self.board = self.initial_state()
+
 
     @property
     def initial_state(self) -> List[List[int]]:
         return [[0 for _ in range(self.board_size)] for _ in range(self.board_size)]
+    
+    
+    def reset_board(self):
+        self.board = self.initial_state
+
+
+    def play_move(self, move, player):
+        if self.is_valid_action(self.board, move):
+            self.board = self.next_state(self.board, move, player)
+        else:
+            raise ValueError("Invalid move")
+
 
     def is_terminal(self, state: List[List[int]]) -> bool:
         def dfs(player, x, y, path):
