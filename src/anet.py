@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
+
 class ANET(nn.Module):
     def __init__(self, input_size, hidden_size, output_size):
         super(ANET, self).__init__()
@@ -17,6 +18,7 @@ class ANET(nn.Module):
         x = self.fc2(x)
         return x
 
+
     def predict(self, state, legal_actions):
         state_tensor = torch.tensor(state, dtype=torch.float32)
         state_tensor = state_tensor.view(-1)  # Flatten the input tensor
@@ -26,13 +28,14 @@ class ANET(nn.Module):
         for action in legal_actions:
             action_idx = self.action_to_index(action)
             action_values.append(output[action_idx].item())
-
         return action_values
+
 
     def action_to_index(self, action):
         pile, stones = action
         index = 2 * pile + (stones - 1)
         return index
+
 
     def train(self, states, targets, learning_rate):
         states_tensor = torch.tensor(states, dtype=torch.float32)
@@ -46,3 +49,7 @@ class ANET(nn.Module):
         loss = criterion(outputs, targets_tensor)
         loss.backward()
         optimizer.step()
+        
+        
+    def save_model(self, file_path):
+        torch.save(self.state_dict(), file_path)
