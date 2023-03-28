@@ -1,5 +1,5 @@
 from node import *
-from game_manager.Hex import *
+from game_manager.hex import *
 from functionality import *
 from anet import *
 import random
@@ -82,7 +82,6 @@ class MCTS():
         for action_value, action in sorted_actions:
             if action in legal_actions:
                 return action
-
         return random.choice(legal_actions)  # Fallback if no valid action is found
 
 
@@ -113,7 +112,6 @@ class MCTS():
             if self.game_manager.is_terminal(state):
                 winner = player_that_won
                 break
-
         # winner = node.player
         print("Finished simulating")
         return winner
@@ -155,7 +153,6 @@ class MCTS():
             if self.game_manager.is_valid_action(child.parent.state, action):
                 print("Choosing: " + str(action))
                 return action
-
         # If no legal moves are found (should not happen in a normal game), return None
         print("No move found.")
         return None
