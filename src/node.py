@@ -57,10 +57,20 @@ class Node():
             self.U = exploration_constant * math.sqrt(math.log(self.parent.visits) / self.visits)
 
 
-    def get_distribution(self):
-        distribution = [child.visits for child in self.children]
-        total_visits = sum(distribution)
-        if total_visits == 0:
-            return [0] * len(distribution)
-        else:
-            return [x / total_visits for x in distribution]
+    def get_distribution(self, max_actions=20, board_size=5):
+        """
+        Get the distribution of visit counts for all child nodes of the current node.
+        :param max_actions: The maximum number of actions.
+        :param board_size: The size of the board.
+        :return: The distribution of visit counts for all child nodes.
+        """
+        distribution = [0] * max_actions
+        total_visits = sum(child.visits for child in self.children)
+        
+        for child, action in zip(self.children, self.child_actions):
+            if action is not None:
+                action_index = action[1] * board_size + action[0]
+                if action_index < max_actions:
+                    distribution[action_index] = child.visits / total_visits
+        
+        return distribution

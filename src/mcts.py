@@ -24,7 +24,7 @@ class MCTS():
         # Perform the MCTS search by running through the specified number of games, tree searching, simulating, and backpropagating
         self.root = Node(state=current_state)  # Update the root with the current state
         for i in range(self.max_games):
-            print(f"Iteration: {i + 1}/{self.max_games}")
+            print(f"\nIteration: {i + 1}/{self.max_games}")
             leaf = self.tree_search(self.root)
             reward = self.simulate(leaf)
             self.backpropagate(leaf, reward)
@@ -78,11 +78,11 @@ class MCTS():
 
         if random.random() < self.epsilon:
             return random.choice(legal_actions)
-        
+
         for action_value, action in sorted_actions:
             if action in legal_actions:
                 return action
-        return random.choice(legal_actions)  # Fallback if no valid action is found
+        return None  # Return None if no valid action is found
 
 
     def simulate(self, node: Node) -> int:
@@ -105,9 +105,11 @@ class MCTS():
                     action = random.choice(legal_actions)
                 else:
                     action = self.get_best_valid_action(state, legal_actions, player)
+                    if action is None:
+                        print("No valid action found in simulate()")
+                        break
                 state = self.game_manager.next_state(state, action, player)
                 player = 2 if player == 1 else 1
-            
             player_that_won=2 if player==1 else 1
             if self.game_manager.is_terminal(state):
                 winner = player_that_won
@@ -121,7 +123,6 @@ class MCTS():
         """
         Backpropagate the results of a game simulation up the tree, incrementing visit counts and win counts as necessary
         """
-        print("Backpropagating!")
         current_node = node
         while current_node is not None:
             current_node.increment_visits()
@@ -137,21 +138,23 @@ class MCTS():
         action that led to that child node, considering only legal moves. If the best move is not valid, choose the next
         best move.
         """
+        legal_actions = self.game_manager.get_legal_actions(self.root.state)
+        print(f"Legal actions for current state: {legal_actions}")
+    
         child_action_pairs = [(child, action) for child, action in zip(self.root.children, self.root.child_actions)]
-
-        # Sort child_action_pairs by the score of the child node in descending order
         sorted_child_action_pairs = sorted(child_action_pairs, key=lambda x: x[0].score, reverse=True)
 
-        print(f"get_best_move() - Choosing from these {len(sorted_child_action_pairs)} moves:")
-        for child, action in sorted_child_action_pairs:
-            print(child.score, action, child.wins, child.visits)
+
+        # print(f"get_best_move() - Choosing from these {len(sorted_child_action_pairs)} moves:")
+        # for child, action in sorted_child_action_pairs:
+        #     print(child.score, action, child.wins, child.visits)
             
-        print(f"Board looks like this for {sorted_child_action_pairs[0][1]}: ")
-        self.game_manager.print_state(sorted_child_action_pairs[0][0].parent.state)
+        # print(f"Board looks like this for {sorted_child_action_pairs[0][1]}: ")
+        # self.game_manager.print_state(sorted_child_action_pairs[0][0].parent.state)
             
         for child, action in sorted_child_action_pairs:
             if self.game_manager.is_valid_action(child.parent.state, action):
-                print("Choosing: " + str(action))
+                # print("Choosing: " + str(action))
                 return action
         # If no legal moves are found (should not happen in a normal game), return None
         print("No move found.")

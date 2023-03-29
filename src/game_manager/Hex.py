@@ -5,7 +5,7 @@ from termcolor import colored
 class Hex:
     def __init__(self, board_size: int):
         self.board_size = board_size
-        self.board = self.initial_state()
+        self.board = self.initial_state
 
 
     @property
