@@ -1,11 +1,8 @@
 from node import *
-from game_manager.hex import *
+from game_manager.Hex import *
 from functionality import *
 from anet import *
 import random
-import queue
-import matplotlib.pyplot as plt
-import numpy as np
 
 class MCTS():
     def __init__(self, game_manager: Hex, max_games: int, max_game_variations: int, anet: ANET = None, exploration_constant: float = 1.0, starting_player=1, epsilon=0.0):
@@ -24,7 +21,7 @@ class MCTS():
         # Perform the MCTS search by running through the specified number of games, tree searching, simulating, and backpropagating
         self.root = Node(state=current_state)  # Update the root with the current state
         for i in range(self.max_games):
-            print(f"\nIteration: {i + 1}/{self.max_games}")
+            #print(f"\nIteration: {i + 1}/{self.max_games}")
             leaf = self.tree_search(self.root)
             reward = self.simulate(leaf)
             self.backpropagate(leaf, reward)
@@ -63,7 +60,7 @@ class MCTS():
             next_legal_actions = self.game_manager.get_legal_actions(next_state)
             child_node = Node(state=next_state, parent=node, player=next_player, child_actions=[action], legal_actions=next_legal_actions)
             node.add_child(child_node, action)
-        print("Finished expanding, leaf found.")
+        #print("Finished expanding, leaf found.")
 
 
     def select_best_child(self, node: Node) -> Node:
@@ -73,26 +70,26 @@ class MCTS():
     
     
     def get_best_valid_action(self, state, legal_actions, player):
-        action_values = self.anet.predict(state, legal_actions)
-        sorted_actions = sorted(zip(action_values, legal_actions), key=lambda x: x[0], reverse=True)
+        action_values = self.anet.predict(state, player, legal_actions)
 
         if random.random() < self.epsilon:
-            return random.choice(legal_actions)
+            return random.choices(population=legal_actions, weights=action_values, k=1)
 
-        for action_value, action in sorted_actions:
+        sorted_actions = sorted(zip(action_values, legal_actions), key=lambda x: x[0], reverse=True)
+        for _, action in sorted_actions:
             if action in legal_actions:
                 return action
         return None  # Return None if no valid action is found
 
 
     def simulate(self, node: Node) -> int:
-        print("Starting simulation from this state:")
+        #print("Starting simulation from this state:")
         # Simulate a game from the current game state, choosing random actions until the game is over, and return the winner
         num_simulations = 0
         initial_player = node.player
         initial_state = [row.copy() for row in node.state] 
         for i in range(self.max_game_variations):
-            print(f"Game variation: {i + 1}")
+            #print(f"Game variation: {i + 1}")
             state = [row.copy() for row in initial_state]  # Move this line inside the loop
             player = initial_player
             num_simulations += 1
@@ -115,7 +112,7 @@ class MCTS():
                 winner = player_that_won
                 break
         # winner = node.player
-        print("Finished simulating")
+        #print("Finished simulating")
         return winner
 
     
@@ -139,7 +136,7 @@ class MCTS():
         best move.
         """
         legal_actions = self.game_manager.get_legal_actions(self.root.state)
-        print(f"Legal actions for current state: {legal_actions}")
+        #print(f"Legal actions for current state: {legal_actions}")
     
         child_action_pairs = [(child, action) for child, action in zip(self.root.children, self.root.child_actions)]
         sorted_child_action_pairs = sorted(child_action_pairs, key=lambda x: x[0].score, reverse=True)
@@ -158,4 +155,5 @@ class MCTS():
                 return action
         # If no legal moves are found (should not happen in a normal game), return None
         print("No move found.")
+        self.game_manager.print_state(self.root.state)
         return None

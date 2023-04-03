@@ -1,4 +1,4 @@
-from game_manager.hex import *
+from game_manager.Hex import *
 from functionality import *
 from mcts import *
 from anet import *
@@ -17,7 +17,7 @@ class Main:
         self.hidden_size = 64  # The number of neurons in the hidden layer
         self.output_size = self.board_size * self.board_size  # The number of unique actions (assuming a maximum of 2 stones per pile)
         print("Ready to initialize MCTS...")
-        self.anet = ANET(self.input_size, self.hidden_size, self.output_size, self.board_size)
+        self.anet = ANET(self.board_size)
         self.mcts = MCTS(self.game_manager, self.max_games, self.max_game_variations, self.anet, self.exploration_constant, 1, self.epsilon)
 
 
@@ -56,8 +56,8 @@ class Main:
         exploration_constant = 5
         starting_player = 1
         I_s = 50  # Save interval for ANET parameters
-        number_actual_games = 100  # The number of actual games to play
-        number_search_games = 10  # The number of search games per move
+        number_actual_games = 10  # The number of actual games to play
+        number_search_games = 5  # The number of search games per move
         number_game_variations = 1 # The number of game variations for ANET to run TODO: Check this
         minibatch_size = 32  # The size of the minibatch for training ANET
         learning_rate = 0.001 # Learning rate for ANET
@@ -65,11 +65,7 @@ class Main:
         # Clear Replay Buffer (RBUF)
         replay_buffer = []
 
-        # Randomly initialize parameters (weights and biases) of ANET
-        input_size = board_size * board_size
-        hidden_size = 64  # The number of neurons in the hidden layer
-        output_size = board_size * board_size  # The number of unique actions (assuming a maximum of 2 stones per pile)
-        actor_network = ANET(input_size, hidden_size, output_size, board_size)
+        actor_network = ANET(board_size)
 
         # Create the game manager
         game_manager = Hex(board_size)
@@ -95,7 +91,7 @@ class Main:
                 exploration_constant = exploration_constant,
                 starting_player=starting_player,
                 epsilon=epsilon
-                )
+            )
 
             # While B_a not in a final state:
             while not game_manager.is_terminal(game_manager.board):

@@ -47,9 +47,9 @@ class Hex:
                 if state[start_y][start_x] == player:
                     winning_path = dfs(player, start_x, start_y, [])
                     if winning_path:
-                        print("Winning path for player {}: {}".format(player, winning_path))
-                        print("State of the board:")
-                        self.print_state(state, winning_path)
+                        #print("Winning path for player {}: {}".format(player, winning_path))
+                        #print("State of the board:")
+                        #self.print_state(state, winning_path)
                         return True
 
         for row in state:
