@@ -13,3 +13,10 @@ def parse_arguments(args: list[str]):
     if (args_size == 2):
         cmd_args = args[1]
     return (error, cmd, cmd_args)
+
+def print_commands():
+    msg = "\nList of commands:\n"
+    msg += "\t'--help' or '-h': Shows this information\n"
+    msg += "\t'--alphahex' or '-ah': Starts the alphahex program, takes parameters from 'configuration.json' file\n"
+    msg += "\t'--tournament' or '-t': Starts the tournament program, requries a second argument with the directory name in 'data/'\n"
+    print(msg)
