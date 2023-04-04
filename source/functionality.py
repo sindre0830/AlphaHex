@@ -35,3 +35,8 @@ def parse_json(directory_path: str = "", file_name: str = "configuration") -> di
 
 def print_json(name: str, data: dict[str, any]):
     print("\n" + name + ": " + json.dumps(data, indent=4, sort_keys=True) + "\n")
+
+
+def action_to_index(action: tuple[int, int]) -> int:
+        row, column = action
+        return 2 * row + (column - 1)

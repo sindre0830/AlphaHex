@@ -29,23 +29,27 @@ class Hex:
         x, y = action
         return 0 <= x < self.board_size and 0 <= y < self.board_size and state[y][x] == 0
     
-    def print_state(self, state: list[list[int]], winning_path=None):
-        """
-        Method to print the current game state
-        """
-        if winning_path is None:
-            winning_path = []
+    def print_state(self, winning_path=None):
+        print_state(self.board)
 
-        winning_path_set = set(winning_path)
-        for i, row in enumerate(state):
-            print(' ' * i, end='')
-            colored_row = []
-            for j, cell in enumerate(row):
-                if (j, i) in winning_path_set:
-                    colored_row.append(colored(str(cell), "red"))
-                else:
-                    colored_row.append(str(cell))
-            print(' '.join(colored_row))
+
+def print_state(state: list[list[int]], winning_path=None):
+    """
+    Method to print the current game state
+    """
+    if winning_path is None:
+        winning_path = []
+
+    winning_path_set = set(winning_path)
+    for i, row in enumerate(state):
+        print(' ' * i, end='')
+        colored_row = []
+        for j, cell in enumerate(row):
+            if (j, i) in winning_path_set:
+                colored_row.append(colored(str(cell), "red"))
+            else:
+                colored_row.append(str(cell))
+        print(' '.join(colored_row))
 
 
 def apply_action_to_board(state: list[list[int]], action: tuple[int, int], player: int) -> list[list[int]]:

@@ -1,10 +1,15 @@
 # internal libraries
 from node import Node
+from anet import ANET
 from game_manager.hex import (
     apply_action_to_board,
     get_legal_actions,
-    terminal
+    terminal,
+    print_state
 )
+# external libraries
+import random
+import copy
 
 
 class MCT:
@@ -14,17 +19,17 @@ class MCT:
         self.exploration_constant = exploration_constant
     
     def initialize_root_node(self, board: list[list[int]]):
-        self.root_node = Node(board.copy())
+        self.root_node = Node(copy.deepcopy(board))
     
     def update_game_board(self, board: list[list[int]]):
-        self.game_board = board.copy()
+        self.game_board = copy.deepcopy(board)
     
     def tree_search(self) -> Node:
         node = self.root_node
         while not terminal(node.board):
             if (node.is_leaf_node()):
                 return node
-            node = max(node.children_nodes, key=lambda child_node: self.get_node_score(child_node))
+            node = max(node.children_nodes, key=lambda child_node: child_node.score)
             self.update_game_board(node.board)
         return node
 
@@ -35,8 +40,16 @@ class MCT:
             next_player = 2 if node.player == 1 else 1
             child_node = Node(next_board, player=next_player, parent_node=node)
             node.add_child(child_node, action)
-        self.game_board = node.board.copy()
     
-    def get_node_score(self, node: Node):
-        node.update_score(self.exploration_constant)
-        return node.score
+    def leaf_evaluation(self, anet: ANET, node: Node):
+        board = copy.deepcopy(node.board)
+        player = node.player
+        winner = 2 if player == 1 else 1
+        while not terminal(board):
+            legal_actions = get_legal_actions(board)
+            action_values = anet.predict(board, player, legal_actions)
+            action = random.choices(population=legal_actions, weights=action_values, k=1)[0]
+            board = apply_action_to_board(board, action, player)
+            winner = player
+            player = 2 if player == 1 else 1
+        return winner

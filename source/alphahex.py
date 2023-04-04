@@ -31,7 +31,9 @@ class AlphaHex:
             self.game_manager.initialize_empty_board()
             self.mct.initialize_root_node(self.game_manager.board)
             while not self.game_manager.terminal():
-                self.mct.set_game_board_from_root()
+                self.mct.update_game_board(self.mct.root_node.board)
                 for search_game in range(self.search_games_size):
                     leaf = self.mct.tree_search()
                     self.mct.node_expansion(leaf)
+                    score = self.mct.leaf_evaluation(self.anet, leaf)
+                    return
