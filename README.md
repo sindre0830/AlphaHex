@@ -1,10 +1,16 @@
 # AlphaHex
+### Run program
+0. Install required python version **3.10**
+1. Install required packages `pip install -r source/requirements.txt` (We recommend using virtual environment, follow guide under **Virtual Environment Setup** below and skip this step)
+3. Change directory `cd source`
+4. Run program `py main.py --help`
+
 ### Virtual Environment Setup
 #### Windows
 0. Get the package `pip install virtualenv`
 1. Create a new empty instance of python 3.10 environment `py -3.10 -m venv ./.venv`
 2. Activate the environment `source .venv/Scripts/activate`
-3. Install the packages required by this project `pip install -r requirements.txt`
+3. Install the packages required by this project `pip install -r source/requirements.txt`
 
 ### Project
 #### Tasks
@@ -46,7 +52,7 @@ Tree policy = Upper confidence bound
 1. I_s = save interval for ANET (the actor network) parameters
 2. Clear Replay Buffer (RBUF)
 3. Randomly initialize parameters (weights and biases) of ANET
-4. For g_a in number actual games:
+4. For G_a in number actual games:
     - Initialize the actual game board (B_a) to an empty board.
     - S_init ← starting board state
     - Initialize the Monte Carlo Tree (MCT) to a single root, which represents sinit
