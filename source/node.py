@@ -12,6 +12,9 @@ class Node():
         self.score = 0.0
         self.wins = 0
         self.visits = 0
+    
+    def is_leaf_node(self) -> bool:
+        return len(self.children_nodes) == 0
 
     def add_child(self, node, action) -> None:
         self.children_nodes.append(node)
