@@ -9,6 +9,7 @@ from functionality import (
     parse_json,
     print_json
 )
+import alphahex
 # external libraries
 import sys
 import torch
@@ -36,6 +37,7 @@ def main():
             return
         case "--alphahex" | "-ah":
             print("Starting alpha hex...")
+            alphahex.run()
             return
         case "--tournament" | "-t":
             if (cmd_args == None):
