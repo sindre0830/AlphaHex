@@ -55,7 +55,7 @@ Tree policy = Upper confidence bound
 4. For G_a in number actual games:
     - Initialize the actual game board (B_a) to an empty board.
     - S_init ← starting board state
-    - Initialize the Monte Carlo Tree (MCT) to a single root, which represents sinit
+    - Initialize the Monte Carlo Tree (MCT) to a single root, which represents S_init
     - While B_a not in a final state:
         - Initialize Monte Carlo game board (B_mc) to same state as root.
         - For G_s in number search games:

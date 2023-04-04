@@ -21,3 +21,5 @@ class AlphaHex:
     def run(self):
         self.rbuf.clear()
         self.anet.initialize_model()
+        for actual_game in range(self.actual_games_size):
+            pass

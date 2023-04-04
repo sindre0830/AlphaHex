@@ -1,7 +1,7 @@
 class RBUF():
     def __init__(self):
-        self.states: list[list[int]]
-        self.visit_distributions: list[list[int]]
+        self.states: list[list[int]] = []
+        self.visit_distributions: list[list[int]] = []
 
     def clear(self):
         self.states.clear()
