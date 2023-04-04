@@ -28,10 +28,10 @@ def print_commands():
     print(msg)
 
 
-def parse_json(file_name: str) -> dict[str, any]:
-    with open(file_name + ".json", "r") as file:
+def parse_json(directory_path: str = "", file_name: str = "configuration") -> dict[str, any]:
+    with open(directory_path + file_name + ".json", "r") as file:
         return json.load(file)
 
 
-def print_json(name: str, json_data: dict[str, any]):
-    print("\n" + name + ": " + json.dumps(json_data, indent=4, sort_keys=True) + "\n")
+def print_json(name: str, data: dict[str, any]):
+    print("\n" + name + ": " + json.dumps(data, indent=4, sort_keys=True) + "\n")

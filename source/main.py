@@ -9,7 +9,7 @@ from functionality import (
     parse_json,
     print_json
 )
-import alphahex
+from alphahex import AlphaHex
 # external libraries
 import sys
 import torch
@@ -25,7 +25,7 @@ device = torch.device(device_type)
 # Main program.
 def main():
     # parse arguments and branch if an error occured
-    (error, cmd, cmd_args) = parse_arguments(sys.argv[1:])
+    (error, cmd, cmd_args) = parse_arguments(args=sys.argv[1:])
     if (error != None):
         print("Error during command parsing: '" + error + "'")
         print_commands()
@@ -37,7 +37,8 @@ def main():
             return
         case "--alphahex" | "-ah":
             print("Starting alpha hex...")
-            alphahex.run()
+            alpha_hex = AlphaHex()
+            alpha_hex.run()
             return
         case "--tournament" | "-t":
             if (cmd_args == None):
@@ -47,8 +48,8 @@ def main():
             print("Starting tournament...")
             return
         case "--config" | "-c":
-            json_data = parse_json("configuration")
-            print_json("configuration", json_data)
+            configuration = parse_json(file_name="configuration")
+            print_json(name="configuration", data=configuration)
             return
         case _:
             print("Error during command matching 'Command not found'")
