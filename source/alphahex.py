@@ -2,11 +2,13 @@
 from functionality import (
     parse_json
 )
+from rbuf import RBUF
 
 
 class AlphaHex:
     def __init__(self, working_directory_path = ""):
         self.working_directory_path = working_directory_path
+        self.rbuf = RBUF()
         # load coniguration
         configuration = parse_json(directory_path=self.working_directory_path, file_name="configuration")
         self.save_interval = configuration["save_interval"]
@@ -15,4 +17,4 @@ class AlphaHex:
         self.search_games_size = configuration["search_games_size"]
 
     def run(self):
-        pass
+        self.rbuf.clear()
