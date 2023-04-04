@@ -4,7 +4,8 @@ from constants import (
     CPU_DEVICE
 )
 from functionality import (
-    parse_arguments
+    parse_arguments,
+    print_commands
 )
 # external libraries
 import sys
@@ -24,15 +25,27 @@ def main():
     (error, cmd, cmd_args) = parse_arguments(sys.argv[1:])
     if (error != None):
         print("Error during command parsing: '" + error + "'")
+        print_commands()
         return
     # compute command given
     match cmd:
+        case "--help" | "-h":
+            print_commands()
+            return
+        case "--alphahex" | "-ah":
+            print("Starting alpha hex...")
+            return
         case "--tournament" | "-t":
             if (cmd_args == None):
                 print("Tournament requires a directory name from 'data/' of which models to run.")
+                print_commands()
                 return
             print("Starting tournament...")
-            pass
+            return
+        case _:
+            print("Error during command matching 'Command not found'")
+            print_commands()
+            return
 
 
 # branch if program is run through 'python main.py'
