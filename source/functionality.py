@@ -1,3 +1,7 @@
+# external libraries
+import json
+
+
 def parse_arguments(args: list[str]):
     error = None
     cmd = None
@@ -14,9 +18,20 @@ def parse_arguments(args: list[str]):
         cmd_args = args[1]
     return (error, cmd, cmd_args)
 
+
 def print_commands():
     msg = "\nList of commands:\n"
     msg += "\t'--help' or '-h': Shows this information\n"
     msg += "\t'--alphahex' or '-ah': Starts the alphahex program, takes parameters from 'configuration.json' file\n"
     msg += "\t'--tournament' or '-t': Starts the tournament program, requries a second argument with the directory name in 'data/'\n"
+    msg += "\t'--config' or '-c': Prints current configuration\n"
     print(msg)
+
+
+def parse_json(file_name: str) -> dict[str, any]:
+    with open(file_name + ".json", "r") as file:
+        return json.load(file)
+
+
+def print_json(name: str, json_data: dict[str, any]):
+    print("\n" + name + ": " + json.dumps(json_data, indent=4, sort_keys=True) + "\n")

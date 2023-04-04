@@ -5,7 +5,9 @@ from constants import (
 )
 from functionality import (
     parse_arguments,
-    print_commands
+    print_commands,
+    parse_json,
+    print_json
 )
 # external libraries
 import sys
@@ -41,6 +43,10 @@ def main():
                 print_commands()
                 return
             print("Starting tournament...")
+            return
+        case "--config" | "-c":
+            json_data = parse_json("configuration")
+            print_json("configuration", json_data)
             return
         case _:
             print("Error during command matching 'Command not found'")
