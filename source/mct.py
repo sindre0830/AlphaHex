@@ -53,3 +53,12 @@ class MCT:
             winner = player
             player = 2 if player == 1 else 1
         return winner
+    
+    def backpropagate(self, node: Node, score: int):
+        current_node = node
+        while current_node is not None:
+            current_node.visits += 1
+            if current_node.player == score:
+                current_node.wins += 1
+            current_node.update_score(self.exploration_constant)
+            current_node = current_node.parent
