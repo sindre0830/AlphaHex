@@ -61,4 +61,4 @@ class MCT:
             if current_node.player == score:
                 current_node.wins += 1
             current_node.update_score(self.exploration_constant)
-            current_node = current_node.parent
+            current_node = current_node.parent_node

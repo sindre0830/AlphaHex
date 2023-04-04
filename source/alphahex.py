@@ -37,3 +37,4 @@ class AlphaHex:
                     self.mct.node_expansion(leaf)
                     score = self.mct.leaf_evaluation(self.anet, leaf)
                     self.mct.backpropagate(leaf, score)
+                return
