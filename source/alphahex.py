@@ -3,12 +3,14 @@ from functionality import (
     parse_json
 )
 from rbuf import RBUF
+from anet import ANET
 
 
 class AlphaHex:
     def __init__(self, working_directory_path = ""):
         self.working_directory_path = working_directory_path
         self.rbuf = RBUF()
+        self.anet = ANET()
         # load coniguration
         configuration = parse_json(directory_path=self.working_directory_path, file_name="configuration")
         self.save_interval = configuration["save_interval"]
@@ -18,3 +20,4 @@ class AlphaHex:
 
     def run(self):
         self.rbuf.clear()
+        self.anet.initialize_model()
