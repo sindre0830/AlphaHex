@@ -5,6 +5,7 @@ from functionality import (
 from rbuf import RBUF
 from anet import ANET
 from game_manager.hex import Hex
+from mct import MCT
 
 
 class AlphaHex:
@@ -20,6 +21,7 @@ class AlphaHex:
         self.rbuf = RBUF()
         self.anet = ANET()
         self.game_manager = Hex(self.game_board_size)
+        self.mct = MCT()
 
     def run(self):
         self.rbuf.clear()
@@ -27,4 +29,8 @@ class AlphaHex:
         for actual_game in range(self.actual_games_size):
             print(f"Actual game {(actual_game + 1):>{len(str(self.actual_games_size))}}/{self.actual_games_size}")
             self.game_manager.initialize_empty_board()
-            
+            self.mct.initialize_root_node(self.game_manager.board)
+            while not self.game_manager.terminal(self.game_manager.board):
+                self.mct.set_game_board_from_root()
+                for search_game in range(self.search_games_size):
+                    pass

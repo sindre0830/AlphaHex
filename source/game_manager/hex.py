@@ -19,7 +19,7 @@ class Hex:
         else:
             raise ValueError("Invalid move")
 
-    def is_terminal(self, state: list[list[int]]) -> bool:
+    def terminal(self, state: list[list[int]]) -> bool:
         def dfs(player, x, y, path):
             if (player == 1 and y == len(state) - 1) or (player == 2 and x == len(state) - 1):
                 path.append((x, y))
