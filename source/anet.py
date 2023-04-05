@@ -2,16 +2,18 @@
 from functionality import (
     prepare_data
 )
+from model import Model
 # external libraries
 import random
 
 
 class ANET():
-    def __init__(self):
-        pass
+    def __init__(self, board_size: int):
+        self.board_size = board_size
+        self.model = None
     
     def initialize_model(self):
-        pass
+        self.model = Model(self.board_size)
 
     def predict(self, legal_actions: list[tuple[int, int]], state: tuple[list[list[int]], int]):
         board, player = state

@@ -25,7 +25,7 @@ class AlphaHex:
         self.mini_batch_size: int = configuration["mini_batch_size"]
         # init objects
         self.rbuf = RBUF()
-        self.anet = ANET()
+        self.anet = ANET(self.game_board_size)
         self.game_manager = Hex(self.game_board_size)
         self.mct = MCT()
 
