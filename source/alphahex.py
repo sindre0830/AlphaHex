@@ -5,8 +5,12 @@ from functionality import (
 )
 from rbuf import RBUF
 from anet import ANET
-from game_manager.hex import Hex
 from mct import MCT
+from game_manager.hex import (
+    Hex,
+    apply_action_to_board,
+    print_state
+)
 
 
 class AlphaHex:
@@ -18,6 +22,7 @@ class AlphaHex:
         self.actual_games_size: int = configuration["actual_games_size"]
         self.game_board_size: int = configuration["game_board_size"]
         self.search_games_size: int = configuration["search_games_size"]
+        self.mini_batch_size: int = configuration["mini_batch_size"]
         # init objects
         self.rbuf = RBUF()
         self.anet = ANET()
@@ -30,7 +35,7 @@ class AlphaHex:
         for actual_game in range(self.actual_games_size):
             print(f"Actual game {(actual_game + 1):>{len(str(self.actual_games_size))}}/{self.actual_games_size}")
             self.game_manager.initialize_empty_board()
-            self.mct.initialize_root_node(self.game_manager.board)
+            self.mct.set_root_node(self.game_manager.board, self.game_manager.player)
             while not self.game_manager.terminal():
                 self.mct.update_game_board(self.mct.root_node.board)
                 for search_game in range(self.search_games_size):
@@ -41,4 +46,6 @@ class AlphaHex:
                 visit_distribution = self.mct.root_node.visit_distribution()
                 self.rbuf.add((self.mct.root_node.board, self.mct.root_node.player), visit_distribution)
                 actual_move = action_from_visit_distribution(visit_distribution, self.game_board_size)
-                return
+                self.game_manager.play_move(actual_move)
+                self.mct.set_root_node(self.game_manager.board, self.game_manager.player)
+            self.anet.train(self.rbuf.get_mini_batch(self.mini_batch_size))

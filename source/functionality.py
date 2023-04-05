@@ -44,12 +44,12 @@ def action_from_visit_distribution(visit_distribution: list[float], board_size: 
     return index_to_action(index, board_size)
 
 
-def action_to_index(action: tuple[int, int]) -> int:
-        row, column = action
-        return 2 * row + (column - 1)
+def action_to_index(action: tuple[int, int], width: int) -> int:
+    row, column = action
+    return (row * width) + column
 
 
-def index_to_action(index: int, board_size: int) -> tuple[int, int]:
-    row = math.floor(index / board_size)
-    column = index % board_size
+def index_to_action(index: int, width: int) -> tuple[int, int]:
+    row = math.floor(index / width)
+    column = index - (row * width)
     return (row, column)

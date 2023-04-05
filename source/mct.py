@@ -4,8 +4,7 @@ from anet import ANET
 from game_manager.hex import (
     apply_action_to_board,
     get_legal_actions,
-    terminal,
-    print_state
+    terminal
 )
 # external libraries
 import random
@@ -18,8 +17,8 @@ class MCT:
         self.game_board: list[list[int]] = None
         self.exploration_constant = exploration_constant
     
-    def initialize_root_node(self, board: list[list[int]]):
-        self.root_node = Node(copy.deepcopy(board))
+    def set_root_node(self, board: list[list[int]], player: int):
+        self.root_node = Node(copy.deepcopy(board), player)
     
     def update_game_board(self, board: list[list[int]]):
         self.game_board = copy.deepcopy(board)

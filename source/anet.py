@@ -14,3 +14,7 @@ class ANET():
         for _ in legal_actions:
             action_values.append(random.random())
         return action_values
+    
+    def train(self, batch: tuple[list[tuple[list[list[int]], int]], list[list[float]]]):
+        states, visit_distributions = batch
+        print(len(states))

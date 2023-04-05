@@ -1,4 +1,5 @@
 # external libraries
+import copy
 from termcolor import colored 
 
 
@@ -6,6 +7,7 @@ class Hex:
     def __init__(self, board_size: int):
         self.board_size = board_size
         self.board = []
+        self.player = 1
     
     def initialize_empty_board(self):
         self.board = self.initial_state()
@@ -13,21 +15,15 @@ class Hex:
     def initial_state(self) -> list[list[int]]:
         return [[0 for _ in range(self.board_size)] for _ in range(self.board_size)]
 
-    def play_move(self, move, player):
-        if self.is_valid_action(self.board, move):
-            self.board = self.next_state(self.board, move, player)
-        else:
-            raise ValueError("Invalid move")
+    def play_move(self, move):
+        self.board = apply_action_to_board(self.board, move, self.player)
+        self.player = 2 if self.player == 1 else 1
 
     def terminal(self) -> bool:
         return terminal(self.board)
     
     def get_legal_actions(self) -> list[tuple[int, int]]:
         return get_legal_actions(self.board)
-
-    def is_valid_action(self, state: list[list[int]], action: tuple[int, int]) -> bool:
-        x, y = action
-        return 0 <= x < self.board_size and 0 <= y < self.board_size and state[y][x] == 0
     
     def print_state(self, winning_path=None):
         print_state(self.board)
@@ -52,15 +48,17 @@ def print_state(state: list[list[int]], winning_path=None):
         print(' '.join(colored_row))
 
 
-def apply_action_to_board(state: list[list[int]], action: tuple[int, int], player: int) -> list[list[int]]:
+def apply_action_to_board(board: list[list[int]], action: tuple[int, int], player: int) -> list[list[int]]:
     x, y = action
-    next_board = [row.copy() for row in state]
+    next_board = copy.deepcopy(board)
+    if (next_board[y][x] != 0):
+        print("OH OH")
     next_board[y][x] = player
     return next_board
 
 
-def get_legal_actions(state: list[list[int]]) -> list[tuple[int, int]]:
-    return [(x, y) for x in range(len(state)) for y in range(len(state)) if state[y][x] == 0]
+def get_legal_actions(board: list[list[int]]) -> list[tuple[int, int]]:
+    return [(x, y) for x in range(len(board)) for y in range(len(board)) if board[y][x] == 0]
 
 
 def terminal(state: list[list[int]]) -> bool:

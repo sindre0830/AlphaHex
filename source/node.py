@@ -50,6 +50,6 @@ class Node():
         total_visits = sum(child_node.visits for child_node in self.children_nodes)
         for child_node, action in zip(self.children_nodes, self.children_nodes_actions):
             if action is not None:
-                action_index = action_to_index(action)
+                action_index = action_to_index(action, width=len(self.board))
                 distribution[action_index] = child_node.visits / total_visits
         return distribution
