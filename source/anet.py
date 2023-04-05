@@ -1,3 +1,7 @@
+# internal libraries
+from functionality import (
+    prepare_data
+)
 # external libraries
 import random
 
@@ -18,6 +22,7 @@ class ANET():
     
     def train(self, batch: tuple[list[tuple[list[list[int]], int]], list[list[float]]]):
         states, visit_distributions = batch
+        prepare_data(states[4])
     
     def save(self, index: int):
         pass

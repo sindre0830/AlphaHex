@@ -1,6 +1,7 @@
 # external libraries
 import json
 import math
+import numpy as np
 
 
 def parse_arguments(args: list[str]):
@@ -53,3 +54,18 @@ def index_to_action(index: int, width: int) -> tuple[int, int]:
     row = math.floor(index / width)
     column = index - (row * width)
     return (row, column)
+
+
+def opposite_player(current_player: int) -> int:
+    return 2 if current_player == 1 else 1
+
+
+def prepare_data(state: tuple[list[list[int]], int]) -> np.ndarray:
+    board, player = state
+    board_width = len(board)
+    data: np.ndarray = np.zeros(shape=(3, board_width, board_width))
+    for row in range(board_width):
+        for column in range(board_width):
+            data[board[row][column]][row][column] = 1
+    if player != 1:
+        data[[1, 2]] = data[[2, 1]]
