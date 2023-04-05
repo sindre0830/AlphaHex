@@ -1,5 +1,6 @@
 # external libraries
 import json
+import math
 
 
 def parse_arguments(args: list[str]):
@@ -37,6 +38,18 @@ def print_json(name: str, data: dict[str, any]):
     print("\n" + name + ": " + json.dumps(data, indent=4, sort_keys=True) + "\n")
 
 
+def action_from_visit_distribution(visit_distribution: list[float], board_size: int) -> tuple[int, int]:
+    value = max(visit_distribution)
+    index = visit_distribution.index(value)
+    return index_to_action(index, board_size)
+
+
 def action_to_index(action: tuple[int, int]) -> int:
         row, column = action
         return 2 * row + (column - 1)
+
+
+def index_to_action(index: int, board_size: int) -> tuple[int, int]:
+    row = math.floor(index / board_size)
+    column = index % board_size
+    return (row, column)

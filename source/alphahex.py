@@ -1,6 +1,7 @@
 # internal libraries
 from functionality import (
-    parse_json
+    parse_json,
+    action_from_visit_distribution
 )
 from rbuf import RBUF
 from anet import ANET
@@ -39,5 +40,5 @@ class AlphaHex:
                     self.mct.backpropagate(leaf, score)
                 visit_distribution = self.mct.root_node.visit_distribution()
                 self.rbuf.add((self.mct.root_node.board, self.mct.root_node.player), visit_distribution)
-                print(self.rbuf.visit_distributions)
+                actual_move = action_from_visit_distribution(visit_distribution, self.game_board_size)
                 return
