@@ -29,7 +29,7 @@ class MCT:
         while not terminal(node.board):
             if (node.is_leaf_node()):
                 return node
-            node = max(node.children_nodes, key=lambda child_node: child_node.score)
+            node = max(node.children_nodes, key=lambda child_node: child_node.get_score(self.exploration_constant))
             self.update_game_board(node.board)
         return node
 

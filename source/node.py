@@ -23,6 +23,10 @@ class Node():
     def add_child(self, node, action) -> None:
         self.children_nodes.append(node)
         self.children_nodes_actions.append(action)
+    
+    def get_score(self, exploration_constant: float) -> float:
+        self.update_score(exploration_constant)
+        return self.score
 
     def update_score(self, exploration_constant: float):
         self.score = self.get_q() + self.get_u(exploration_constant)
