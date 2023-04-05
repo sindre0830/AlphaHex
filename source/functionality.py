@@ -69,3 +69,4 @@ def prepare_data(state: tuple[list[list[int]], int]) -> np.ndarray:
             data[board[row][column]][row][column] = 1
     if player != 1:
         data[[1, 2]] = data[[2, 1]]
+    return data
