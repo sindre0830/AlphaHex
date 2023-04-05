@@ -9,7 +9,8 @@ class ANET():
     def initialize_model(self):
         pass
 
-    def predict(self, board: list[list[int]], player: int, legal_actions: list[tuple[int, int]]):
+    def predict(self, legal_actions: list[tuple[int, int]], state: tuple[list[list[int]], int]):
+        board, player = state
         action_values = []
         for _ in legal_actions:
             action_values.append(random.random())
@@ -17,4 +18,6 @@ class ANET():
     
     def train(self, batch: tuple[list[tuple[list[list[int]], int]], list[list[float]]]):
         states, visit_distributions = batch
-        print(len(states))
+    
+    def save(self, index: int):
+        pass

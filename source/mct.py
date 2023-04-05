@@ -46,7 +46,7 @@ class MCT:
         winner = 2 if player == 1 else 1
         while not terminal(board):
             legal_actions = get_legal_actions(board)
-            action_values = anet.predict(board, player, legal_actions)
+            action_values = anet.predict(legal_actions, state=(board, player))
             action = random.choices(population=legal_actions, weights=action_values, k=1)[0]
             board = apply_action_to_board(board, action, player)
             winner = player

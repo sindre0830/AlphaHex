@@ -49,3 +49,5 @@ class AlphaHex:
                 self.game_manager.play_move(actual_move)
                 self.mct.set_root_node(self.game_manager.board, self.game_manager.player)
             self.anet.train(self.rbuf.get_mini_batch(self.mini_batch_size))
+            if actual_game % self.save_interval == 0:
+                self.anet.save(actual_game)
