@@ -2,5 +2,5 @@
     "save_interval": 5,
     "actual_games_size": 10,
     "game_board_size": 7,
-    "search_games_size": 20
+    "search_games_size": 100
 }

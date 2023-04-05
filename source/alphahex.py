@@ -37,6 +37,7 @@ class AlphaHex:
                     self.mct.node_expansion(leaf)
                     score = self.mct.leaf_evaluation(self.anet, leaf)
                     self.mct.backpropagate(leaf, score)
-                distribution = self.mct.root_node.get_distribution()
-                print(distribution)
+                visit_distribution = self.mct.root_node.visit_distribution()
+                self.rbuf.add((self.mct.root_node.board, self.mct.root_node.player), visit_distribution)
+                print(self.rbuf.visit_distributions)
                 return
