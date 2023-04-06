@@ -1,7 +1,15 @@
+# internal libraries
+from constants import (
+    CPU_DEVICE,
+    BATCH_SIZE
+)
 # external libraries
 import json
 import math
 import numpy as np
+import torch
+import torch.utils.data
+import multiprocessing
 
 
 def parse_arguments(args: list[str]):
@@ -70,3 +78,31 @@ def prepare_data(state: tuple[list[list[int]], int]) -> np.ndarray:
     if player != 1:
         data[[1, 2]] = data[[2, 1]]
     return data
+
+
+def prepare_labels(visit_distribution: list[float]) -> np.ndarray:
+    label = np.zeros(shape=len(visit_distribution), dtype=np.float32)
+    for i in range(len(visit_distribution)):
+        label[i] = visit_distribution[i]
+    return label
+
+
+def convert_dataset_to_tensors(device_type: str, data: np.ndarray, labels: np.ndarray):
+    """
+    Converts dataset to a PyTorch tensor dataset.
+    """
+    # reshape data by adding channels
+    data = np.expand_dims(data, axis=1).astype('float32')
+    # convert to tensors
+    data = torch.tensor(data)
+    labels = torch.tensor(labels)
+    # convert to dataset
+    dataset = torch.utils.data.TensorDataset(data, labels)
+    # convert to data loader
+    pin_memory = False
+    workers = 0
+    # branch if device is set to CPU and set parameters accordingly
+    if device_type is CPU_DEVICE:
+        pin_memory = True
+        workers = multiprocessing.cpu_count()
+    return torch.utils.data.DataLoader(dataset, batch_size=BATCH_SIZE, pin_memory=pin_memory, num_workers=workers)

@@ -14,7 +14,7 @@ from game_manager.hex import (
 
 
 class AlphaHex:
-    def __init__(self, working_directory_path = ""):
+    def __init__(self, device_type, working_directory_path = ""):
         self.working_directory_path = working_directory_path
         self.simulated_games_count = 0
         self.game_moves_count = 0
@@ -27,7 +27,7 @@ class AlphaHex:
         self.mini_batch_size: int = configuration["mini_batch_size"]
         # init objects
         self.rbuf = RBUF()
-        self.anet = ANET(self.game_board_size)
+        self.anet = ANET(device_type, self.game_board_size)
         self.game_manager = Hex(self.game_board_size)
         self.mct = MCT()
 

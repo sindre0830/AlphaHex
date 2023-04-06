@@ -37,7 +37,7 @@ def main():
             return
         case "--alphahex" | "-ah":
             print("Starting alpha hex...")
-            alpha_hex = AlphaHex()
+            alpha_hex = AlphaHex(device_type)
             alpha_hex.run()
             return
         case "--tournament" | "-t":
