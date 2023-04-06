@@ -1,7 +1,6 @@
 # external libraries
 import torch
 import torch.utils.data
-import numpy as np
 
 
 class Model(torch.nn.Module):
@@ -51,3 +50,11 @@ class Model(torch.nn.Module):
         # output layer
         x = self.output_layer(x)
         return x
+    
+    def train_neural_network(
+        self,
+        device: torch.cuda.device,
+        device_type: str,
+        train_loader: torch.utils.data.DataLoader
+    ):
+        pass

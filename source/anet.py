@@ -12,7 +12,8 @@ import numpy as np
 
 
 class ANET():
-    def __init__(self, device_type: str, board_size: int):
+    def __init__(self, device: torch.cuda.device, device_type: str, board_size: int):
+        self.device = device
         self.device_type = device_type
         self.board_size = board_size
         self.model = None
@@ -41,6 +42,7 @@ class ANET():
         for visit_distribution in visit_distributions:
             labels.append(prepare_labels(visit_distribution))
         dataset_loader = convert_dataset_to_tensors(self.device_type, np.asarray(data), np.asarray(labels))
+        self.model.train_neural_network(self.device, self.device_type, dataset_loader)
     
     def save(self, index: int):
         pass
