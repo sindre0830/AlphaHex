@@ -47,5 +47,5 @@ class ANET():
         dataset_loader = convert_dataset_to_tensors(self.device_type, np.asarray(data), np.asarray(labels, dtype=np.int64))
         self.model.train_neural_network(self.device, self.device_type, dataset_loader)
     
-    def save(self, index: int):
-        pass
+    def save(self, directory_path: str, iteration: int):
+        torch.save(self.model.state_dict(), f"{directory_path}/model-{iteration}.pt")

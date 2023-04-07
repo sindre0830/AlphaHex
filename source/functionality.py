@@ -44,6 +44,11 @@ def parse_json(directory_path: str = "", file_name: str = "configuration") -> di
         return json.load(file)
 
 
+def store_json(data: dict[str, any], directory_path: str = "", file_name: str = "configuration"):
+    with open(directory_path + file_name + ".json", "w") as file:
+        json.dump(data, file)
+
+
 def print_json(name: str, data: dict[str, any]):
     print("\n" + name + ": " + json.dumps(data, indent=4, sort_keys=True) + "\n")
 
@@ -119,7 +124,7 @@ def get_progressbar(iter: torch.utils.data.DataLoader, epoch: int, epochs: int):
     width = len(str(epochs))
     progressbar = tqdm.tqdm(
         iterable=iter,
-        desc=f'        Epoch {(epoch + 1):>{width}}/{epochs}',
+        desc=f'                Epoch {(epoch + 1):>{width}}/{epochs}',
         ascii='░▒',
         unit=' steps',
         colour='blue'

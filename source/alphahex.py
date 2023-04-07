@@ -1,6 +1,10 @@
 # internal libraries
+from constants import (
+    DATA_PATH
+)
 from functionality import (
     parse_json,
+    store_json,
     action_from_visit_distribution
 )
 from rbuf import RBUF
@@ -9,16 +13,17 @@ from mct import MCT
 from game_manager.hex import Hex
 # external libraries
 import torch
-import time
+from time import time
+import os
+from datetime import datetime
 
 
 class AlphaHex:
-    def __init__(self, device: torch.cuda.device, device_type: str, working_directory_path = ""):
-        self.working_directory_path = working_directory_path
+    def __init__(self, device: torch.cuda.device, device_type: str):
         self.simulated_games_count = 0
         self.game_moves_count = 0
         # load coniguration
-        configuration = parse_json(directory_path=self.working_directory_path, file_name="configuration")
+        configuration = parse_json(file_name="configuration")
         self.save_interval: int = configuration["save_interval"]
         self.actual_games_size: int = configuration["actual_games_size"]
         self.game_board_size: int = configuration["game_board_size"]
@@ -29,13 +34,17 @@ class AlphaHex:
         self.anet = ANET(device, device_type, self.game_board_size)
         self.game_manager = Hex(self.game_board_size)
         self.mct = MCT()
+        # create directory to store models and configuration
+        self.save_directory_name = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+        os.makedirs(f"{DATA_PATH}/{self.save_directory_name}", exist_ok=True)
+        store_json(configuration, directory_path=f"{DATA_PATH}/{self.save_directory_name}/", file_name="configuration")
 
     def run(self):
         self.rbuf.clear()
         self.anet.initialize_model()
         for actual_game in range(self.actual_games_size):
             print(f"Actual game {(actual_game + 1):>{len(str(self.actual_games_size))}}/{self.actual_games_size}")
-            time_start = time.time()
+            time_start = time()
             self.game_manager.initialize_empty_board()
             self.mct.set_root_node(self.game_manager.board, self.game_manager.player)
             while not self.game_manager.terminal():
@@ -57,10 +66,12 @@ class AlphaHex:
                 self.game_manager.play_move(actual_move)
                 self.mct.set_root_node(self.game_manager.board, self.game_manager.player)
             self.reset_counts()
+            print("\tTraining model")
             self.anet.train(self.rbuf.get_mini_batch(self.mini_batch_size))
-            if actual_game % self.save_interval == 0:
-                self.anet.save(actual_game)
-            time_end = time.time()
+            if (actual_game + 1) % self.save_interval == 0 or actual_game == (self.actual_games_size - 1) or actual_game == 0:
+                self.anet.save(directory_path=DATA_PATH + "/" + self.save_directory_name, iteration=(actual_game + 1))
+                print("\tModel saved")
+            time_end = time()
             print(f"\tTime elapsed: {(time_end - time_start):0.2f} seconds")
 
     def increment_simulated_games_count(self) -> int:
