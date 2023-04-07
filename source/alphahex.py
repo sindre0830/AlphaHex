@@ -6,13 +6,10 @@ from functionality import (
 from rbuf import RBUF
 from anet import ANET
 from mct import MCT
-from game_manager.hex import (
-    Hex,
-    apply_action_to_board,
-    print_state
-)
+from game_manager.hex import Hex
 # external libraries
 import torch
+import time
 
 
 class AlphaHex:
@@ -38,6 +35,7 @@ class AlphaHex:
         self.anet.initialize_model()
         for actual_game in range(self.actual_games_size):
             print(f"Actual game {(actual_game + 1):>{len(str(self.actual_games_size))}}/{self.actual_games_size}")
+            time_start = time.time()
             self.game_manager.initialize_empty_board()
             self.mct.set_root_node(self.game_manager.board, self.game_manager.player)
             while not self.game_manager.terminal():
@@ -62,6 +60,8 @@ class AlphaHex:
             self.anet.train(self.rbuf.get_mini_batch(self.mini_batch_size))
             if actual_game % self.save_interval == 0:
                 self.anet.save(actual_game)
+            time_end = time.time()
+            print(f"\tTime elapsed: {(time_end - time_start):0.2f} seconds")
 
     def increment_simulated_games_count(self) -> int:
         self.simulated_games_count += 1

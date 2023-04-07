@@ -24,6 +24,7 @@ class ANET():
 
     def predict(self, legal_actions: list[tuple[int, int]], state: tuple[list[list[int]], int]):
         data = prepare_data(state)
+        data = np.asarray([data])
         board_width = len(state[0])
         tensor_data = torch.tensor(data, dtype=torch.float32)
         prediction_output: torch.Tensor = self.model(tensor_data)
@@ -41,7 +42,7 @@ class ANET():
             data.append(prepare_data(state))
         for visit_distribution in visit_distributions:
             labels.append(prepare_labels(visit_distribution))
-        dataset_loader = convert_dataset_to_tensors(self.device_type, np.asarray(data), np.asarray(labels))
+        dataset_loader = convert_dataset_to_tensors(self.device_type, np.asarray(data), np.asarray(labels, dtype=np.int64))
         self.model.train_neural_network(self.device, self.device_type, dataset_loader)
     
     def save(self, index: int):

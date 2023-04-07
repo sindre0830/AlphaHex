@@ -10,6 +10,7 @@ import numpy as np
 import torch
 import torch.utils.data
 import multiprocessing
+import tqdm
 
 
 def parse_arguments(args: list[str]):
@@ -71,7 +72,7 @@ def opposite_player(current_player: int) -> int:
 def prepare_data(state: tuple[list[list[int]], int]) -> np.ndarray:
     board, player = state
     board_width = len(board)
-    data: np.ndarray = np.zeros(shape=(3, board_width, board_width))
+    data: np.ndarray = np.zeros(shape=(3, board_width, board_width), dtype=np.float32)
     for row in range(board_width):
         for column in range(board_width):
             data[board[row][column]][row][column] = 1
@@ -80,19 +81,14 @@ def prepare_data(state: tuple[list[list[int]], int]) -> np.ndarray:
     return data
 
 
-def prepare_labels(visit_distribution: list[float]) -> np.ndarray:
-    label = np.zeros(shape=len(visit_distribution), dtype=np.float32)
-    for i in range(len(visit_distribution)):
-        label[i] = visit_distribution[i]
-    return label
+def prepare_labels(visit_distribution: list[float]) -> float:
+    return visit_distribution.index(max(visit_distribution))
 
 
 def convert_dataset_to_tensors(device_type: str, data: np.ndarray, labels: np.ndarray):
     """
     Converts dataset to a PyTorch tensor dataset.
     """
-    # reshape data by adding channels
-    data = np.expand_dims(data, axis=1).astype('float32')
     # convert to tensors
     data = torch.tensor(data)
     labels = torch.tensor(labels)
@@ -105,4 +101,41 @@ def convert_dataset_to_tensors(device_type: str, data: np.ndarray, labels: np.nd
     if device_type is CPU_DEVICE:
         pin_memory = True
         workers = multiprocessing.cpu_count()
-    return torch.utils.data.DataLoader(dataset, batch_size=BATCH_SIZE, pin_memory=pin_memory, num_workers=workers)
+    dataset_loader = torch.utils.data.DataLoader(
+        dataset,
+        batch_size=BATCH_SIZE,
+        shuffle=True,
+        num_workers=workers,
+        pin_memory=pin_memory,
+        persistent_workers=True
+    )
+    return dataset_loader
+
+
+def get_progressbar(iter: torch.utils.data.DataLoader, epoch: int, epochs: int):
+    """
+    Generates progressbar for iterable used in model training.
+    """
+    width = len(str(epochs))
+    progressbar = tqdm.tqdm(
+        iterable=iter,
+        desc=f'        Epoch {(epoch + 1):>{width}}/{epochs}',
+        ascii='░▒',
+        unit=' steps',
+        colour='blue'
+    )
+    set_progressbar_prefix(progressbar)
+    return progressbar
+
+
+def set_progressbar_prefix(
+    progressbar: tqdm.tqdm,
+    train_loss: float = 0.0,
+    train_accuracy: float = 0.0
+):
+    """
+    Set prefix in progressbar and update output.
+    """
+    train_loss_str = f'Train loss: {train_loss:.4f}, '
+    train_accuracy_str = f'Train acc: {train_accuracy:.4f}'
+    progressbar.set_postfix_str(train_loss_str + train_accuracy_str)

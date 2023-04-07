@@ -2,4 +2,5 @@
 GPU_DEVICE = 'cuda:0'
 CPU_DEVICE = 'cpu'
 # parameters
-BATCH_SIZE = 32
+EPOCHS = 32
+BATCH_SIZE = 4
