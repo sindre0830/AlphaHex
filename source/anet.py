@@ -3,7 +3,8 @@ from functionality import (
     action_to_index,
     prepare_data,
     prepare_labels,
-    convert_dataset_to_tensors
+    convert_dataset_to_tensors,
+    normalize_array
 )
 from model import Model
 # external libraries
@@ -28,11 +29,12 @@ class ANET():
         board_width = len(state[0])
         tensor_data = torch.tensor(data, dtype=torch.float32)
         prediction_output: torch.Tensor = self.model(tensor_data)
-        action_values = []
+        probability_distribution = []
         for action in legal_actions:
             action_index = action_to_index(action, board_width)
-            action_values.append(prediction_output[0, action_index].item())
-        return action_values
+            probability_distribution.append(prediction_output[0, action_index].item())
+        probability_distribution = normalize_array(probability_distribution)
+        return probability_distribution
     
     def train(self, batch: tuple[list[tuple[list[list[int]], int]], list[list[float]]]):
         states, visit_distributions = batch

@@ -139,3 +139,10 @@ def set_progressbar_prefix(
     train_loss_str = f'Train loss: {train_loss:.4f}, '
     train_accuracy_str = f'Train acc: {train_accuracy:.4f}'
     progressbar.set_postfix_str(train_loss_str + train_accuracy_str)
+
+
+def normalize_array(arr: list[float]) -> list[float]:
+    # divide each element by the sum
+    arr_sum = sum(arr)
+    arr = [elem / arr_sum for elem in arr]
+    return arr
