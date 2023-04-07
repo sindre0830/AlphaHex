@@ -26,7 +26,7 @@ class Hex:
         return get_legal_actions(self.board)
     
     def print_state(self, winning_path=None):
-        print_state(self.board)
+        print_state(self.board, winning_path)
 
 
 def print_state(state: list[list[int]], winning_path=None):
@@ -51,8 +51,6 @@ def print_state(state: list[list[int]], winning_path=None):
 def apply_action_to_board(board: list[list[int]], action: tuple[int, int], player: int) -> list[list[int]]:
     x, y = action
     next_board = copy.deepcopy(board)
-    if (next_board[y][x] != 0):
-        print("OH OH")
     next_board[y][x] = player
     return next_board
 
