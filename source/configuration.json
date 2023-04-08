@@ -5,7 +5,7 @@
     "search_games_size": 1000,
     "mini_batch_size": 64,
     "epochs": 32,
-    "criterion": "cross_entropy_loss",
+    "criterion": "mse",
     "optimizer": {
         "type": "adam",
         "lr": 0.0005

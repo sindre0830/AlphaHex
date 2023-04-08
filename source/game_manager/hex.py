@@ -32,15 +32,15 @@ class Hex:
         return get_winner(self.board)
 
 
-def print_state(state: list[list[int]], winning_path=None):
+def print_state(board: list[list[int]], winning_path=None):
     """
-    Method to print the current game state
+    Method to print the current game board
     """
     if winning_path is None:
         winning_path = []
 
     winning_path_set = set(winning_path)
-    for i, row in enumerate(state):
+    for i, row in enumerate(board):
         print(' ' * i, end='')
         colored_row = []
         for j, cell in enumerate(row):
