@@ -7,7 +7,8 @@ from constants import (
 from functionality import (
     get_progressbar,
     set_progressbar_prefix,
-    build_hidden_layer
+    build_hidden_layer,
+    build_criterion
 )
 # external libraries
 import torch
@@ -19,9 +20,11 @@ class Model(torch.nn.Module):
         self,
         board_size: int,
         input_layer_architecture: dict[str, any],
-        hidden_layer_architectures: list[dict[str, any]]
+        hidden_layer_architectures: list[dict[str, any]],
+        criterion_config: str
     ):
         super().__init__()
+        self.criterion_config = criterion_config
         # define input layer
         self.input_layer = torch.nn.Sequential(
             torch.nn.Conv2d(
@@ -64,7 +67,7 @@ class Model(torch.nn.Module):
         if device_type is GPU_DEVICE:
             self.cuda(device)
         # set optimizer and criterion
-        criterion = torch.nn.CrossEntropyLoss()
+        criterion = build_criterion(self.criterion_config)
         optimizer = torch.optim.Adam(self.parameters(), lr=0.0005)
         TRAIN_SIZE = len(train_loader.dataset)
         # loop through each epoch

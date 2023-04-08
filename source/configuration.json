@@ -4,6 +4,7 @@
     "game_board_size": 5,
     "search_games_size": 50,
     "mini_batch_size": 32,
+    "criterion": "cross_entropy_loss",
     "input_layer": {
         "filters": 16,
         "kernel_size": 3,

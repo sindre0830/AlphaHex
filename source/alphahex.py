@@ -31,7 +31,14 @@ class AlphaHex:
         self.mini_batch_size: int = self.configuration["mini_batch_size"]
         # init objects
         self.rbuf = RBUF()
-        self.anet = ANET(device, device_type, self.game_board_size, self.configuration["input_layer"], self.configuration["hidden_layers"])
+        self.anet = ANET(
+            device,
+            device_type,
+            self.game_board_size,
+            self.configuration["input_layer"],
+            self.configuration["hidden_layers"],
+            self.configuration["criterion"]
+        )
         self.game_manager = Hex(self.game_board_size)
         self.mct = MCT()
         # create directory to store models and configuration

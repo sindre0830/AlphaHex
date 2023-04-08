@@ -204,3 +204,13 @@ def build_hidden_layer(architecture: dict[str, any]) -> torch.nn.Sequential:
             )
         case _:
             return torch.nn.Sequential()
+
+
+def build_criterion(criterion_config: str) -> torch.nn.CrossEntropyLoss | torch.nn.MSELoss:
+    match criterion_config:
+        case "cross_entropy_loss":
+            return torch.nn.CrossEntropyLoss()
+        case "mse":
+            return torch.nn.MSELoss()
+        case _:
+            return torch.nn.CrossEntropyLoss()
