@@ -157,3 +157,6 @@ class Model(torch.nn.Module):
         loss = total_loss / VALIDATION_SIZE
         accuracy = correct / VALIDATION_SIZE
         return loss, accuracy
+
+    def load(self, path: str):
+        self.load_state_dict(torch.load(path))

@@ -1,10 +1,10 @@
 {
     "save_interval": 5,
-    "actual_games_size": 10,
+    "actual_games_size": 20,
     "game_board_size": 5,
-    "search_games_size": 200,
-    "mini_batch_size": 32,
-    "epochs": 64,
+    "search_games_size": 1000,
+    "mini_batch_size": 64,
+    "epochs": 32,
     "criterion": "cross_entropy_loss",
     "optimizer": {
         "type": "adam",

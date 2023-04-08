@@ -4,7 +4,8 @@ from anet import ANET
 from game_manager.hex import (
     apply_action_to_board,
     get_legal_actions,
-    terminal
+    terminal,
+    get_winner
 )
 # external libraries
 import random
@@ -43,15 +44,13 @@ class MCT:
     def leaf_evaluation(self, anet: ANET, node: Node):
         board = copy.deepcopy(node.board)
         player = node.player
-        winner = 2 if player == 1 else 1
         while not terminal(board):
             legal_actions = get_legal_actions(board)
             action_values = anet.predict(legal_actions, state=(board, player))
             action = random.choices(population=legal_actions, weights=action_values, k=1)[0]
             board = apply_action_to_board(board, action, player)
-            winner = player
             player = 2 if player == 1 else 1
-        return winner
+        return get_winner(board)
     
     def backpropagate(self, node: Node, score: int):
         current_node = node

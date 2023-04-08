@@ -50,7 +50,7 @@ class AlphaHex:
 
     def run(self):
         self.rbuf.clear()
-        self.anet.initialize_model()
+        self.anet.initialize_model(save_directory_name=self.save_directory_name)
         for actual_game in range(self.actual_games_size):
             print(f"Actual game {(actual_game + 1):>{len(str(self.actual_games_size))}}/{self.actual_games_size}")
             time_start = time()
@@ -77,8 +77,8 @@ class AlphaHex:
             self.reset_counts()
             print("\tTraining model")
             self.anet.train(self.rbuf.get_mini_batch(self.mini_batch_size))
-            if (actual_game + 1) % self.save_interval == 0 or actual_game == (self.actual_games_size - 1) or actual_game == 0:
-                self.anet.save(directory_path=DATA_PATH + "/" + self.save_directory_name, iteration=(actual_game + 1))
+            if (actual_game + 1) % self.save_interval == 0 or actual_game == (self.actual_games_size - 1):
+                self.anet.save(directory_path=f"{DATA_PATH}/{self.save_directory_name}", iteration=(actual_game + 1))
                 print("\tModel saved")
             time_end = time()
             print(f"\tTime elapsed: {(time_end - time_start):0.2f} seconds")

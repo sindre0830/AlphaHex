@@ -1,4 +1,7 @@
 # internal libraries
+from constants import (
+    DATA_PATH
+)
 from functionality import (
     action_to_index,
     prepare_data,
@@ -34,7 +37,7 @@ class ANET():
         self.optimizer_architecture = optimizer_architecture
         self.model = None
     
-    def initialize_model(self):
+    def initialize_model(self, saved_model_path: str = None, save_directory_name: str = None):
         self.model = Model(
             self.board_size,
             self.epochs,
@@ -43,6 +46,10 @@ class ANET():
             self.criterion_config,
             self.optimizer_architecture
         )
+        if saved_model_path is not None:
+            self.model.load(saved_model_path)
+        if save_directory_name is not None:
+            self.save(directory_path=DATA_PATH + "/" + save_directory_name, iteration=0)
         self.model.eval()
 
     def predict(self, legal_actions: list[tuple[int, int]], state: tuple[list[list[int]], int]):

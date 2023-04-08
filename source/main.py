@@ -10,6 +10,7 @@ from functionality import (
     print_json
 )
 from alphahex import AlphaHex
+from topp import TOPP
 # external libraries
 import sys
 import torch
@@ -46,6 +47,8 @@ def main():
                 print_commands()
                 return
             print("Starting tournament...")
+            topp = TOPP(device, device_type, cmd_args)
+            topp.run()
             return
         case "--config" | "-c":
             configuration = parse_json(file_name="configuration")
