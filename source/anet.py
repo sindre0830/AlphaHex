@@ -73,8 +73,12 @@ class ANET():
         for state in states:
             data.append(prepare_data(state))
         for visit_distribution in visit_distributions:
-            labels.append(prepare_labels(visit_distribution))
-        dataset_loader = convert_dataset_to_tensors(self.device_type, np.asarray(data), np.asarray(labels, dtype=np.int64))
+            labels.append(prepare_labels(visit_distribution) if self.criterion_config != "mse" else np.asarray(visit_distribution, dtype=np.float32))
+        dataset_loader = convert_dataset_to_tensors(
+            self.device_type,
+            data=np.asarray(data),
+            labels=np.asarray(labels, dtype=np.int64) if self.criterion_config != "mse" else np.asarray(labels)
+        )
         return dataset_loader
     
     def save(self, directory_path: str, iteration: int):

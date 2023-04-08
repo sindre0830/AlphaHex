@@ -101,8 +101,11 @@ class Model(torch.nn.Module):
                 running_loss += loss.item()
                 total_loss += loss.item()
                 # calculate accuracy
-                output = torch.argmax(output, dim=1)
-                correct += (output == labels).float().sum()
+                if self.criterion_config == "mse":
+                    correct += ((output - labels) ** 2).float().sum()
+                else:
+                    output = torch.argmax(output, dim=1)
+                    correct += (output == labels).float().sum()
                 # branch if iteration is on the last step and update information with current values
                 if i >= (TRAIN_SIZE / BATCH_SIZE) - 1:
                     validation_loss, validation_accuracy = self.validate_neural_network(device, criterion, validation_loader)
@@ -142,8 +145,11 @@ class Model(torch.nn.Module):
             loss = criterion(output, labels)
             total_loss += loss.item()
             # calculate validation accuracy
-            output = torch.argmax(output, dim=1)
-            correct += (output == labels).float().sum()
+            if self.criterion_config == "mse":
+                correct += ((output - labels) ** 2).float().sum()
+            else:
+                output = torch.argmax(output, dim=1)
+                correct += (output == labels).float().sum()
         # set model to train mode
         self.train()
         # calculate loss and accruacy
