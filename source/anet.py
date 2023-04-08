@@ -55,7 +55,18 @@ class ANET():
         probability_distribution = normalize_array(probability_distribution)
         return probability_distribution
     
-    def train(self, batch: tuple[list[tuple[list[list[int]], int]], list[list[float]]]):
+    def train(
+        self,
+        batches: tuple[tuple[list[tuple[list[list[int]], int]], list[list[float]]]]
+    ):
+        train_batch, validate_batch = batches
+        train_loader = self.convert_batch_to_dataset(train_batch)
+        validation_loader = self.convert_batch_to_dataset(validate_batch)
+        self.model.train_neural_network(self.device, self.device_type, train_loader, validation_loader)
+    
+    def convert_batch_to_dataset(self, batch: tuple[list[tuple[list[list[int]], int]], list[list[float]]]):
+        if (batch is None):
+            return None
         states, visit_distributions = batch
         data = []
         labels = []
@@ -64,7 +75,7 @@ class ANET():
         for visit_distribution in visit_distributions:
             labels.append(prepare_labels(visit_distribution))
         dataset_loader = convert_dataset_to_tensors(self.device_type, np.asarray(data), np.asarray(labels, dtype=np.int64))
-        self.model.train_neural_network(self.device, self.device_type, dataset_loader)
+        return dataset_loader
     
     def save(self, directory_path: str, iteration: int):
         torch.save(self.model.state_dict(), f"{directory_path}/model-{iteration}.pt")
