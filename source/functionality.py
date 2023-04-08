@@ -151,3 +151,56 @@ def normalize_array(arr: list[float]) -> list[float]:
     arr_sum = sum(arr)
     arr = [elem / arr_sum for elem in arr]
     return arr
+
+
+def build_hidden_layer(architecture: dict[str, any]) -> torch.nn.Sequential:
+    layer_type = architecture["type"]
+    match layer_type:
+        case "conv":
+            return torch.nn.Sequential(
+                torch.nn.LazyConv2d(
+                    out_channels=architecture["filters"],
+                    kernel_size=architecture["kernel_size"],
+                    stride=architecture["stride"],
+                    padding=architecture["padding"],
+                    bias=architecture["bias"]
+                )
+            )
+        case "linear":
+            return torch.nn.Sequential(
+                torch.nn.LazyLinear(
+                    out_features=architecture["filters"],
+                    bias=architecture["bias"]
+                )
+            )
+        case "flatten":
+            return torch.nn.Sequential(
+                torch.nn.Flatten()
+            )
+        case "max_pool":
+            return torch.nn.Sequential(
+                torch.nn.MaxPool2d(
+                    kernel_size=architecture["kernel_size"],
+                    stride=architecture["stride"]
+                )
+            )
+        case "dropout":
+            return torch.nn.Sequential(
+                torch.nn.Dropout(
+                    p=architecture["p"]
+                )
+            )
+        case "batch_norm_2d":
+            return torch.nn.Sequential(
+                torch.nn.LazyBatchNorm2d()
+            )
+        case "batch_norm_1d":
+            return torch.nn.Sequential(
+                torch.nn.LazyBatchNorm1d()
+            )
+        case "relu":
+            return torch.nn.Sequential(
+                torch.nn.ReLU()
+            )
+        case _:
+            return torch.nn.Sequential()

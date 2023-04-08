@@ -6,7 +6,8 @@ from constants import (
 )
 from functionality import (
     get_progressbar,
-    set_progressbar_prefix
+    set_progressbar_prefix,
+    build_hidden_layer
 )
 # external libraries
 import torch
@@ -17,50 +18,27 @@ class Model(torch.nn.Module):
     def __init__(
         self,
         board_size: int,
-        input_filter=32,
-        filters=[64, 64],
-        input_kernel_size = (3, 3),
-        kernel_sizes=[(2, 2), (1, 1)],
-        dense_shapes=[16, 32],
-        activation=torch.nn.ReLU
+        input_layer_architecture: dict[str, any],
+        hidden_layer_architectures: list[dict[str, any]]
     ):
         super().__init__()
         # define input layer
-        self.input_layer: torch.nn.Sequential = torch.nn.Sequential(
+        self.input_layer = torch.nn.Sequential(
             torch.nn.Conv2d(
                 in_channels=3,
-                out_channels=input_filter,
-                kernel_size=input_kernel_size
-            ),
-            activation()
+                out_channels=input_layer_architecture["filters"],
+                kernel_size=input_layer_architecture["kernel_size"],
+                stride=input_layer_architecture["stride"],
+                padding=input_layer_architecture["padding"],
+                bias=input_layer_architecture["bias"]
+            )
         )
-        # define conv layers
-        self.conv_layers: list[torch.nn.Sequential] = []
-        for (filter, kernel_size) in tuple(zip(filters, kernel_sizes)):
-            self.conv_layers.append(
-                torch.nn.Sequential(
-                    torch.nn.LazyConv2d(
-                        out_channels=filter,
-                        kernel_size=kernel_size
-                    ),
-                    activation()
-                )
-            )
-        # define flatten layer
-        self.flatten_layer = torch.nn.Flatten()
-        # define dense layers
-        self.dense_layers: list[torch.nn.Sequential] = []
-        for dense_shape in dense_shapes:
-            self.dense_layers.append(
-                torch.nn.Sequential(
-                    torch.nn.LazyLinear(
-                        out_features=dense_shape
-                    ),
-                    activation()
-                )
-            )
+        # define hidden layers
+        self.hidden_layers: list[torch.nn.Sequential] = []
+        for hidden_layer_architecture in hidden_layer_architectures:
+            self.hidden_layers.append(build_hidden_layer(hidden_layer_architecture))
         # define output layer
-        self.output_layer: torch.nn.Sequential = torch.nn.Sequential(
+        self.output_layer = torch.nn.Sequential(
             torch.nn.LazyLinear(out_features=(board_size * board_size)),
             torch.nn.Softmax(dim=1)
         )
@@ -69,14 +47,9 @@ class Model(torch.nn.Module):
     def forward(self, x):
         # input layer
         x = self.input_layer(x)
-        # conv2d layer
-        for conv_layer in self.conv_layers:
-            x = conv_layer(x)
-        # flatten layer
-        x = self.flatten_layer(x)
-        # linear layer
-        for dense_layer in self.dense_layers:
-            x = dense_layer(x)
+        # hidden layers
+        for hidden_layer in self.hidden_layers:
+            x = hidden_layer(x)
         # output layer
         x = self.output_layer(x)
         return x

@@ -13,14 +13,23 @@ import numpy as np
 
 
 class ANET():
-    def __init__(self, device: torch.cuda.device, device_type: str, board_size: int):
+    def __init__(
+        self,
+        device: torch.cuda.device,
+        device_type: str,
+        board_size: int,
+        input_layer_architecture: dict[str, any],
+        hidden_layer_architectures: list[dict[str, any]]
+    ):
         self.device = device
         self.device_type = device_type
         self.board_size = board_size
+        self.input_layer_architecture = input_layer_architecture
+        self.hidden_layer_architectures = hidden_layer_architectures
         self.model = None
     
     def initialize_model(self):
-        self.model = Model(self.board_size)
+        self.model = Model(self.board_size, self.input_layer_architecture, self.hidden_layer_architectures)
         self.model.eval()
 
     def predict(self, legal_actions: list[tuple[int, int]], state: tuple[list[list[int]], int]):

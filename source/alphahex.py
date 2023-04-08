@@ -23,21 +23,21 @@ class AlphaHex:
         self.simulated_games_count = 0
         self.game_moves_count = 0
         # load coniguration
-        configuration = parse_json(file_name="configuration")
-        self.save_interval: int = configuration["save_interval"]
-        self.actual_games_size: int = configuration["actual_games_size"]
-        self.game_board_size: int = configuration["game_board_size"]
-        self.search_games_size: int = configuration["search_games_size"]
-        self.mini_batch_size: int = configuration["mini_batch_size"]
+        self.configuration = parse_json(file_name="configuration")
+        self.save_interval: int = self.configuration["save_interval"]
+        self.actual_games_size: int = self.configuration["actual_games_size"]
+        self.game_board_size: int = self.configuration["game_board_size"]
+        self.search_games_size: int = self.configuration["search_games_size"]
+        self.mini_batch_size: int = self.configuration["mini_batch_size"]
         # init objects
         self.rbuf = RBUF()
-        self.anet = ANET(device, device_type, self.game_board_size)
+        self.anet = ANET(device, device_type, self.game_board_size, self.configuration["input_layer"], self.configuration["hidden_layers"])
         self.game_manager = Hex(self.game_board_size)
         self.mct = MCT()
         # create directory to store models and configuration
         self.save_directory_name = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
         os.makedirs(f"{DATA_PATH}/{self.save_directory_name}", exist_ok=True)
-        store_json(configuration, directory_path=f"{DATA_PATH}/{self.save_directory_name}/", file_name="configuration")
+        store_json(self.configuration, directory_path=f"{DATA_PATH}/{self.save_directory_name}/", file_name="configuration")
 
     def run(self):
         self.rbuf.clear()
