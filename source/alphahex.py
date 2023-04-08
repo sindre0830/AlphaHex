@@ -37,7 +37,8 @@ class AlphaHex:
             self.game_board_size,
             self.configuration["input_layer"],
             self.configuration["hidden_layers"],
-            self.configuration["criterion"]
+            self.configuration["criterion"],
+            self.configuration["optimizer"]
         )
         self.game_manager = Hex(self.game_board_size)
         self.mct = MCT()

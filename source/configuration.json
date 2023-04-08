@@ -5,6 +5,10 @@
     "search_games_size": 50,
     "mini_batch_size": 32,
     "criterion": "cross_entropy_loss",
+    "optimizer": {
+        "type": "adam",
+        "lr": 0.0005
+    },
     "input_layer": {
         "filters": 16,
         "kernel_size": 3,

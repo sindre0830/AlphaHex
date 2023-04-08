@@ -11,6 +11,7 @@ import torch
 import torch.utils.data
 import multiprocessing
 import tqdm
+from typing import Iterator
 
 
 def parse_arguments(args: list[str]):
@@ -206,7 +207,7 @@ def build_hidden_layer(architecture: dict[str, any]) -> torch.nn.Sequential:
             return torch.nn.Sequential()
 
 
-def build_criterion(criterion_config: str) -> torch.nn.CrossEntropyLoss | torch.nn.MSELoss:
+def build_criterion(criterion_config: str) -> torch.nn.modules.loss._Loss:
     match criterion_config:
         case "cross_entropy_loss":
             return torch.nn.CrossEntropyLoss()
@@ -214,3 +215,30 @@ def build_criterion(criterion_config: str) -> torch.nn.CrossEntropyLoss | torch.
             return torch.nn.MSELoss()
         case _:
             return torch.nn.CrossEntropyLoss()
+
+
+def build_optimizer(parameters: Iterator[torch.nn.Parameter], architecture: dict[str, any]) -> torch.optim.Optimizer:
+    optimizer_type = architecture["type"]
+    match optimizer_type:
+        case "adagrad":
+            return torch.optim.Adagrad(
+                parameters,
+                lr=architecture["lr"]
+            )
+        case "sgd":
+            return torch.optim.SGD(
+                parameters,
+                lr=architecture["lr"]
+            )
+        case "rms_prop":
+            return torch.optim.RMSprop(
+                parameters,
+                lr=architecture["lr"]
+            )
+        case "adam":
+            return torch.optim.Adam(
+                parameters,
+                lr=architecture["lr"]
+            )
+        case _:
+            return torch.optim.Adam(parameters, lr=0.0005)

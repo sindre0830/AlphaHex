@@ -8,7 +8,8 @@ from functionality import (
     get_progressbar,
     set_progressbar_prefix,
     build_hidden_layer,
-    build_criterion
+    build_criterion,
+    build_optimizer
 )
 # external libraries
 import torch
@@ -21,10 +22,12 @@ class Model(torch.nn.Module):
         board_size: int,
         input_layer_architecture: dict[str, any],
         hidden_layer_architectures: list[dict[str, any]],
-        criterion_config: str
+        criterion_config: str,
+        optimizer_architecture: dict[str, any]
     ):
         super().__init__()
         self.criterion_config = criterion_config
+        self.optimizer_architecture = optimizer_architecture
         # define input layer
         self.input_layer = torch.nn.Sequential(
             torch.nn.Conv2d(
@@ -68,7 +71,7 @@ class Model(torch.nn.Module):
             self.cuda(device)
         # set optimizer and criterion
         criterion = build_criterion(self.criterion_config)
-        optimizer = torch.optim.Adam(self.parameters(), lr=0.0005)
+        optimizer = build_optimizer(self.parameters(), self.optimizer_architecture)
         TRAIN_SIZE = len(train_loader.dataset)
         # loop through each epoch
         for epoch in range(EPOCHS):

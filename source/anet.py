@@ -20,7 +20,8 @@ class ANET():
         board_size: int,
         input_layer_architecture: dict[str, any],
         hidden_layer_architectures: list[dict[str, any]],
-        criterion_config: str
+        criterion_config: str,
+        optimizer_architecture: dict[str, any]
     ):
         self.device = device
         self.device_type = device_type
@@ -28,10 +29,17 @@ class ANET():
         self.input_layer_architecture = input_layer_architecture
         self.hidden_layer_architectures = hidden_layer_architectures
         self.criterion_config = criterion_config
+        self.optimizer_architecture = optimizer_architecture
         self.model = None
     
     def initialize_model(self):
-        self.model = Model(self.board_size, self.input_layer_architecture, self.hidden_layer_architectures, self.criterion_config)
+        self.model = Model(
+            self.board_size,
+            self.input_layer_architecture,
+            self.hidden_layer_architectures,
+            self.criterion_config,
+            self.optimizer_architecture
+        )
         self.model.eval()
 
     def predict(self, legal_actions: list[tuple[int, int]], state: tuple[list[list[int]], int]):
