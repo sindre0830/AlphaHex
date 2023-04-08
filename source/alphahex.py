@@ -35,6 +35,7 @@ class AlphaHex:
             device,
             device_type,
             self.game_board_size,
+            self.configuration["epochs"],
             self.configuration["input_layer"],
             self.configuration["hidden_layers"],
             self.configuration["criterion"],

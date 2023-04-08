@@ -1,7 +1,6 @@
 # internal libraries
 from constants import (
     GPU_DEVICE,
-    EPOCHS,
     BATCH_SIZE
 )
 from functionality import (
@@ -20,12 +19,14 @@ class Model(torch.nn.Module):
     def __init__(
         self,
         board_size: int,
+        epochs: int,
         input_layer_architecture: dict[str, any],
         hidden_layer_architectures: list[dict[str, any]],
         criterion_config: str,
         optimizer_architecture: dict[str, any]
     ):
         super().__init__()
+        self.total_epochs = epochs
         self.criterion_config = criterion_config
         self.optimizer_architecture = optimizer_architecture
         # define input layer
@@ -75,12 +76,12 @@ class Model(torch.nn.Module):
         optimizer = build_optimizer(self.parameters(), self.optimizer_architecture)
         TRAIN_SIZE = len(train_loader.dataset)
         # loop through each epoch
-        for epoch in range(EPOCHS):
+        for epoch in range(self.total_epochs):
             correct = 0.0
             running_loss = 0.0
             total_loss = 0.0
             # define the progressbar
-            progressbar = get_progressbar(train_loader, epoch, EPOCHS)
+            progressbar = get_progressbar(train_loader, epoch, self.total_epochs)
             # set model to training mode
             self.train()
             # loop through the dataset

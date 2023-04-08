@@ -18,6 +18,7 @@ class ANET():
         device: torch.cuda.device,
         device_type: str,
         board_size: int,
+        epochs: int,
         input_layer_architecture: dict[str, any],
         hidden_layer_architectures: list[dict[str, any]],
         criterion_config: str,
@@ -26,6 +27,7 @@ class ANET():
         self.device = device
         self.device_type = device_type
         self.board_size = board_size
+        self.epochs = epochs
         self.input_layer_architecture = input_layer_architecture
         self.hidden_layer_architectures = hidden_layer_architectures
         self.criterion_config = criterion_config
@@ -35,6 +37,7 @@ class ANET():
     def initialize_model(self):
         self.model = Model(
             self.board_size,
+            self.epochs,
             self.input_layer_architecture,
             self.hidden_layer_architectures,
             self.criterion_config,
