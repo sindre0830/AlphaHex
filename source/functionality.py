@@ -103,17 +103,19 @@ def convert_dataset_to_tensors(device_type: str, data: np.ndarray, labels: np.nd
     # convert to data loader
     pin_memory = False
     workers = 0
+    persistent_workers = False
     # branch if device is set to CPU and set parameters accordingly
     if device_type is CPU_DEVICE:
         pin_memory = True
         workers = multiprocessing.cpu_count()
+        persistent_workers = True
     dataset_loader = torch.utils.data.DataLoader(
         dataset,
         batch_size=BATCH_SIZE,
         shuffle=True,
         num_workers=workers,
         pin_memory=pin_memory,
-        persistent_workers=True
+        persistent_workers=persistent_workers
     )
     return dataset_loader
 

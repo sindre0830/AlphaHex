@@ -71,6 +71,8 @@ class Model(torch.nn.Module):
         # branch if the device is set to GPU and send the model to the device
         if device_type is GPU_DEVICE:
             self.cuda(device)
+            for hidden_layer in self.hidden_layers:
+                hidden_layer.to(device)
         # set optimizer and criterion
         criterion = build_criterion(self.criterion_config)
         optimizer = build_optimizer(self.parameters(), self.optimizer_architecture)
@@ -138,8 +140,8 @@ class Model(torch.nn.Module):
         # loop through the validation dataset
         for _, (data, labels) in enumerate(validation_loader):
             # send validation data to device
-            data = data.to(device, non_blocking=True)
-            labels = labels.to(device, non_blocking=True)
+            data: torch.Tensor = data.to(device, non_blocking=True)
+            labels: torch.Tensor = labels.to(device, non_blocking=True)
             # get validation results
             output = self(data)
             # calculate training loss for this batch

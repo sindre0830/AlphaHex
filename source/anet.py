@@ -1,6 +1,7 @@
 # internal libraries
 from constants import (
-    DATA_PATH
+    DATA_PATH,
+    GPU_DEVICE
 )
 from functionality import (
     action_to_index,
@@ -53,6 +54,11 @@ class ANET():
         self.model.eval()
 
     def predict(self, legal_actions: list[tuple[int, int]], state: tuple[list[list[int]], int]):
+        # branch if the device is set to GPU and send the model back to the CPU for prediction
+        if self.device_type is GPU_DEVICE:
+            self.model.cpu()
+            for hidden_layer in self.model.hidden_layers:
+                hidden_layer.cpu()
         data = prepare_data(state)
         data = np.asarray([data])
         board_width = len(state[0])
