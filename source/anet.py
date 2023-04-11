@@ -1,7 +1,6 @@
 # internal libraries
 from constants import (
-    DATA_PATH,
-    GPU_DEVICE
+    DATA_PATH
 )
 from functionality import (
     action_to_index,
@@ -40,6 +39,8 @@ class ANET():
     
     def initialize_model(self, saved_model_path: str = None, save_directory_name: str = None):
         self.model = Model(
+            self.device,
+            self.device_type,
             self.board_size,
             self.epochs,
             self.input_layer_architecture,
@@ -54,11 +55,7 @@ class ANET():
         self.model.eval()
 
     def predict(self, legal_actions: list[tuple[int, int]], state: tuple[list[list[int]], int]):
-        # branch if the device is set to GPU and send the model back to the CPU for prediction
-        if self.device_type is GPU_DEVICE:
-            self.model.cpu()
-            for hidden_layer in self.model.hidden_layers:
-                hidden_layer.cpu()
+        self.model.evaluate_mode()
         data = prepare_data(state)
         data = np.asarray([data])
         board_width = len(state[0])
@@ -78,7 +75,7 @@ class ANET():
         train_batch, validate_batch = batches
         train_loader = self.convert_batch_to_dataset(train_batch)
         validation_loader = self.convert_batch_to_dataset(validate_batch)
-        self.model.train_neural_network(self.device, self.device_type, train_loader, validation_loader)
+        self.model.train_neural_network(train_loader, validation_loader)
     
     def convert_batch_to_dataset(self, batch: tuple[list[tuple[list[list[int]], int]], list[list[float]]]):
         if (batch is None):

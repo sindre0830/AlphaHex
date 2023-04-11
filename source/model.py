@@ -18,6 +18,8 @@ import torch.utils.data
 class Model(torch.nn.Module):
     def __init__(
         self,
+        device: torch.cuda.device,
+        device_type: str,
         board_size: int,
         epochs: int,
         input_layer_architecture: dict[str, any],
@@ -26,6 +28,8 @@ class Model(torch.nn.Module):
         optimizer_architecture: dict[str, any]
     ):
         super().__init__()
+        self.device = device
+        self.device_type = device_type
         self.total_epochs = epochs
         self.criterion_config = criterion_config
         self.optimizer_architecture = optimizer_architecture
@@ -49,6 +53,30 @@ class Model(torch.nn.Module):
             torch.nn.LazyLinear(out_features=(board_size * board_size)),
             torch.nn.Softmax(dim=1)
         )
+        # send model to CPU
+        self.training_flag = None
+        self.evaluate_mode()
+    
+    def evaluate_mode(self):
+        if self.training_flag is False:
+            return
+        else:
+            self.training_flag = False
+        # send model to CPU
+        self.cpu()
+        for hidden_layer in self.hidden_layers:
+            hidden_layer.cpu()
+    
+    def training_mode(self):
+        if self.training_flag is True:
+            return
+        else:
+            self.training_flag = True
+        # branch if the device is set to GPU and send the model to the device
+        if self.device_type is GPU_DEVICE:
+            self.cuda(self.device)
+            for hidden_layer in self.hidden_layers:
+                hidden_layer.to(self.device)
     
     # Defines model layout.
     def forward(self, x):
@@ -63,16 +91,10 @@ class Model(torch.nn.Module):
     
     def train_neural_network(
         self,
-        device: torch.cuda.device,
-        device_type: str,
         train_loader: torch.utils.data.DataLoader,
         validation_loader: torch.utils.data.DataLoader = None
     ):
-        # branch if the device is set to GPU and send the model to the device
-        if device_type is GPU_DEVICE:
-            self.cuda(device)
-            for hidden_layer in self.hidden_layers:
-                hidden_layer.to(device)
+        self.training_mode()
         # set optimizer and criterion
         criterion = build_criterion(self.criterion_config)
         optimizer = build_optimizer(self.parameters(), self.optimizer_architecture)
@@ -89,8 +111,8 @@ class Model(torch.nn.Module):
             # loop through the dataset
             for i, (data, labels) in enumerate(progressbar):
                 # send dataset to device
-                data: torch.Tensor = data.to(device, non_blocking=True)
-                labels: torch.Tensor = labels.to(device, non_blocking=True)
+                data: torch.Tensor = data.to(self.device, non_blocking=True)
+                labels: torch.Tensor = labels.to(self.device, non_blocking=True)
                 # clear gradients
                 optimizer.zero_grad()
                 # get results
@@ -111,7 +133,7 @@ class Model(torch.nn.Module):
                     correct += (output == labels).float().sum()
                 # branch if iteration is on the last step and update information with current values
                 if i >= (TRAIN_SIZE / BATCH_SIZE) - 1:
-                    validation_loss, validation_accuracy = self.validate_neural_network(device, criterion, validation_loader)
+                    validation_loss, validation_accuracy = self.validate_neural_network(criterion, validation_loader)
                     train_loss = total_loss / TRAIN_SIZE
                     train_accuracy = correct / TRAIN_SIZE
                     set_progressbar_prefix(progressbar, train_loss, train_accuracy, validation_loss, validation_accuracy)
@@ -126,7 +148,6 @@ class Model(torch.nn.Module):
 
     def validate_neural_network(
         self,
-        device: torch.cuda.device,
         criterion: torch.nn.CrossEntropyLoss,
         validation_loader: torch.utils.data.DataLoader
     ):
@@ -140,8 +161,8 @@ class Model(torch.nn.Module):
         # loop through the validation dataset
         for _, (data, labels) in enumerate(validation_loader):
             # send validation data to device
-            data: torch.Tensor = data.to(device, non_blocking=True)
-            labels: torch.Tensor = labels.to(device, non_blocking=True)
+            data: torch.Tensor = data.to(self.device, non_blocking=True)
+            labels: torch.Tensor = labels.to(self.device, non_blocking=True)
             # get validation results
             output = self(data)
             # calculate training loss for this batch
