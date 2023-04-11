@@ -49,6 +49,7 @@ def main():
             print("Starting tournament...")
             topp = TOPP(device, device_type, cmd_args)
             topp.run()
+            topp.print_score()
             return
         case "--config" | "-c":
             configuration = parse_json(file_name="configuration")

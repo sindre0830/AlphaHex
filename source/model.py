@@ -36,7 +36,7 @@ class Model(torch.nn.Module):
         # define input layer
         self.input_layer = torch.nn.Sequential(
             torch.nn.Conv2d(
-                in_channels=3,
+                in_channels=5,
                 out_channels=input_layer_architecture["filters"],
                 kernel_size=input_layer_architecture["kernel_size"],
                 stride=input_layer_architecture["stride"],
@@ -51,7 +51,7 @@ class Model(torch.nn.Module):
         # define output layer
         self.output_layer = torch.nn.Sequential(
             torch.nn.LazyLinear(out_features=(board_size * board_size)),
-            torch.nn.Softmax(dim=1)
+            torch.nn.LogSoftmax(dim=1)
         )
         # send model to CPU
         self.training_flag = None

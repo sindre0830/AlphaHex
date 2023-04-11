@@ -4,7 +4,7 @@ import random
 
 class RBUF():
     def __init__(self):
-        self.states: list[tuple[list[list[int]], int]] = []
+        self.states: list[tuple[list[list[int]], int, int]] = []
         self.visit_distributions: list[list[float]] = []
 
     def clear(self):
@@ -15,7 +15,7 @@ class RBUF():
         self.states.append(state)
         self.visit_distributions.append(visit_distribution)
 
-    def get_mini_batch(self, mini_batch_size) -> tuple[tuple[list[tuple[list[list[int]], int]], list[list[float]]], tuple[list[tuple[list[list[int]], int]], list[list[float]]]]:
+    def get_mini_batch(self, mini_batch_size) -> tuple[tuple[list[tuple[list[list[int]], int, int]], list[list[float]]], tuple[list[tuple[list[list[int]], int, int]], list[list[float]]]]:
         if (len(self.states) <= mini_batch_size):
             train_batch = (self.states, self.visit_distributions)
             validation_batch = None

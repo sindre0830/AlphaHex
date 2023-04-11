@@ -55,7 +55,7 @@ class AlphaHex:
             print(f"Actual game {(actual_game + 1):>{len(str(self.actual_games_size))}}/{self.actual_games_size}")
             time_start = time()
             self.game_manager.initialize_empty_board()
-            self.mct.set_root_node(self.game_manager.board, self.game_manager.player)
+            self.mct.set_root_node(self.game_manager.board, self.game_manager.player, reset_turn=True)
             while not self.game_manager.terminal():
                 self.increment_game_moves_count()
                 self.mct.update_game_board(self.mct.root_node.board)
@@ -70,7 +70,7 @@ class AlphaHex:
                     score = self.mct.leaf_evaluation(self.anet, leaf)
                     self.mct.backpropagate(leaf, score)
                 visit_distribution = self.mct.root_node.visit_distribution()
-                self.rbuf.add((self.mct.root_node.board, self.mct.root_node.player), visit_distribution)
+                self.rbuf.add((self.mct.root_node.board, self.mct.root_node.player, self.game_moves_count), visit_distribution)
                 actual_move = action_from_visit_distribution(visit_distribution, self.game_board_size)
                 self.game_manager.play_move(actual_move)
                 self.mct.set_root_node(self.game_manager.board, self.game_manager.player)

@@ -54,7 +54,7 @@ class ANET():
             self.save(directory_path=DATA_PATH + "/" + save_directory_name, iteration=0)
         self.model.eval()
 
-    def predict(self, legal_actions: list[tuple[int, int]], state: tuple[list[list[int]], int]):
+    def predict(self, legal_actions: list[tuple[int, int]], state: tuple[list[list[int]], int, int]):
         self.model.evaluate_mode()
         data = prepare_data(state)
         data = np.asarray([data])
@@ -77,7 +77,7 @@ class ANET():
         validation_loader = self.convert_batch_to_dataset(validate_batch)
         self.model.train_neural_network(train_loader, validation_loader)
     
-    def convert_batch_to_dataset(self, batch: tuple[list[tuple[list[list[int]], int]], list[list[float]]]):
+    def convert_batch_to_dataset(self, batch: tuple[list[tuple[list[list[int]], int, int]], list[list[float]]]):
         if (batch is None):
             return None
         states, visit_distributions = batch

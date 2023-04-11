@@ -75,15 +75,23 @@ def opposite_player(current_player: int) -> int:
     return 2 if current_player == 1 else 1
 
 
-def prepare_data(state: tuple[list[list[int]], int]) -> np.ndarray:
-    board, player = state
+def prepare_data(state: tuple[list[list[int]], int, int]) -> np.ndarray:
+    board, player, turn = state
     board_width = len(board)
-    data: np.ndarray = np.zeros(shape=(3, board_width, board_width), dtype=np.float32)
+    # prepare feature maps
+    # 1 = binary representation of empty cells on the current game board
+    # 2 = binary representation of player 1 cells on the current game board
+    # 3 = binary representation of player 2 cells on the current game board
+    # 4 = binary representation of which players turn it is
+    data: np.ndarray = np.zeros(shape=(5, board_width, board_width), dtype=np.float32)
+    # fill the first 3 feature maps with current board data
     for row in range(board_width):
         for column in range(board_width):
             data[board[row][column]][row][column] = 1
-    if player != 1:
-        data[[1, 2]] = data[[2, 1]]
+    # fill a feautre map with the current players turn
+    data[3] = player
+    # fill a feature map with the current turn
+    data[4] = turn
     return data
 
 
@@ -247,4 +255,4 @@ def build_optimizer(parameters: Iterator[torch.nn.Parameter], architecture: dict
                 lr=architecture["lr"]
             )
         case _:
-            return torch.optim.Adam(parameters, lr=0.0005)
+            return torch.optim.Adam(parameters, lr=0.001)

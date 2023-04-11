@@ -1,17 +1,17 @@
 {
     "save_interval": 5,
     "actual_games_size": 20,
-    "game_board_size": 5,
-    "search_games_size": 100,
-    "mini_batch_size": 64,
-    "epochs": 32,
+    "game_board_size": 4,
+    "search_games_size": 200,
+    "mini_batch_size": 32,
+    "epochs": 20,
     "criterion": "cross_entropy_loss",
     "optimizer": {
         "type": "adam",
-        "lr": 0.0005
+        "lr": 0.001
     },
     "input_layer": {
-        "filters": 16,
+        "filters": 64,
         "kernel_size": 3,
         "stride": 1,
         "padding": 1,
@@ -19,24 +19,10 @@
     },
     "hidden_layers": [
             {
-                "type": "relu"
-            },
-
-            {
-                "type": "conv",
-                "filters": 32,
-                "kernel_size": 3,
-                "stride": 1,
-                "padding": 1,
-                "bias": true
+                "type": "batch_norm_2d"
             },
             {
                 "type": "relu"
-            },
-            {
-                "type": "max_pool",
-                "kernel_size": 2,
-                "stride": 1
             },
 
             {
@@ -48,21 +34,79 @@
                 "bias": true
             },
             {
-                "type": "relu"
+                "type": "batch_norm_2d"
             },
             {
-                "type": "max_pool",
-                "kernel_size": 2,
-                "stride": 1
-        },
+                "type": "relu"
+            },
 
-        {
-            "type": "flatten"
-        },
+            {
+                "type": "conv",
+                "filters": 128,
+                "kernel_size": 3,
+                "stride": 1,
+                "padding": 1,
+                "bias": true
+            },
+            {
+                "type": "batch_norm_2d"
+            },
+            {
+                "type": "relu"
+            },
+
+            {
+                "type": "conv",
+                "filters": 128,
+                "kernel_size": 3,
+                "stride": 1,
+                "padding": 1,
+                "bias": true
+            },
+            {
+                "type": "batch_norm_2d"
+            },
+            {
+                "type": "relu"
+            },
+
+            {
+                "type": "conv",
+                "filters": 256,
+                "kernel_size": 3,
+                "stride": 1,
+                "padding": 1,
+                "bias": true
+            },
+            {
+                "type": "batch_norm_2d"
+            },
+            {
+                "type": "relu"
+            },
+
+            {
+                "type": "conv",
+                "filters": 256,
+                "kernel_size": 3,
+                "stride": 1,
+                "padding": 1,
+                "bias": true
+            },
+            {
+                "type": "batch_norm_2d"
+            },
+            {
+                "type": "relu"
+            },
+
+            {
+                "type": "flatten"
+            },
 
             {
                 "type": "linear",
-                "filters": 256,
+                "filters": 512,
                 "bias": true
             },
             {
