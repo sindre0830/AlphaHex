@@ -6,12 +6,7 @@ from functionality import (
     parse_json
 )
 from anet import ANET
-from game_manager.hex import (
-    Hex,
-    terminal,
-    get_legal_actions,
-    apply_action_to_board
-)
+from game_manager.hex import Hex
 # external libraries
 import os
 import glob
@@ -87,7 +82,7 @@ class TOPP:
         score: list[int] = []
         for _ in range(25):
             game_manager = Hex(self.board_size)
-            game_manager.initialize_empty_board()
+            game_manager.set_state(board=game_manager.empty_board())
             turn = 0
             while not game_manager.terminal():
                 legal_actions = game_manager.get_legal_actions()

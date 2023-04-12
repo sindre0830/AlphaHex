@@ -5,7 +5,8 @@ from constants import (
 from functionality import (
     parse_json,
     store_json,
-    action_from_visit_distribution
+    action_from_visit_distribution,
+    animate_gameboard_history
 )
 from rbuf import RBUF
 from anet import ANET
@@ -54,7 +55,7 @@ class AlphaHex:
         for actual_game in range(self.actual_games_size):
             print(f"Actual game {(actual_game + 1):>{len(str(self.actual_games_size))}}/{self.actual_games_size}")
             time_start = time()
-            self.game_manager.initialize_empty_board()
+            self.game_manager.set_state(board=self.game_manager.empty_board())
             self.mct.set_root_node(self.game_manager.board, self.game_manager.player, reset_turn=True)
             while not self.game_manager.terminal():
                 self.increment_game_moves_count()
@@ -74,6 +75,7 @@ class AlphaHex:
                 actual_move = action_from_visit_distribution(visit_distribution, self.game_board_size)
                 self.game_manager.play_move(actual_move)
                 self.mct.set_root_node(self.game_manager.board, self.game_manager.player)
+            animate_gameboard_history(self.mct.game_board_history)
             self.reset_counts()
             print("\tTraining model")
             self.anet.train(self.rbuf.get_mini_batch(self.mini_batch_size))

@@ -12,6 +12,9 @@ import torch.utils.data
 import multiprocessing
 import tqdm
 from typing import Iterator
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+from matplotlib.patches import RegularPolygon
 
 
 def parse_arguments(args: list[str]):
@@ -256,3 +259,32 @@ def build_optimizer(parameters: Iterator[torch.nn.Parameter], architecture: dict
             )
         case _:
             return torch.optim.Adam(parameters, lr=0.001)
+
+
+def animate_gameboard_history(board_history: list[list[list[int]]]):
+    def animate(i):
+        ax.cla()
+        for row in range(board_size):
+            for col in range(board_size):
+                x, y = col + row, -col + row
+                facecolor = "none"
+                if np.array(board_history[i])[row][col] == 1:
+                    facecolor = "b"
+                else:
+                    facecolor = "r"
+                patch = RegularPolygon((x, y), numVertices=6, radius=0.5, orientation=np.pi / 2, facecolor=facecolor, edgecolor='k', linewidth=1)
+                ax.add_patch(patch)
+        ax.set_box_aspect(1)
+        ax.set_xlim(-1, 2 * board_size - 1)
+        ax.set_ylim(-board_size, board_size)
+        ax.axis('off')
+        return [ax]
+    # duplicate last state
+    last_element = board_history[-1]
+    duplicates = [last_element] * 4
+    board_history = board_history + duplicates
+    # create gif
+    fig, ax = plt.subplots()
+    board_size = len(board_history[0])
+    ani = animation.FuncAnimation(fig, animate, frames=len(board_history), interval=500)
+    ani.save('game_board.gif', writer='pillow')

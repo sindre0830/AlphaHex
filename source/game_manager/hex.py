@@ -1,3 +1,7 @@
+# internal libraries
+from functionality import (
+    opposite_player
+)
 # external libraries
 import copy
 from termcolor import colored
@@ -9,15 +13,16 @@ class Hex:
         self.board = []
         self.player = 1
     
-    def initialize_empty_board(self):
-        self.board = self.initial_state()
+    def set_state(self, board: list[list[int]], player = 1):
+        self.board = copy.deepcopy(board)
+        self.player = player
 
-    def initial_state(self) -> list[list[int]]:
+    def empty_board(self) -> list[list[int]]:
         return [[0 for _ in range(self.board_size)] for _ in range(self.board_size)]
 
     def play_move(self, move):
         self.board = apply_action_to_board(self.board, move, self.player)
-        self.player = 2 if self.player == 1 else 1
+        self.player = opposite_player(self.player)
 
     def terminal(self) -> bool:
         return terminal(self.board)
@@ -69,28 +74,29 @@ def terminal(board: list[list[int]]) -> bool:
         return False
 
 
-def get_winner(bord: list[list[int]]) -> int:
+def get_winner(board: list[list[int]]) -> int:
+    board_width = len(board)
     def dfs(player: int, x: int, y: int, path: list):
-        if (player == 1 and y == len(bord) - 1) or (player == 2 and x == len(bord) - 1):
+        if (player == 1 and y == board_width - 1) or (player == 2 and x == board_width - 1):
             path.append((x, y))
             return path
         visited.add((x, y))
         for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, 1), (1, -1)]:
             nx, ny = x + dx, y + dy
-            if (0 <= nx < len(bord) and 0 <= ny < len(bord) and bord[ny][nx] == player and (nx, ny) not in visited):
+            if (0 <= nx < board_width and 0 <= ny < board_width and board[ny][nx] == player and (nx, ny) not in visited):
                 new_path = dfs(player, nx, ny, path + [(x, y)])
                 if new_path:
                     return new_path
         return False
     for player in [1, 2]:
-        for i in range(len(bord)):
+        for i in range(board_width):
             visited = set()
             start_x, start_y = (0, i) if player == 2 else (i, 0)
-            if bord[start_y][start_x] == player:
+            if board[start_y][start_x] == player:
                 winning_path = dfs(player, start_x, start_y, [])
                 if winning_path:
                     return player
-    for row in bord:
+    for row in board:
         if 0 in row:
             return -1
     return 0
