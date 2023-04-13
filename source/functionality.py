@@ -3,6 +3,10 @@ from constants import (
     CPU_DEVICE,
     BATCH_SIZE
 )
+from game_manager.hex import (
+    print_state,
+    get_winner
+)
 # external libraries
 import json
 import math
@@ -270,15 +274,18 @@ def animate_gameboard_history(board_history: list[list[list[int]]]):
                 facecolor = "none"
                 if np.array(board_history[i])[row][col] == 1:
                     facecolor = "b"
-                else:
+                elif np.array(board_history[i])[row][col] == 2:
                     facecolor = "r"
-                patch = RegularPolygon((x, y), numVertices=6, radius=0.5, orientation=np.pi / 2, facecolor=facecolor, edgecolor='k', linewidth=1)
+                patch = RegularPolygon((x, y / 2), numVertices=6, radius=0.6, orientation=np.pi / 2, facecolor=facecolor, edgecolor='k', linewidth=1)
                 ax.add_patch(patch)
         ax.set_box_aspect(1)
         ax.set_xlim(-1, 2 * board_size - 1)
         ax.set_ylim(-board_size, board_size)
         ax.axis('off')
         return [ax]
+    print()
+    print_state(board_history[-1])
+    print(f"Winner: {get_winner(board_history[-1])}")
     # duplicate last state
     last_element = board_history[-1]
     duplicates = [last_element] * 4

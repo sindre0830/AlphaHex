@@ -36,6 +36,7 @@ class ANET():
         self.criterion_config = criterion_config
         self.optimizer_architecture = optimizer_architecture
         self.model = None
+        self.prediction_cache = {}
     
     def initialize_model(self, saved_model_path: str = None, save_directory_name: str = None):
         self.model = Model(
@@ -55,6 +56,13 @@ class ANET():
         self.model.eval()
 
     def predict(self, legal_actions: list[tuple[int, int]], state: tuple[list[list[int]], int, int]):
+        if len(legal_actions) == 1:
+            return [1]
+        key = (tuple(action for action in legal_actions), (tuple(tuple(row) for row in state[0]), state[1:]))
+        # branch if prediction is cached and return cached value
+        if key in self.prediction_cache:
+            return self.prediction_cache[key]
+        # get prediction
         self.model.evaluate_mode()
         data = prepare_data(state)
         data = np.asarray([data])
@@ -66,12 +74,15 @@ class ANET():
             action_index = action_to_index(action, board_width)
             probability_distribution.append(prediction_output[0, action_index].item())
         probability_distribution = normalize_array(probability_distribution)
+        # cache result
+        self.prediction_cache[key] = probability_distribution
         return probability_distribution
     
     def train(
         self,
         batches: tuple[tuple[list[tuple[list[list[int]], int]], list[list[float]]]]
     ):
+        self.prediction_cache.clear()
         train_batch, validate_batch = batches
         train_loader = self.convert_batch_to_dataset(train_batch)
         validation_loader = self.convert_batch_to_dataset(validate_batch)

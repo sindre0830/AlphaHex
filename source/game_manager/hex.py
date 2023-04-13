@@ -1,7 +1,4 @@
 # internal libraries
-from functionality import (
-    opposite_player
-)
 # external libraries
 import copy
 from termcolor import colored
@@ -22,7 +19,7 @@ class Hex:
 
     def play_move(self, move):
         self.board = apply_action_to_board(self.board, move, self.player)
-        self.player = opposite_player(self.player)
+        self.player = 2 if self.player == 1 else 1
 
     def terminal(self) -> bool:
         return terminal(self.board)
@@ -68,10 +65,7 @@ def get_legal_actions(board: list[list[int]]) -> list[tuple[int, int]]:
 
 
 def terminal(board: list[list[int]]) -> bool:
-    if (get_winner(board) != -1):
-        return True
-    else:
-        return False
+    return get_winner(board) != -1
 
 
 def get_winner(board: list[list[int]]) -> int:
