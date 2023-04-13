@@ -1,11 +1,8 @@
 # internal libraries
 from constants import (
     CPU_DEVICE,
-    BATCH_SIZE
-)
-from game_manager.hex import (
-    print_state,
-    get_winner
+    BATCH_SIZE,
+    DATA_PATH
 )
 # external libraries
 import json
@@ -19,6 +16,7 @@ from typing import Iterator
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib.patches import RegularPolygon
+from matplotlib.collections import LineCollection
 
 
 def parse_arguments(args: list[str]):
@@ -265,33 +263,48 @@ def build_optimizer(parameters: Iterator[torch.nn.Parameter], architecture: dict
             return torch.optim.Adam(parameters, lr=0.001)
 
 
-def animate_gameboard_history(board_history: list[list[list[int]]]):
+def animate_game(save_directory_name: str, board_history: list[list[list[int]]], iteration: int):
     def animate(i):
+        # clear previous canvas
         ax.cla()
+        # draw polygons
         for row in range(board_size):
             for col in range(board_size):
                 x, y = col + row, -col + row
-                facecolor = "none"
-                if np.array(board_history[i])[row][col] == 1:
-                    facecolor = "b"
-                elif np.array(board_history[i])[row][col] == 2:
-                    facecolor = "r"
-                patch = RegularPolygon((x, y / 2), numVertices=6, radius=0.6, orientation=np.pi / 2, facecolor=facecolor, edgecolor='k', linewidth=1)
+                patch = RegularPolygon((x / 1.1, y / 1.9), numVertices=6, radius=0.6, orientation=np.pi / 2, facecolor=player_colors[board_history[i][row][col]], edgecolor="black", linewidth=1)
                 ax.add_patch(patch)
+        # draw lines
+        offset = 0.8
+        edge_states = [
+            ((0 - offset, 0 - offset), (0 - offset, board_size - 1 + offset), 1),
+            ((0 - offset, board_size - 1 + offset), (board_size - 1 + offset, board_size - 1 + offset), 2),
+            ((board_size - 1 + offset, board_size - 1 + offset), (board_size - 1 + offset, 0 - offset), 1),
+            ((board_size - 1 + offset, 0 - offset), (0 - offset, 0 - offset), 2)
+        ]
+        lines = []
+        line_colors = []
+        for edge_state in edge_states:
+            (row_1, col_1), (row_2, col_2), player = edge_state
+            x_1, y_1 = col_1 + row_1, -col_1 + row_1
+            x_2, y_2 = col_2 + row_2, -col_2 + row_2
+            lines.append([(x_1 / 1.1, y_1 / 1.9), (x_2 / 1.1, y_2 / 1.9)])
+            line_colors.append(player_colors[player])
+        ax.add_collection(LineCollection(lines, colors=line_colors, linewidths=4))
+        # set size and apspect ratio of canvas
         ax.set_box_aspect(1)
-        ax.set_xlim(-1, 2 * board_size - 1)
-        ax.set_ylim(-board_size, board_size)
-        ax.axis('off')
+        size = -0.5
+        ax.set_xlim(-1 + size, 2 * board_size - 1 - size)
+        ax.set_ylim(-board_size + size, board_size - size)
+        ax.axis("off")
         return [ax]
-    print()
-    print_state(board_history[-1])
-    print(f"Winner: {get_winner(board_history[-1])}")
     # duplicate last state
     last_element = board_history[-1]
     duplicates = [last_element] * 4
     board_history = board_history + duplicates
+    player_colors = {0: "none", 1: "red", 2: "blue"}
     # create gif
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(10, 10))
     board_size = len(board_history[0])
     ani = animation.FuncAnimation(fig, animate, frames=len(board_history), interval=500)
-    ani.save('game_board.gif', writer='pillow')
+    # save gif
+    ani.save(f"{DATA_PATH}/{save_directory_name}/visualization_{iteration}.gif", writer="pillow")

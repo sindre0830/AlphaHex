@@ -6,7 +6,7 @@ from functionality import (
     parse_json,
     store_json,
     action_from_visit_distribution,
-    animate_gameboard_history
+    animate_game
 )
 from rbuf import RBUF
 from anet import ANET
@@ -75,13 +75,13 @@ class AlphaHex:
                 actual_move = action_from_visit_distribution(visit_distribution, self.game_board_size)
                 self.game_manager.play_move(actual_move)
                 self.mct.set_root_node(self.game_manager.board, self.game_manager.player)
-            animate_gameboard_history(self.mct.game_board_history)
             self.reset_counts()
             print("\tTraining model")
             self.anet.train(self.rbuf.get_mini_batch(self.mini_batch_size))
             if (actual_game + 1) % self.save_interval == 0 or actual_game == (self.actual_games_size - 1):
                 self.anet.save(directory_path=f"{DATA_PATH}/{self.save_directory_name}", iteration=(actual_game + 1))
                 print("\tModel saved")
+            animate_game(self.save_directory_name, self.mct.game_board_history, iteration=(actual_game + 1))
             time_end = time()
             print(f"\tTime elapsed: {(time_end - time_start):0.2f} seconds")
 

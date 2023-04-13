@@ -1,4 +1,7 @@
 # internal libraries
+from functionality import (
+    opposite_player
+)
 # external libraries
 import copy
 from termcolor import colored
@@ -19,7 +22,7 @@ class Hex:
 
     def play_move(self, move):
         self.board = apply_action_to_board(self.board, move, self.player)
-        self.player = 2 if self.player == 1 else 1
+        self.player = opposite_player(self.player)
 
     def terminal(self) -> bool:
         return terminal(self.board)
