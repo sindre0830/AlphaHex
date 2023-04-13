@@ -26,6 +26,7 @@ class AlphaHex:
         # load coniguration
         self.configuration = parse_json(file_name="configuration")
         self.save_interval: int = self.configuration["save_interval"]
+        self.save_visualization_interval: int = self.configuration["save_visualization_interval"]
         self.actual_games_size: int = self.configuration["actual_games_size"]
         self.game_board_size: int = self.configuration["game_board_size"]
         self.search_games_size: int = self.configuration["search_games_size"]
@@ -81,7 +82,9 @@ class AlphaHex:
             if (actual_game + 1) % self.save_interval == 0 or actual_game == (self.actual_games_size - 1):
                 self.anet.save(directory_path=f"{DATA_PATH}/{self.save_directory_name}", iteration=(actual_game + 1))
                 print("\tModel saved")
-            animate_game(self.save_directory_name, self.mct.game_board_history, iteration=(actual_game + 1))
+            if self.save_visualization_interval is not None and ((actual_game + 1) % self.save_visualization_interval == 0 or actual_game == (self.actual_games_size - 1) or actual_game == 0):
+                animate_game(self.save_directory_name, self.mct.game_board_history, iteration=(actual_game + 1))
+                print("\tBoard visualization saved")
             time_end = time()
             print(f"\tTime elapsed: {(time_end - time_start):0.2f} seconds")
 
