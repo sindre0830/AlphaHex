@@ -5,6 +5,10 @@ from constants import (
     DATA_PATH,
     INPUT_CHANNELS
 )
+from game_manager.hex import (
+    get_legal_actions
+)
+import strategies
 # external libraries
 import json
 import math
@@ -83,27 +87,25 @@ def opposite_player(current_player: int) -> int:
 
 def prepare_data(state: tuple[list[list[int]], int, int]) -> np.ndarray:
     board, player, turn = state
-    board_width = len(board)
+    opponent = opposite_player(player)
+    board_size = len(board)
     # prepare feature maps
-    # 1 = binary representation of empty cells on the current game board
-    # 2 = binary representation of player 1 cells on the current game board
-    # 3 = binary representation of player 2 cells on the current game board
-    # 4 = binary representation of which players turn it is
-    data: np.ndarray = np.zeros(shape=(INPUT_CHANNELS, board_width, board_width), dtype=np.float32)
+    data: np.ndarray = np.zeros(shape=(INPUT_CHANNELS, board_size, board_size), dtype=np.float32)
     # fill the first 3 feature maps with current board data
-    for row in range(board_width):
-        for column in range(board_width):
+    for row in range(board_size):
+        for column in range(board_size):
             cell = board[row][column]
             if cell == player:
                 data[0][row][column] = 1
-            elif cell == opposite_player(player):
+            elif cell == opponent:
                 data[1][row][column] = 1
-    # fill a feautre map with the current players turn
-    data[2] = 0 if player == 1 else 1
-    # fill a feature map with the current turn
-    #data[3] = turn
-    # add a constant plane as bias
+            else:
+                data[2][row][column] = 1
     data[3] = 1
+    data[4] = strategies.fork_actions(board, player)
+    for (row, column) in get_legal_actions(board):
+        data[5][row][column] = 1
+    data[6] = 0
     return data
 
 
@@ -308,7 +310,7 @@ def animate_game(save_directory_name: str, board_history: list[list[list[int]]],
     last_element = board_history[-1]
     duplicates = [last_element] * 4
     board_history = board_history + duplicates
-    player_colors = {0: "none", 1: "red", 2: "blue"}
+    player_colors = {-1: "green", 0: "none", 1: "red", 2: "blue"}
     # create gif
     fig, ax = plt.subplots(figsize=(10, 10))
     board_size = len(board_history[0])
