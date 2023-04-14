@@ -1,6 +1,6 @@
 # internal libraries
-from game_manager import (
-    get_legal_actions
+from functionality.board import (
+    legal_actions
 )
 # external libraries
 import numpy as np
@@ -23,7 +23,7 @@ def onehot_encode_cell(board: list[list[int]], target: int) -> np.ndarray:
 def sensibleness(board: list[list[int]]) -> np.ndarray:
     board_size = len(board)
     feature = np.zeros(shape=(board_size, board_size), dtype=np.float32)
-    for (row, column) in get_legal_actions(board):
+    for (row, column) in legal_actions(board):
         feature[row][column] = 1
     return feature
 

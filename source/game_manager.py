@@ -1,3 +1,7 @@
+# internal libraries
+from functionality.board import (
+    legal_actions
+)
 # external libraries
 import copy
 from termcolor import colored
@@ -23,8 +27,8 @@ class GameManager:
     def terminal(self) -> bool:
         return terminal(self.board)
     
-    def get_legal_actions(self) -> list[tuple[int, int]]:
-        return get_legal_actions(self.board)
+    def legal_actions(self) -> list[tuple[int, int]]:
+        return legal_actions(self.board)
     
     def print_state(self, winning_path=None):
         print_state(self.board, winning_path)
@@ -57,16 +61,6 @@ def apply_action_to_board(board: list[list[int]], action: tuple[int, int], playe
     next_board = copy.deepcopy(board)
     next_board[row][col] = player
     return next_board
-
-
-def get_legal_actions(board: list[list[int]]) -> list[tuple[int, int]]:
-    board_size = len(board)
-    actions: list[tuple[int, int]] = []
-    for row in range(board_size):
-        for col in range(board_size):
-            if (board[row][col] == 0):
-                actions.append((row, col))
-    return actions
 
 
 def terminal(board: list[list[int]]) -> bool:

@@ -1,36 +1,49 @@
+# internal libraries
+from constants import (
+    BRIDGE_DIRECTIONS,
+    EMPTY
+)
+from functionality.board import (
+    in_bounds,
+    cells_between,
+    get_distance_from_center,
+    illegal_actions
+)
 # external libraries
 import numpy as np
 
 
-def fork(board: list[list[int]], player: int) -> np.ndarray:
+def bridge_template(board: list[list[int]], player: int) -> np.ndarray:
     board_size = len(board)
-    two_bridge_actions_board = np.zeros((board_size, board_size), dtype=np.float32)
+    bridge_actions = np.zeros(shape=(board_size, board_size), dtype=np.float32)
     for row in range(board_size):
         for col in range(board_size):
             if board[row][col] == player:
-                # iterates through each neighbour cell which would result in a bridge, order:
-                # left, right, top left, top right, bottom left, bottom right
-                for direction_row, direction_col in [(-1, -1), (1, 1), (1, -2), (2, -1), (-2, 1), (-1, 2)]:
-                    neighbour_row = row + direction_row
-                    neighbour_col = col + direction_col
-                    # branch if neighbour cell is out of bounds
-                    if neighbour_row < 0 or neighbour_row > board_size - 1:
-                        continue
-                    if neighbour_col < 0 or neighbour_col > board_size - 1:
+                # iterates through each neighbour cell which would result in a bridge
+                for direction_row, direction_col in BRIDGE_DIRECTIONS:
+                    bridge_row = row + direction_row
+                    bridge_col = col + direction_col
+                    if not in_bounds(board_size, cell=(bridge_row, bridge_col)):
                         continue
                     # branch if neighbour cell is occupied
-                    if board[neighbour_row][neighbour_col] != 0:
+                    if board[bridge_row][bridge_col] != EMPTY:
                         continue
-                    two_bridge_actions_board[neighbour_row][neighbour_col] += 1
-    return two_bridge_actions_board
+                    # make sure none of the cells between are occupied
+                    cells_between_occupied = False
+                    for cell_between_row, cells_between_col in cells_between(cell=(row, col), target=(bridge_row, bridge_col)):
+                        if board[cell_between_row][cells_between_col] != EMPTY:
+                            cells_between_occupied = True
+                            break
+                    if cells_between_occupied:
+                        continue
+                    # add 1 so that bridge actions that overlap are differentiated
+                    bridge_actions[bridge_row][bridge_col] += 1
+    return bridge_actions
 
 
-def center_control(board_size: int) -> np.ndarray:
-    board = np.zeros((board_size, board_size), dtype=np.float32)
-    center = board_size // 2
-    size = board_size - 1
-    for fill_value in (range(0, center + 1)):
-        size -= 1
-        board[center - size // 2: center + size // 2 + 1, center - size // 2: center + size // 2 + 1] = fill_value
-    return board
-
+def center_importance(board: list[list[int]], player: int) -> np.ndarray:
+    board_size = len(board)
+    distance_from_center = get_distance_from_center(board_size)
+    for row, col in illegal_actions(board):
+        distance_from_center[row][col] = 0
+    return distance_from_center

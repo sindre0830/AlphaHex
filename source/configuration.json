@@ -3,9 +3,9 @@
     "save_visualization_interval": 5,
     "actual_games_size": 5,
     "game_board_size": 5,
-    "search_games_size": 50,
+    "search_games_size": 200,
     "mini_batch_size": 32,
-    "epochs": 20,
+    "epochs": 64,
     "criterion": "kl_divergence",
     "optimizer": {
         "type": "adam",
