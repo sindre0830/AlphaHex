@@ -11,7 +11,7 @@ from functionality import (
 from rbuf import RBUF
 from anet import ANET
 from mct import MCT
-from game_manager.hex import Hex
+from game_manager import GameManager
 # external libraries
 import torch
 from time import time
@@ -43,7 +43,7 @@ class AlphaHex:
             self.configuration["criterion"],
             self.configuration["optimizer"]
         )
-        self.game_manager = Hex(self.game_board_size)
+        self.game_manager = GameManager(self.game_board_size)
         self.mct = MCT()
         # create directory to store models and configuration
         self.save_directory_name = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")

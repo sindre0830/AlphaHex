@@ -4,8 +4,8 @@ from functionality import (
 )
 from node import Node
 from anet import ANET
-from game_manager.hex import (
-    Hex,
+from game_manager import (
+    GameManager,
     apply_action_to_board,
     get_legal_actions,
     terminal
@@ -53,7 +53,7 @@ class MCT:
             node.add_child(child_node, action)
     
     def leaf_evaluation(self, anet: ANET, node: Node):
-        local_game_manager = Hex(board_size=len(node.board))
+        local_game_manager = GameManager(board_size=len(node.board))
         local_game_manager.set_state(node.board, node.player)
         turn = self.turn
         while not local_game_manager.terminal():

@@ -3,7 +3,7 @@ import copy
 from termcolor import colored
 
 
-class Hex:
+class GameManager:
     def __init__(self, board_size: int):
         self.board_size = board_size
         self.board = []

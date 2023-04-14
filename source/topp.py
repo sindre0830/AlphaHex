@@ -6,7 +6,7 @@ from functionality import (
     parse_json
 )
 from anet import ANET
-from game_manager.hex import Hex
+from game_manager import GameManager
 # external libraries
 import os
 import glob
@@ -81,7 +81,7 @@ class TOPP:
     def match(self, model_1: ANET, model_2: ANET):
         score: list[int] = []
         for _ in range(25):
-            game_manager = Hex(self.board_size)
+            game_manager = GameManager(self.board_size)
             game_manager.set_state(board=game_manager.empty_board())
             turn = 0
             while not game_manager.terminal():

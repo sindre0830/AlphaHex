@@ -5,7 +5,7 @@ from constants import (
     DATA_PATH,
     INPUT_CHANNELS
 )
-from game_manager.hex import (
+from game_manager import (
     get_legal_actions
 )
 import strategies
