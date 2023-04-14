@@ -1,5 +1,5 @@
 # internal libraries
-from functionality import (
+from functionality.game import (
     opposite_player
 )
 from node import Node

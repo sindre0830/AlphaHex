@@ -2,8 +2,10 @@
 from constants import (
     DATA_PATH
 )
-from functionality import (
-    action_to_index,
+from functionality.game import (
+    action_to_index
+)
+from functionality.data import (
     prepare_data,
     prepare_labels,
     convert_dataset_to_tensors,

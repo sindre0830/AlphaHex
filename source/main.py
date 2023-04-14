@@ -3,9 +3,11 @@ from constants import (
     GPU_DEVICE,
     CPU_DEVICE
 )
-from functionality import (
+from functionality.cli import (
     parse_arguments,
-    print_commands,
+    print_commands
+)
+from functionality.data import (
     parse_json,
     print_json
 )

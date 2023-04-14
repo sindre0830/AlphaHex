@@ -1,5 +1,5 @@
 # internal libraries
-from functionality import (
+from functionality.game import (
     action_to_index
 )
 # external libraries

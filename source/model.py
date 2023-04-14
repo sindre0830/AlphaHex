@@ -4,7 +4,7 @@ from constants import (
     BATCH_SIZE,
     INPUT_CHANNELS
 )
-from functionality import (
+from functionality.model import (
     get_progressbar,
     set_progressbar_prefix,
     build_hidden_layer,

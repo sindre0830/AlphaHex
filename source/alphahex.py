@@ -2,9 +2,11 @@
 from constants import (
     DATA_PATH
 )
-from functionality import (
+from functionality.data import (
     parse_json,
-    store_json,
+    store_json
+)
+from functionality.game import (
     action_from_visit_distribution,
     animate_game
 )

@@ -2,7 +2,7 @@
 from constants import (
     DATA_PATH
 )
-from functionality import (
+from functionality.data import (
     parse_json
 )
 from anet import ANET
