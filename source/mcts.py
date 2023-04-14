@@ -15,7 +15,7 @@ import random
 import copy
 
 
-class MCT:
+class MCTS:
     def __init__(self, exploration_constant: float = 1.0):
         self.root_node: Node = None
         self.game_board: list[list[int]] = None
