@@ -2,7 +2,7 @@
 import numpy as np
 
 
-def fork_actions(board: list[list[int]], player: int) -> np.ndarray:
+def fork(board: list[list[int]], player: int) -> np.ndarray:
     board_size = len(board)
     two_bridge_actions_board = np.zeros((board_size, board_size), dtype=np.float32)
     for row in range(board_size):

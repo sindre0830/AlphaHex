@@ -53,14 +53,20 @@ def print_state(board: list[list[int]], winning_path=None):
 
 
 def apply_action_to_board(board: list[list[int]], action: tuple[int, int], player: int) -> list[list[int]]:
-    x, y = action
+    row, col = action
     next_board = copy.deepcopy(board)
-    next_board[y][x] = player
+    next_board[row][col] = player
     return next_board
 
 
 def get_legal_actions(board: list[list[int]]) -> list[tuple[int, int]]:
-    return [(x, y) for x in range(len(board)) for y in range(len(board)) if board[y][x] == 0]
+    board_size = len(board)
+    actions: list[tuple[int, int]] = []
+    for row in range(board_size):
+        for col in range(board_size):
+            if (board[row][col] == 0):
+                actions.append((row, col))
+    return actions
 
 
 def terminal(board: list[list[int]]) -> bool:

@@ -4,13 +4,11 @@ from constants import (
     BATCH_SIZE,
     INPUT_CHANNELS
 )
-from game_manager import (
-    get_legal_actions
-)
 import functionality.strategies as strategies
 from functionality.game import (
     opposite_player
 )
+import functionality.feature_maps as feature_maps
 # external libraries
 import json
 import numpy as np
@@ -40,20 +38,12 @@ def prepare_data(state: tuple[list[list[int]], int, int]) -> np.ndarray:
     # prepare feature maps
     data: np.ndarray = np.zeros(shape=(INPUT_CHANNELS, board_size, board_size), dtype=np.float32)
     # fill the first 3 feature maps with current board data
-    for row in range(board_size):
-        for column in range(board_size):
-            cell = board[row][column]
-            if cell == player:
-                data[0][row][column] = 1
-            elif cell == opponent:
-                data[1][row][column] = 1
-            else:
-                data[2][row][column] = 1
-    data[3] = 1
-    data[4] = strategies.fork_actions(board, player)
-    for (row, column) in get_legal_actions(board):
-        data[5][row][column] = 1
-    data[6] = 0
+    data[0] = feature_maps.onehot_encode_cell(board, target=player)
+    data[1] = feature_maps.onehot_encode_cell(board, target=opponent)
+    data[2] = feature_maps.onehot_encode_cell(board, target=0)
+    data[3] = feature_maps.constant_plane(board_size, value=1)
+    data[4] = feature_maps.strategy(strategies.fork, board, player)
+    data[5] = feature_maps.constant_plane(board_size, value=0)
     return data
 
 

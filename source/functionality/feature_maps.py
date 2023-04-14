@@ -1,3 +1,7 @@
+# internal libraries
+from game_manager import (
+    get_legal_actions
+)
 # external libraries
 import numpy as np
 
@@ -8,9 +12,21 @@ def constant_plane(board_size: int, value: float) -> np.ndarray:
 
 def onehot_encode_cell(board: list[list[int]], target: int) -> np.ndarray:
     board_size = len(board)
-    new_board = np.zeros(shape=(board_size, board_size), dtype=np.float32)
+    feature = np.zeros(shape=(board_size, board_size), dtype=np.float32)
     for row in range(board_size):
         for col in range(board_size):
             if board[row][col] == target:
-                new_board[row][col] = 1
-    return new_board
+                feature[row][col] = 1
+    return feature
+
+
+def sensibleness(board: list[list[int]]) -> np.ndarray:
+    board_size = len(board)
+    feature = np.zeros(shape=(board_size, board_size), dtype=np.float32)
+    for (row, column) in get_legal_actions(board):
+        feature[row][column] = 1
+    return feature
+
+
+def strategy(strategy_func, board: list[list[int]], player: int) -> np.ndarray:
+    return strategy_func(board, player)
