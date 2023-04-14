@@ -69,6 +69,8 @@ class ANET():
         board_width = len(state[0])
         tensor_data = torch.tensor(data, dtype=torch.float32)
         prediction_output: torch.Tensor = self.model(tensor_data)
+        # convert from logarithmic probability to normal probability
+        prediction_output = torch.nn.functional.softmax(prediction_output, dim=1)
         probability_distribution = []
         for action in legal_actions:
             action_index = action_to_index(action, board_width)
@@ -97,11 +99,11 @@ class ANET():
         for state in states:
             data.append(prepare_data(state))
         for visit_distribution in visit_distributions:
-            labels.append(prepare_labels(visit_distribution) if self.criterion_config != "mse" else np.asarray(visit_distribution, dtype=np.float32))
+            labels.append(prepare_labels(visit_distribution) if self.criterion_config != "kl_divergence" else np.asarray(visit_distribution, dtype=np.float32))
         dataset_loader = convert_dataset_to_tensors(
             self.device_type,
             data=np.asarray(data),
-            labels=np.asarray(labels, dtype=np.int64) if self.criterion_config != "mse" else np.asarray(labels)
+            labels=np.asarray(labels, dtype=np.int64) if self.criterion_config != "kl_divergence" else np.asarray(labels)
         )
         return dataset_loader
     

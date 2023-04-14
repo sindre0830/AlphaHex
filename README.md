@@ -1,4 +1,16 @@
 # AlphaHex
+### Info
+The feature maps consists of:
+1. onehot-encoding for player 1 cells
+2. onehot-encoding for player 2 cells
+3. onehot-encoding for empty cells
+4. single plane representing the current player, player 1 is 1 and player 2 is 0
+5. map of the turn when each cell was modified
+6. ? map showing all possible moves that results in two-bridge
+7. ? all other strategies goes here
+8. map of legal and illegal moves where legal moves marks the cell as 1, and illegal moves marks the cell as 0
+
+
 ### Run program
 0. Install required python version **3.10**
 1. Install required packages `pip install -r source/requirements.txt` (We recommend using virtual environment, follow guide under **Virtual Environment Setup** below and skip this step)

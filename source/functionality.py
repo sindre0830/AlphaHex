@@ -2,7 +2,8 @@
 from constants import (
     CPU_DEVICE,
     BATCH_SIZE,
-    DATA_PATH
+    DATA_PATH,
+    INPUT_CHANNELS
 )
 # external libraries
 import json
@@ -88,15 +89,21 @@ def prepare_data(state: tuple[list[list[int]], int, int]) -> np.ndarray:
     # 2 = binary representation of player 1 cells on the current game board
     # 3 = binary representation of player 2 cells on the current game board
     # 4 = binary representation of which players turn it is
-    data: np.ndarray = np.zeros(shape=(5, board_width, board_width), dtype=np.float32)
+    data: np.ndarray = np.zeros(shape=(INPUT_CHANNELS, board_width, board_width), dtype=np.float32)
     # fill the first 3 feature maps with current board data
     for row in range(board_width):
         for column in range(board_width):
-            data[board[row][column]][row][column] = 1
+            cell = board[row][column]
+            if cell == player:
+                data[0][row][column] = 1
+            elif cell == opposite_player(player):
+                data[1][row][column] = 1
     # fill a feautre map with the current players turn
-    data[3] = player
+    data[2] = 0 if player == 1 else 1
     # fill a feature map with the current turn
-    data[4] = turn
+    #data[3] = turn
+    # add a constant plane as bias
+    data[3] = 1
     return data
 
 
@@ -230,8 +237,8 @@ def build_criterion(criterion_config: str) -> torch.nn.modules.loss._Loss:
     match criterion_config:
         case "cross_entropy_loss":
             return torch.nn.CrossEntropyLoss()
-        case "mse":
-            return torch.nn.MSELoss()
+        case "kl_divergence":
+            return torch.nn.KLDivLoss(reduction="batchmean")
         case _:
             return torch.nn.CrossEntropyLoss()
 

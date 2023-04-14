@@ -1,7 +1,8 @@
 # internal libraries
 from constants import (
     GPU_DEVICE,
-    BATCH_SIZE
+    BATCH_SIZE,
+    INPUT_CHANNELS
 )
 from functionality import (
     get_progressbar,
@@ -36,7 +37,7 @@ class Model(torch.nn.Module):
         # define input layer
         self.input_layer = torch.nn.Sequential(
             torch.nn.Conv2d(
-                in_channels=5,
+                in_channels=INPUT_CHANNELS,
                 out_channels=input_layer_architecture["filters"],
                 kernel_size=input_layer_architecture["kernel_size"],
                 stride=input_layer_architecture["stride"],
@@ -116,7 +117,7 @@ class Model(torch.nn.Module):
                 # clear gradients
                 optimizer.zero_grad()
                 # get results
-                output = self(data)
+                output: torch.Tensor = self(data)
                 # compute gradients through backpropagation
                 loss: torch.Tensor = criterion(output, labels)
                 loss.backward()
@@ -125,12 +126,13 @@ class Model(torch.nn.Module):
                 # calculate running loss
                 running_loss += loss.item()
                 total_loss += loss.item()
+                # convert output from logarithmic probability to normal probability
+                output = torch.nn.functional.softmax(output, dim=1)
                 # calculate accuracy
-                if self.criterion_config == "mse":
-                    correct += ((output - labels) ** 2).float().sum()
+                if self.criterion_config == "kl_divergence":
+                    correct += (torch.argmax(output, dim=1) == torch.argmax(labels, dim=1)).float().sum()
                 else:
-                    output = torch.argmax(output, dim=1)
-                    correct += (output == labels).float().sum()
+                    correct += (torch.argmax(output, dim=1) == labels).float().sum()
                 # branch if iteration is on the last step and update information with current values
                 if i >= (TRAIN_SIZE / BATCH_SIZE) - 1:
                     validation_loss, validation_accuracy = self.validate_neural_network(criterion, validation_loader)
@@ -164,16 +166,17 @@ class Model(torch.nn.Module):
             data: torch.Tensor = data.to(self.device, non_blocking=True)
             labels: torch.Tensor = labels.to(self.device, non_blocking=True)
             # get validation results
-            output = self(data)
+            output: torch.Tensor = self(data)
             # calculate training loss for this batch
-            loss = criterion(output, labels)
+            loss: torch.Tensor = criterion(output, labels)
             total_loss += loss.item()
-            # calculate validation accuracy
-            if self.criterion_config == "mse":
-                correct += ((output - labels) ** 2).float().sum()
+            # convert output from logarithmic probability to normal probability
+            output = torch.nn.functional.softmax(output, dim=1)
+            # calculate accuracy
+            if self.criterion_config == "kl_divergence":
+                correct += (torch.argmax(output, dim=1) == torch.argmax(labels, dim=1)).float().sum()
             else:
-                output = torch.argmax(output, dim=1)
-                correct += (output == labels).float().sum()
+                correct += (torch.argmax(output, dim=1) == labels).float().sum()
         # set model to train mode
         self.train()
         # calculate loss and accruacy
