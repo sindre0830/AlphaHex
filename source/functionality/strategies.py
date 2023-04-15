@@ -7,7 +7,8 @@ from functionality.board import (
     in_bounds,
     cells_between,
     get_distance_from_center,
-    illegal_actions
+    illegal_actions,
+    in_bound_neighbours
 )
 from functionality.game import (
     opposite_player
@@ -16,7 +17,7 @@ from functionality.game import (
 import numpy as np
 
 
-def bridge_template(board: np.ndarray, player: int) -> np.ndarray:
+def bridge_templates(board: np.ndarray, player: int) -> np.ndarray:
     board_size = len(board)
     bridge_actions = np.zeros_like(board, dtype=np.float32)
     for row in range(board_size):
@@ -75,6 +76,19 @@ def critical_bridge_connections(board: np.ndarray, player: int) -> np.ndarray:
                         continue
                     for critical_cell_row, critical_cell_col in critical_cells:
                         feature[critical_cell_row][critical_cell_col] = 1
+    return feature
+
+
+def block(board: np.ndarray, player: int) -> np.ndarray:
+    board_size = len(board)
+    opponent = opposite_player(player)
+    feature = np.zeros_like(board, dtype=np.float32)
+    for row in range(board_size):
+        for col in range(board_size):
+            if board[row][col] == opponent:
+                for neighbour_row, neighbour_col in in_bound_neighbours(board_size, cell=(row, col)):
+                    if board[neighbour_row][neighbour_col] == EMPTY:
+                        feature[neighbour_row][neighbour_col] += 1
     return feature
 
 
