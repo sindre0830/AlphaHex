@@ -1,29 +1,66 @@
+# internal libraries
+from functionality.data import (
+    normalize_array
+)
 # external libraries
-import random
 import numpy as np
 
 
 class RBUF():
     def __init__(self):
-        self.states: list[tuple(np.ndarray, int)] = []
-        self.visit_distributions: list[np.ndarray] = []
+        self.data: list[tuple[np.ndarray, int]] = []
+        self.labels: list[np.ndarray] = []
+        self.frequency_count: dict[tuple[bytes, int, bytes], int] = {}
 
     def clear(self):
-        self.states.clear()
-        self.visit_distributions.clear()
+        self.data.clear()
+        self.labels.clear()
+        self.frequency_count.clear()
 
-    def add(self, state, visit_distribution):
-        self.states.append(state)
-        self.visit_distributions.append(visit_distribution)
+    def add(self, state: tuple[np.ndarray, int], visit_distribution: np.ndarray):
+        self.data.append(state)
+        self.labels.append(visit_distribution)
+        self.frequency_count[self.key((state, visit_distribution))] = 1
 
     def get_mini_batch(self, mini_batch_size) -> tuple[tuple[tuple[np.ndarray, int], list[np.ndarray]], tuple[tuple[np.ndarray, int], list[np.ndarray]]]:
-        if (len(self.states) <= mini_batch_size):
-            train_batch = (self.states, self.visit_distributions)
+        data_size = len(self.data)
+        if (data_size <= mini_batch_size):
+            train_batch = (self.data, self.labels)
             validation_batch = None
+            self.increment_frequency_count(train_batch)
             return (train_batch, validation_batch)
         else:
-            selected_data = random.sample(population=list(zip(self.states, self.visit_distributions)), k=mini_batch_size)
-            all_data = list(zip(self.states, self.visit_distributions))
-            train_batch = zip(*selected_data)
-            validation_batch = zip(*[data for data in all_data if data not in selected_data])
+            indicies = list(range(data_size))
+            train_indicies = np.random.choice(
+                indicies,
+                size=mini_batch_size,
+                replace=False,
+                p=self.weights()
+            )
+            train_data = []
+            train_labels = []
+            validation_data = []
+            validation_labels = []
+            for index in range(data_size):
+                if index in train_indicies:
+                    train_data.append(self.data[index])
+                    train_labels.append(self.labels[index])
+                else:
+                    validation_data.append(self.data[index])
+                    validation_labels.append(self.labels[index])
+            train_batch = (train_data, train_labels)
+            validation_batch = (validation_data, validation_labels)
+            self.increment_frequency_count(train_batch)
             return (train_batch, validation_batch)
+
+    def increment_frequency_count(self, batch: tuple[list[tuple[np.ndarray, int]], list[np.ndarray]]):
+        data, labels = batch
+        for dataset in list(zip(data, labels)):
+            self.frequency_count[self.key(dataset)] += 1
+
+    def weights(self) -> list[float]:
+       weights = [1 / self.frequency_count[self.key(dataset)] for dataset in list(zip(self.data, self.labels))]
+       return normalize_array(weights)
+
+    def key(self, dataset: tuple[tuple[np.ndarray, int], np.ndarray]):
+        return (dataset[0][0].tobytes(), dataset[0][1], dataset[1].tobytes())
