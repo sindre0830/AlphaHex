@@ -1,7 +1,9 @@
 # internal libraries
 from constants import (
     BRIDGE_DIRECTIONS,
-    EMPTY
+    EMPTY,
+    PLAYER_1,
+    PLAYER_2
 )
 from functionality.board import (
     in_bounds,
@@ -89,6 +91,17 @@ def block(board: np.ndarray, player: int) -> np.ndarray:
                 for neighbour_row, neighbour_col in in_bound_neighbours(board_size, cell=(row, col)):
                     if board[neighbour_row][neighbour_col] == EMPTY:
                         feature[neighbour_row][neighbour_col] += 1
+    return feature
+
+
+def winning_edges(board: np.ndarray, player: int) -> np.ndarray:
+    feature = np.zeros_like(board, dtype=np.float32)
+    if player == PLAYER_1:
+        feature[0] = 1
+        feature[-1] = 1
+    else:
+        feature[:, 0] = 1
+        feature[:, -1] = 1
     return feature
 
 
