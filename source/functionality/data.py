@@ -43,7 +43,8 @@ def prepare_data(state: tuple[np.ndarray, int]) -> np.ndarray:
     data[2] = feature_maps.onehot_encode_cell(board, target=0)
     data[3] = feature_maps.constant_plane(board, value=1)
     data[4] = feature_maps.strategy(strategies.bridge_template, board, player)
-    data[5] = feature_maps.constant_plane(board, value=0)
+    data[5] = feature_maps.strategy(strategies.critical_bridge_connections, board, player)
+    data[6] = feature_maps.constant_plane(board, value=0)
     return data
 
 
