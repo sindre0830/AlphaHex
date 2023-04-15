@@ -11,10 +11,8 @@ from matplotlib.patches import RegularPolygon
 from matplotlib.collections import LineCollection
 
 
-def action_from_visit_distribution(visit_distribution: list[float], board_size: int) -> tuple[int, int]:
-    value = max(visit_distribution)
-    index = visit_distribution.index(value)
-    return index_to_action(index, board_size)
+def action_from_visit_distribution(visit_distribution: np.ndarray, board_size: int) -> tuple[int, int]:
+    return index_to_action(np.argmax(visit_distribution), board_size)
 
 
 def action_to_index(action: tuple[int, int], width: int) -> int:
@@ -32,7 +30,7 @@ def opposite_player(current_player: int) -> int:
     return 2 if current_player == 1 else 1
 
 
-def animate_game(save_directory_name: str, board_history: list[list[list[int]]], iteration: int):
+def animate_game(save_directory_name: str, board_history: list[np.ndarray], iteration: int):
     def animate(i):
         # clear previous canvas
         ax.cla()

@@ -57,10 +57,10 @@ class ANET():
             self.save(directory_path=DATA_PATH + "/" + save_directory_name, iteration=0)
         self.model.eval()
 
-    def predict(self, legal_actions: list[tuple[int, int]], state: tuple[list[list[int]], int, int]):
+    def predict(self, legal_actions: list[tuple[int, int]], state: tuple[np.ndarray, int]):
         if len(legal_actions) == 1:
             return [1]
-        key = (tuple(action for action in legal_actions), (tuple(tuple(row) for row in state[0]), state[1]))
+        key = (state[0].tobytes(), state[1])
         # branch if prediction is cached and return cached value
         if key in self.prediction_cache:
             return self.prediction_cache[key]
@@ -84,7 +84,7 @@ class ANET():
     
     def train(
         self,
-        batches: tuple[tuple[list[tuple[list[list[int]], int]], list[list[float]]]]
+        batches: tuple[tuple[tuple[np.ndarray, int], list[np.ndarray]], tuple[tuple[np.ndarray, int], list[np.ndarray]]]
     ):
         self.prediction_cache.clear()
         train_batch, validate_batch = batches
@@ -92,7 +92,7 @@ class ANET():
         validation_loader = self.convert_batch_to_dataset(validate_batch)
         self.model.train_neural_network(train_loader, validation_loader)
     
-    def convert_batch_to_dataset(self, batch: tuple[list[tuple[list[list[int]], int, int]], list[list[float]]]):
+    def convert_batch_to_dataset(self, batch: tuple[tuple[np.ndarray, int], list[np.ndarray]]):
         if (batch is None):
             return None
         states, visit_distributions = batch
@@ -101,7 +101,7 @@ class ANET():
         for state in states:
             data.append(prepare_data(state))
         for visit_distribution in visit_distributions:
-            labels.append(prepare_labels(visit_distribution) if self.criterion_config != "kl_divergence" else np.asarray(visit_distribution, dtype=np.float32))
+            labels.append(prepare_labels(visit_distribution) if self.criterion_config != "kl_divergence" else visit_distribution)
         dataset_loader = convert_dataset_to_tensors(
             self.device_type,
             data=np.asarray(data),

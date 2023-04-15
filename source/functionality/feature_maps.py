@@ -6,13 +6,13 @@ from functionality.board import (
 import numpy as np
 
 
-def constant_plane(board_size: int, value: float) -> np.ndarray:
-    return np.full(shape=(board_size, board_size), fill_value=value, dtype=np.float32)
+def constant_plane(board: np.ndarray, value: float) -> np.ndarray:
+    return np.full_like(board, fill_value=value, dtype=np.float32)
 
 
-def onehot_encode_cell(board: list[list[int]], target: int) -> np.ndarray:
+def onehot_encode_cell(board: np.ndarray, target: int) -> np.ndarray:
     board_size = len(board)
-    feature = np.zeros(shape=(board_size, board_size), dtype=np.float32)
+    feature = np.zeros_like(board, dtype=np.float32)
     for row in range(board_size):
         for col in range(board_size):
             if board[row][col] == target:
@@ -20,13 +20,12 @@ def onehot_encode_cell(board: list[list[int]], target: int) -> np.ndarray:
     return feature
 
 
-def sensibleness(board: list[list[int]]) -> np.ndarray:
-    board_size = len(board)
-    feature = np.zeros(shape=(board_size, board_size), dtype=np.float32)
+def sensibleness(board: np.ndarray) -> np.ndarray:
+    feature = np.zeros_like(board, dtype=np.float32)
     for (row, column) in legal_actions(board):
         feature[row][column] = 1
     return feature
 
 
-def strategy(strategy_func, board: list[list[int]], player: int) -> np.ndarray:
+def strategy(strategy_func, board: np.ndarray, player: int) -> np.ndarray:
     return strategy_func(board, player)

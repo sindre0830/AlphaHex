@@ -31,8 +31,8 @@ def print_json(name: str, data: dict[str, any]):
     print("\n" + name + ": " + json.dumps(data, indent=4, sort_keys=True) + "\n")
 
 
-def prepare_data(state: tuple[list[list[int]], int, int]) -> np.ndarray:
-    board, player, turn = state
+def prepare_data(state: tuple[np.ndarray, int]) -> np.ndarray:
+    board, player = state
     opponent = opposite_player(player)
     board_size = len(board)
     # prepare feature maps
@@ -41,14 +41,14 @@ def prepare_data(state: tuple[list[list[int]], int, int]) -> np.ndarray:
     data[0] = feature_maps.onehot_encode_cell(board, target=player)
     data[1] = feature_maps.onehot_encode_cell(board, target=opponent)
     data[2] = feature_maps.onehot_encode_cell(board, target=0)
-    data[3] = feature_maps.constant_plane(board_size, value=1)
+    data[3] = feature_maps.constant_plane(board, value=1)
     data[4] = feature_maps.strategy(strategies.bridge_template, board, player)
-    data[5] = feature_maps.constant_plane(board_size, value=0)
+    data[5] = feature_maps.constant_plane(board, value=0)
     return data
 
 
-def prepare_labels(visit_distribution: list[float]) -> float:
-    return visit_distribution.index(max(visit_distribution))
+def prepare_labels(visit_distribution: np.ndarray) -> int:
+    return np.argmax(visit_distribution)
 
 
 def convert_dataset_to_tensors(device_type: str, data: np.ndarray, labels: np.ndarray):
@@ -80,7 +80,7 @@ def convert_dataset_to_tensors(device_type: str, data: np.ndarray, labels: np.nd
     return dataset_loader
 
 
-def normalize_array(arr: list[float]) -> list[float]:
+def normalize_array(arr: np.ndarray) -> np.ndarray:
     # divide each element by the sum
     arr_sum = sum(arr)
     arr = [elem / arr_sum for elem in arr]

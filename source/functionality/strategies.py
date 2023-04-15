@@ -13,9 +13,9 @@ from functionality.board import (
 import numpy as np
 
 
-def bridge_template(board: list[list[int]], player: int) -> np.ndarray:
+def bridge_template(board: np.ndarray, player: int) -> np.ndarray:
     board_size = len(board)
-    bridge_actions = np.zeros(shape=(board_size, board_size), dtype=np.float32)
+    bridge_actions = np.zeros_like(board, dtype=np.float32)
     for row in range(board_size):
         for col in range(board_size):
             if board[row][col] == player:
@@ -41,7 +41,7 @@ def bridge_template(board: list[list[int]], player: int) -> np.ndarray:
     return bridge_actions
 
 
-def center_importance(board: list[list[int]], player: int) -> np.ndarray:
+def center_importance(board: np.ndarray, player: int) -> np.ndarray:
     board_size = len(board)
     distance_from_center = get_distance_from_center(board_size)
     for row, col in illegal_actions(board):

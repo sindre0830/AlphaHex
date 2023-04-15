@@ -67,7 +67,7 @@ def get_distance_from_center(board_size: int) -> np.ndarray:
     return distance_from_center
 
 
-def legal_actions(board: list[list[int]]) -> list[tuple[int, int]]:
+def legal_actions(board: np.ndarray) -> list[tuple[int, int]]:
     board_size = len(board)
     actions: list[tuple[int, int]] = []
     for row in range(board_size):
@@ -77,7 +77,7 @@ def legal_actions(board: list[list[int]]) -> list[tuple[int, int]]:
     return actions
 
 
-def illegal_actions(board: list[list[int]]) -> list[tuple[int, int]]:
+def illegal_actions(board: np.ndarray) -> list[tuple[int, int]]:
     board_size = len(board)
     actions: list[tuple[int, int]] = []
     for row in range(board_size):

@@ -74,7 +74,7 @@ class AlphaHex:
                     score = self.mcts.leaf_evaluation(self.anet, leaf)
                     self.mcts.backpropagate(leaf, score)
                 visit_distribution = self.mcts.root_node.visit_distribution()
-                self.rbuf.add((self.mcts.root_node.board, self.mcts.root_node.player, self.game_moves_count), visit_distribution)
+                self.rbuf.add((self.mcts.root_node.board, self.mcts.root_node.player), visit_distribution)
                 actual_move = action_from_visit_distribution(visit_distribution, self.game_board_size)
                 self.game_manager.play_move(actual_move)
                 self.mcts.set_root_node(self.game_manager.board, self.game_manager.player)

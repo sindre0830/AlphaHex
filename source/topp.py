@@ -90,16 +90,14 @@ class TOPP:
         for _ in range(25):
             game_manager = GameManager(self.board_size)
             game_manager.set_state(board=game_manager.empty_board())
-            turn = 0
             while not game_manager.terminal():
                 actions = game_manager.legal_actions()
-                state = (game_manager.board, game_manager.player, turn)
+                state = (game_manager.board, game_manager.player)
                 if game_manager.player == 1:
                     action_values = model_1.predict(actions, state)
                 else:
                     action_values = model_2.predict(actions, state)
                 action = random.choices(population=actions, weights=action_values, k=1)[0]
                 game_manager.play_move(action)
-                turn += 1
             score.append(game_manager.get_winner())
         return score

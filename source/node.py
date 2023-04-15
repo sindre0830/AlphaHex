@@ -4,11 +4,12 @@ from functionality.game import (
 )
 # external libraries
 import math
+import numpy as np
 
 
 class Node():
-    def __init__(self, board: list[list[int]], player=1, parent_node=None):
-        self.board = board
+    def __init__(self, board: np.ndarray, player=1, parent_node=None):
+        self.board = np.copy(board)
         self.player = player
         self.parent_node: Node = parent_node
         self.children_nodes: list[Node] = []
@@ -45,8 +46,9 @@ class Node():
         else:
             return exploration_constant * math.sqrt(math.log(self.parent_node.visits) / self.visits)
 
-    def visit_distribution(self):
-        distribution = [0.0] * (len(self.board) * len(self.board))
+    def visit_distribution(self) -> np.ndarray:
+        board_size = len(self.board)
+        distribution = np.zeros(shape=(board_size * board_size), dtype=np.float32)
         total_visits = sum(child_node.visits for child_node in self.children_nodes)
         for child_node, action in zip(self.children_nodes, self.children_nodes_actions):
             if action is not None:
