@@ -2,8 +2,7 @@
 from constants import (
     BRIDGE_DIRECTIONS,
     EMPTY,
-    PLAYER_1,
-    PLAYER_2
+    PLAYER_1
 )
 from functionality.board import (
     in_bounds,
