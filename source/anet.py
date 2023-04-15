@@ -72,7 +72,7 @@ class ANET():
         tensor_data = torch.tensor(data, dtype=torch.float32)
         prediction_output: torch.Tensor = self.model(tensor_data)
         # convert from logarithmic probability to normal probability
-        prediction_output = torch.nn.functional.softmax(prediction_output, dim=1)
+        prediction_output = prediction_output.exp()
         probability_distribution = []
         for action in legal_actions:
             action_index = action_to_index(action, board_width)
