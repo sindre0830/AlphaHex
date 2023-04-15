@@ -60,7 +60,7 @@ class ANET():
     def predict(self, legal_actions: list[tuple[int, int]], state: tuple[list[list[int]], int, int]):
         if len(legal_actions) == 1:
             return [1]
-        key = (tuple(action for action in legal_actions), (tuple(tuple(row) for row in state[0]), state[1:]))
+        key = (tuple(action for action in legal_actions), (tuple(tuple(row) for row in state[0]), state[1]))
         # branch if prediction is cached and return cached value
         if key in self.prediction_cache:
             return self.prediction_cache[key]

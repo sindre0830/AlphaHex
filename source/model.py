@@ -123,6 +123,11 @@ class Model(torch.nn.Module):
                 loss.backward()
                 # apply gradients
                 optimizer.step()
+                # remove data from device as the data is no longer needed for backpropogation
+                data.detach()
+                labels.detach()
+                output.detach()
+                loss.detach()
                 # calculate running loss
                 running_loss += loss.item()
                 total_loss += loss.item()
@@ -147,6 +152,9 @@ class Model(torch.nn.Module):
                     running_loss = 0.0
             # set model to training mode
             self.eval()
+        # empty GPU cache
+        if self.device_type is GPU_DEVICE:
+            torch.cuda.empty_cache()
 
     def validate_neural_network(
         self,
@@ -170,6 +178,11 @@ class Model(torch.nn.Module):
             # calculate training loss for this batch
             loss: torch.Tensor = criterion(output, labels)
             total_loss += loss.item()
+            # remove data from device as the data is no longer needed for backpropogation
+            data.detach()
+            labels.detach()
+            output.detach()
+            loss.detach()
             # convert output from logarithmic probability to normal probability
             output = torch.nn.functional.softmax(output, dim=1)
             # calculate accuracy
