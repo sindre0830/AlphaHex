@@ -11,13 +11,7 @@ def constant_plane(board: np.ndarray, value: float) -> np.ndarray:
 
 
 def onehot_encode_cell(board: np.ndarray, target: int) -> np.ndarray:
-    board_size = len(board)
-    feature = np.zeros_like(board, dtype=np.float32)
-    for row in range(board_size):
-        for col in range(board_size):
-            if board[row][col] == target:
-                feature[row][col] = 1
-    return feature
+    return np.where(board == target, 1, 0).astype(dtype=np.float32)
 
 
 def sensibleness(board: np.ndarray) -> np.ndarray:
