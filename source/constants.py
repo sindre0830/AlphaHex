@@ -2,7 +2,7 @@
 GPU_DEVICE = 'cuda:0'
 CPU_DEVICE = 'cpu'
 # parameters
-BATCH_SIZE = 4
+BATCH_SIZE = 32
 # paths
 DATA_PATH = "data"
 # directions

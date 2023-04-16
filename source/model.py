@@ -132,7 +132,8 @@ class Model(torch.nn.Module):
                     if train_loss <= best_loss:
                         best_loss = train_loss
                         best_accuracy = train_accuracy
-                        epochs_since_improvement = 0
+                        if best_loss > 0.001:
+                            epochs_since_improvement = 0
                     self.set_progressbar_prefix(progressbar, train_loss, train_accuracy, best_loss, best_accuracy)
                 # branch if batch size is reached and update information with current values
                 elif i % BATCH_SIZE == (BATCH_SIZE - 1):
