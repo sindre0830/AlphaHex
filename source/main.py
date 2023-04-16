@@ -18,6 +18,8 @@ warnings.filterwarnings('ignore')
 # get a device to run on
 device_type = GPU_DEVICE if torch.cuda.is_available() else CPU_DEVICE
 device = torch.device(device_type)
+# set pytorch seed
+torch.manual_seed(0)
 
 
 # Main program.
