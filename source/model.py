@@ -4,15 +4,11 @@ from constants import (
     BATCH_SIZE,
     INPUT_CHANNELS
 )
-from functionality.model import (
-    get_progressbar,
-    set_progressbar_prefix,
-    build_hidden_layer,
-    build_optimizer
-)
 # external libraries
 import torch
 import torch.utils.data
+import tqdm
+from typing import Iterator
 
 
 class Model(torch.nn.Module):
@@ -45,7 +41,7 @@ class Model(torch.nn.Module):
         # define hidden layers
         self.hidden_layers: list[torch.nn.Sequential] = []
         for hidden_layer_architecture in hidden_layer_architectures:
-            self.hidden_layers.append(build_hidden_layer(hidden_layer_architecture))
+            self.hidden_layers.append(self.build_hidden_layer(hidden_layer_architecture))
         # define output layer
         self.output_layer = torch.nn.Sequential(
             torch.nn.LazyLinear(out_features=(board_size * board_size)),
@@ -91,7 +87,7 @@ class Model(torch.nn.Module):
         self.training_mode()
         # set optimizer and criterion
         criterion = torch.nn.KLDivLoss(reduction="batchmean")
-        optimizer = build_optimizer(self.parameters(), self.optimizer_architecture)
+        optimizer = self.build_optimizer(self.parameters(), self.optimizer_architecture)
         TRAIN_SIZE = len(train_loader.dataset)
         # loop through each epoch
         epoch = 0
@@ -105,7 +101,7 @@ class Model(torch.nn.Module):
             running_loss = 0.0
             total_loss = 0.0
             # define the progressbar
-            progressbar = get_progressbar(train_loader, epoch)
+            progressbar = self.get_progressbar(train_loader, epoch)
             # set model to training mode
             self.train()
             # loop through the dataset
@@ -137,13 +133,13 @@ class Model(torch.nn.Module):
                         best_loss = train_loss
                         best_accuracy = train_accuracy
                         epochs_since_improvement = 0
-                    set_progressbar_prefix(progressbar, train_loss, train_accuracy, best_loss, best_accuracy)
+                    self.set_progressbar_prefix(progressbar, train_loss, train_accuracy, best_loss, best_accuracy)
                 # branch if batch size is reached and update information with current values
                 elif i % BATCH_SIZE == (BATCH_SIZE - 1):
                     train_loss = running_loss / (TRAIN_SIZE / BATCH_SIZE)
                     train_accuracy = correct / TRAIN_SIZE
                     running_loss = 0.0
-                    set_progressbar_prefix(progressbar, train_loss, train_accuracy, best_loss, best_accuracy)
+                    self.set_progressbar_prefix(progressbar, train_loss, train_accuracy, best_loss, best_accuracy)
         # empty GPU cache
         if self.device_type is GPU_DEVICE:
             torch.cuda.empty_cache()
@@ -153,3 +149,122 @@ class Model(torch.nn.Module):
 
     def load(self, path: str):
         self.load_state_dict(torch.load(path))
+
+    def get_progressbar(self, iter: torch.utils.data.DataLoader, epoch: int):
+        """
+        Generates progressbar for iterable used in model training.
+        """
+        progressbar = tqdm.tqdm(
+            iterable=iter,
+            desc=f'                Epoch {(epoch + 1):>{4}}',
+            ascii='░▒',
+            unit=' steps',
+            colour='blue'
+        )
+        self.set_progressbar_prefix(progressbar)
+        return progressbar
+
+    def set_progressbar_prefix(
+            self,
+            progressbar: tqdm.tqdm,
+            train_loss: float = 0.0,
+            train_accuracy: float = 0.0,
+            best_loss: float = 0.0,
+            best_accuracy: float = 0.0
+        ):
+        """
+        Set prefix in progressbar and update output.
+        """
+        train_loss_str = f'loss: {train_loss:.4f}, '
+        train_accuracy_str = f'acc: {train_accuracy:.4f}, '
+        best_loss_str = f'best loss: {best_loss:.4f}, '
+        best_accuracy_str = f'best acc: {best_accuracy:.4f}'
+        progressbar.set_postfix_str(train_loss_str + train_accuracy_str + best_loss_str + best_accuracy_str)
+
+    def build_optimizer(self, parameters: Iterator[torch.nn.Parameter], architecture: dict[str, any]) -> torch.optim.Optimizer:
+        optimizer_type = architecture["type"]
+        match optimizer_type:
+            case "adagrad":
+                return torch.optim.Adagrad(
+                    parameters,
+                    lr=architecture["lr"]
+                )
+            case "sgd":
+                return torch.optim.SGD(
+                    parameters,
+                    lr=architecture["lr"]
+                )
+            case "rms_prop":
+                return torch.optim.RMSprop(
+                    parameters,
+                    lr=architecture["lr"]
+                )
+            case "adam":
+                return torch.optim.Adam(
+                    parameters,
+                    lr=architecture["lr"]
+                )
+            case _:
+                return torch.optim.Adam(parameters, lr=0.001)
+
+    def build_hidden_layer(self, architecture: dict[str, any]) -> torch.nn.Sequential:
+        layer_type = architecture["type"]
+        match layer_type:
+            case "conv":
+                return torch.nn.Sequential(
+                    torch.nn.LazyConv2d(
+                        out_channels=architecture["filters"],
+                        kernel_size=architecture["kernel_size"],
+                        stride=architecture["stride"],
+                        padding=architecture["padding"],
+                        bias=architecture["bias"]
+                    )
+                )
+            case "linear":
+                return torch.nn.Sequential(
+                    torch.nn.LazyLinear(
+                        out_features=architecture["filters"],
+                        bias=architecture["bias"]
+                    )
+                )
+            case "flatten":
+                return torch.nn.Sequential(
+                    torch.nn.Flatten()
+                )
+            case "max_pool":
+                return torch.nn.Sequential(
+                    torch.nn.MaxPool2d(
+                        kernel_size=architecture["kernel_size"],
+                        stride=architecture["stride"]
+                    )
+                )
+            case "dropout":
+                return torch.nn.Sequential(
+                    torch.nn.Dropout(
+                        p=architecture["p"]
+                    )
+                )
+            case "batch_norm_2d":
+                return torch.nn.Sequential(
+                    torch.nn.LazyBatchNorm2d()
+                )
+            case "batch_norm_1d":
+                return torch.nn.Sequential(
+                    torch.nn.LazyBatchNorm1d()
+                )
+            case "relu":
+                return torch.nn.Sequential(
+                    torch.nn.ReLU()
+                )
+            case "sigmoid":
+                return torch.nn.Sequential(
+                    torch.nn.Sigmoid()
+                )
+            case "tanh":
+                return torch.nn.Sequential(
+                    torch.nn.Tanh()
+                )
+            case "linear":
+                return torch.nn.Sequential()
+            case _:
+                return torch.nn.Sequential()
