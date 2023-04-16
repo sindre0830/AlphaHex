@@ -21,7 +21,7 @@ class Model(torch.nn.Module):
         device: torch.cuda.device,
         device_type: str,
         board_size: int,
-        epochs: int,
+        minimum_epoch_improvement: int,
         input_layer_architecture: dict[str, any],
         hidden_layer_architectures: list[dict[str, any]],
         optimizer_architecture: dict[str, any]
@@ -29,7 +29,7 @@ class Model(torch.nn.Module):
         super().__init__()
         self.device = device
         self.device_type = device_type
-        self.total_epochs = epochs
+        self.minimum_epoch_improvement = minimum_epoch_improvement
         self.optimizer_architecture = optimizer_architecture
         # define input layer
         self.input_layer = torch.nn.Sequential(
@@ -94,12 +94,18 @@ class Model(torch.nn.Module):
         optimizer = build_optimizer(self.parameters(), self.optimizer_architecture)
         TRAIN_SIZE = len(train_loader.dataset)
         # loop through each epoch
-        for epoch in range(self.total_epochs):
+        epoch = 0
+        epochs_since_improvement = 0
+        best_loss = float("inf")
+        best_accuracy = -float("inf")
+        while epochs_since_improvement <= self.minimum_epoch_improvement:
+            epoch += 1
+            epochs_since_improvement += 1
             correct = 0.0
             running_loss = 0.0
             total_loss = 0.0
             # define the progressbar
-            progressbar = get_progressbar(train_loader, epoch, self.total_epochs)
+            progressbar = get_progressbar(train_loader, epoch)
             # set model to training mode
             self.train()
             # loop through the dataset
@@ -127,13 +133,17 @@ class Model(torch.nn.Module):
                 if i >= (TRAIN_SIZE / BATCH_SIZE) - 1:
                     train_loss = total_loss / TRAIN_SIZE
                     train_accuracy = correct / TRAIN_SIZE
-                    set_progressbar_prefix(progressbar, train_loss, train_accuracy)
+                    if train_loss <= best_loss:
+                        best_loss = train_loss
+                        best_accuracy = train_accuracy
+                        epochs_since_improvement = 0
+                    set_progressbar_prefix(progressbar, train_loss, train_accuracy, best_loss, best_accuracy)
                 # branch if batch size is reached and update information with current values
                 elif i % BATCH_SIZE == (BATCH_SIZE - 1):
                     train_loss = running_loss / (TRAIN_SIZE / BATCH_SIZE)
                     train_accuracy = correct / TRAIN_SIZE
                     running_loss = 0.0
-                    set_progressbar_prefix(progressbar, train_loss, train_accuracy)
+                    set_progressbar_prefix(progressbar, train_loss, train_accuracy, best_loss, best_accuracy)
         # empty GPU cache
         if self.device_type is GPU_DEVICE:
             torch.cuda.empty_cache()

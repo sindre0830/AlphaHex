@@ -5,14 +5,14 @@ import tqdm
 from typing import Iterator
 
 
-def get_progressbar(iter: torch.utils.data.DataLoader, epoch: int, epochs: int):
+def get_progressbar(iter: torch.utils.data.DataLoader, epoch: int):
     """
     Generates progressbar for iterable used in model training.
     """
-    width = len(str(epochs))
+    width = len(str(1000))
     progressbar = tqdm.tqdm(
         iterable=iter,
-        desc=f'                Epoch {(epoch + 1):>{width}}/{epochs}',
+        desc=f'                Epoch {(epoch + 1):>{width}}',
         ascii='░▒',
         unit=' steps',
         colour='blue'
@@ -21,13 +21,21 @@ def get_progressbar(iter: torch.utils.data.DataLoader, epoch: int, epochs: int):
     return progressbar
 
 
-def set_progressbar_prefix(progressbar: tqdm.tqdm, train_loss: float = 0.0, train_accuracy: float = 0.0):
+def set_progressbar_prefix(
+        progressbar: tqdm.tqdm,
+        train_loss: float = 0.0,
+        train_accuracy: float = 0.0,
+        best_loss: float = 0.0,
+        best_accuracy: float = 0.0
+    ):
     """
     Set prefix in progressbar and update output.
     """
     train_loss_str = f'loss: {train_loss:.4f}, '
-    train_accuracy_str = f'acc: {train_accuracy:.4f}'
-    progressbar.set_postfix_str(train_loss_str + train_accuracy_str)
+    train_accuracy_str = f'acc: {train_accuracy:.4f}, '
+    best_loss_str = f'best loss: {best_loss:.4f}, '
+    best_accuracy_str = f'best acc: {best_accuracy:.4f}'
+    progressbar.set_postfix_str(train_loss_str + train_accuracy_str + best_loss_str + best_accuracy_str)
 
 
 def build_hidden_layer(architecture: dict[str, any]) -> torch.nn.Sequential:

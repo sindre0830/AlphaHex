@@ -22,7 +22,7 @@ class ANET():
         device: torch.cuda.device,
         device_type: str,
         board_size: int,
-        epochs: int,
+        minimum_epoch_improvement: int,
         input_layer_architecture: dict[str, any],
         hidden_layer_architectures: list[dict[str, any]],
         optimizer_architecture: dict[str, any]
@@ -30,7 +30,7 @@ class ANET():
         self.device = device
         self.device_type = device_type
         self.board_size = board_size
-        self.epochs = epochs
+        self.minimum_epoch_improvement = minimum_epoch_improvement
         self.input_layer_architecture = input_layer_architecture
         self.hidden_layer_architectures = hidden_layer_architectures
         self.optimizer_architecture = optimizer_architecture
@@ -42,7 +42,7 @@ class ANET():
             self.device,
             self.device_type,
             self.board_size,
-            self.epochs,
+            self.minimum_epoch_improvement,
             self.input_layer_architecture,
             self.hidden_layer_architectures,
             self.optimizer_architecture

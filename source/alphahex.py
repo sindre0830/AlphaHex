@@ -35,7 +35,7 @@ class AlphaHex:
             device,
             device_type,
             self.game_board_size,
-            self.configuration["epochs"],
+            self.configuration["minimum_epoch_improvement"],
             self.configuration["input_layer"],
             self.configuration["hidden_layers"],
             self.configuration["optimizer"]
@@ -56,7 +56,6 @@ class AlphaHex:
             self.state_manager.initialize_state(self.game_board_size)
             self.mcts.set_root_node(self.state_manager)
             while not self.state_manager.terminal():
-                self.increment_game_moves_count()
                 search_games_time_start = time()
                 while((time() - search_games_time_start) < self.search_games_time_limit_seconds):
                     print(
@@ -72,6 +71,7 @@ class AlphaHex:
                 self.rbuf.add(self.mcts.root_node.state, visit_distribution)
                 self.state_manager.apply_action_from_distribution(visit_distribution, deterministic=True)
                 self.mcts.set_root_node(self.state_manager)
+                self.increment_game_moves_count()
             self.reset_counts()
             print("\tTraining model")
             self.anet.train(self.rbuf.get_mini_batch(self.mini_batch_size))
