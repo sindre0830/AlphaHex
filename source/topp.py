@@ -2,7 +2,9 @@
 from constants import (
     DATA_PATH,
     PLAYER_1,
-    PLAYER_2
+    PLAYER_2,
+    TOURNAMENT_GAMES,
+    TOURNAMENT_VISUALIZATION
 )
 from anet import ANET
 from state_manager import StateManager
@@ -18,6 +20,7 @@ class TOPP:
     def __init__(self, device: torch.cuda.device, device_type: str, alphahex_directory_names: str):
         models: list[ANET] = []
         self.model_iterations: list[str] = []
+        self.directory_paths = {}
         self.grid_size = None
         # remove duplicates
         alphahex_directory_names = list(dict.fromkeys(alphahex_directory_names))
@@ -48,7 +51,8 @@ class TOPP:
                 # get model iteration
                 filename = os.path.basename(model_file_path)
                 name, _ = os.path.splitext(filename)
-                self.model_iterations.append(f"{alphahex_directory_names[alphahex_index]} ({name.split('-')[-1]})")
+                self.model_iterations.append(f"{alphahex_directory_names[alphahex_index]}_{name.split('-')[-1]}")
+                self.directory_paths[self.model_iterations[-1]] = alphahex_directory_names[alphahex_index]
         # sort and store models and their iteration index together
         self.models = list(zip(models, self.model_iterations))
         # results
@@ -70,7 +74,7 @@ class TOPP:
         pairings += opposite_pairings
         # send them to match
         for ((model_1, iteration_1), (model_2, iteration_2)) in pairings:
-            scores = self.match(model_1, model_2)
+            scores = self.match(((model_1, iteration_1), (model_2, iteration_2)))
             for score in scores:
                 if score == PLAYER_1:
                     self.total_score[iteration_1]["Total"] += 1
@@ -84,9 +88,10 @@ class TOPP:
         for iteration in iterations:
             print(f"Model {iteration}: {self.total_score[iteration]}")
     
-    def match(self, model_1: ANET, model_2: ANET):
+    def match(self, pairings: tuple[tuple[ANET, str], tuple[ANET, str]]):
+        ((model_1, iteration_1), (model_2, iteration_2)) = pairings
         score: list[int] = []
-        for _ in range(100):
+        for i in range(TOURNAMENT_GAMES):
             state_manager = StateManager()
             state_manager.initialize_state(self.grid_size)
             while not state_manager.terminal():
@@ -97,4 +102,11 @@ class TOPP:
                     probability_distribution = model_2.predict(state, filter_actions=state_manager.illegal_actions())
                 state_manager.apply_action_from_distribution(probability_distribution, deterministic=False)
             score.append(state_manager.determine_winner())
+            if TOURNAMENT_VISUALIZATION:
+                state_manager.visualize(
+                    save_directory_name=f"{self.directory_paths[iteration_1]}/topp",
+                    iteration=i,
+                    filename=f"{iteration_1}-vs-{iteration_2}",
+                    verbose=False
+                )
         return score

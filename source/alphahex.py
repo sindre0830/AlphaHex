@@ -15,7 +15,7 @@ from datetime import datetime
 
 
 class AlphaHex:
-    def __init__(self, device: torch.cuda.device, device_type: str):
+    def __init__(self, device: torch.cuda.device, device_type: str, save_directory_name: str = None):
         self.simulated_games_count = 0
         # load coniguration
         self.configuration = functionality.data.parse_json(file_name="configuration")
@@ -40,13 +40,19 @@ class AlphaHex:
         self.state_manager = StateManager()
         self.mcts = MCTS()
         # create directory to store models and configuration
-        self.save_directory_name = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+        if save_directory_name is None:
+            self.save_directory_name = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+        else:
+            self.save_directory_name = save_directory_name
+            if os.path.exists(f"{DATA_PATH}/{self.save_directory_name}/"):
+                raise Exception("Directory name already taking.")
         os.makedirs(f"{DATA_PATH}/{self.save_directory_name}", exist_ok=True)
         functionality.data.store_json(
             self.configuration,
             directory_path=f"{DATA_PATH}/{self.save_directory_name}/",
             file_name="configuration"
         )
+        os.makedirs(f"{DATA_PATH}/{self.save_directory_name}/topp", exist_ok=True)
 
     def run(self):
         self.rbuf.clear()

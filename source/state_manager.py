@@ -107,7 +107,7 @@ class StateManager:
                 return DNF
         return TIE
 
-    def visualize(self, save_directory_name: str, iteration: int):
+    def visualize(self, save_directory_name: str, iteration: int, filename="visualization", verbose=True):
         def generate_frame(i):
             # clear previous canvas
             ax.cla()
@@ -149,7 +149,8 @@ class StateManager:
             ax.set_ylim(-self.grid_size + size, self.grid_size - size)
             ax.axis("off")
             return [ax]
-        print("\tVisualizing state")
+        if verbose:
+            print("\tVisualizing state")
         # duplicate last state so it lasts longer in the gif
         final_grid = self.grid_history[-1]
         duplicates = [final_grid] * 4
@@ -159,4 +160,4 @@ class StateManager:
         fig, ax = plt.subplots(figsize=(10, 10))
         ani = animation.FuncAnimation(fig, generate_frame, frames=len(grid_history), interval=500)
         # save gif
-        ani.save(f"{DATA_PATH}/{save_directory_name}/visualization_{iteration}.gif", writer="pillow")
+        ani.save(f"{DATA_PATH}/{save_directory_name}/{filename}-{iteration}.gif", writer="pillow")

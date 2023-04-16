@@ -4,6 +4,8 @@ CPU_DEVICE = 'cpu'
 # parameters
 VERBOSE_TRAINING = False
 BATCH_SIZE = 32
+TOURNAMENT_GAMES = 1
+TOURNAMENT_VISUALIZATION = True
 # paths
 DATA_PATH = "data"
 # directions
