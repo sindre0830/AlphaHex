@@ -6,7 +6,6 @@
     "search_games_size": 50,
     "mini_batch_size": 32,
     "epochs": 128,
-    "criterion": "kl_divergence",
     "optimizer": {
         "type": "adam",
         "lr": 0.001

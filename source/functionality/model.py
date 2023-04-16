@@ -91,16 +91,6 @@ def build_hidden_layer(architecture: dict[str, any]) -> torch.nn.Sequential:
             return torch.nn.Sequential()
 
 
-def build_criterion(criterion_config: str) -> torch.nn.modules.loss._Loss:
-    match criterion_config:
-        case "cross_entropy_loss":
-            return torch.nn.CrossEntropyLoss()
-        case "kl_divergence":
-            return torch.nn.KLDivLoss(reduction="batchmean")
-        case _:
-            return torch.nn.CrossEntropyLoss()
-
-
 def build_optimizer(parameters: Iterator[torch.nn.Parameter], architecture: dict[str, any]) -> torch.optim.Optimizer:
     optimizer_type = architecture["type"]
     match optimizer_type:

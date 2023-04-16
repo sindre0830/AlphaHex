@@ -42,7 +42,6 @@ class TOPP:
                     configuration["epochs"],
                     configuration["input_layer"],
                     configuration["hidden_layers"],
-                    configuration["criterion"],
                     configuration["optimizer"]
                 )
                 anet.initialize_model(saved_model_path=model_file_path)

@@ -50,10 +50,6 @@ def prepare_data(state: tuple[np.ndarray, int]) -> np.ndarray:
     return data
 
 
-def prepare_labels(visit_distribution: np.ndarray) -> int:
-    return np.argmax(visit_distribution)
-
-
 def convert_dataset_to_tensors(device_type: str, data: np.ndarray, labels: np.ndarray):
     """
     Converts dataset to a PyTorch tensor dataset.

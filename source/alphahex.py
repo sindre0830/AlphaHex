@@ -38,7 +38,6 @@ class AlphaHex:
             self.configuration["epochs"],
             self.configuration["input_layer"],
             self.configuration["hidden_layers"],
-            self.configuration["criterion"],
             self.configuration["optimizer"]
         )
         self.state_manager = StateManager()

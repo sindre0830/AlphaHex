@@ -7,7 +7,6 @@ from functionality.game import (
 )
 from functionality.data import (
     prepare_data,
-    prepare_labels,
     convert_dataset_to_tensors,
     normalize_array
 )
@@ -26,7 +25,6 @@ class ANET():
         epochs: int,
         input_layer_architecture: dict[str, any],
         hidden_layer_architectures: list[dict[str, any]],
-        criterion_config: str,
         optimizer_architecture: dict[str, any]
     ):
         self.device = device
@@ -35,7 +33,6 @@ class ANET():
         self.epochs = epochs
         self.input_layer_architecture = input_layer_architecture
         self.hidden_layer_architectures = hidden_layer_architectures
-        self.criterion_config = criterion_config
         self.optimizer_architecture = optimizer_architecture
         self.model = None
         self.prediction_cache = {}
@@ -48,7 +45,6 @@ class ANET():
             self.epochs,
             self.input_layer_architecture,
             self.hidden_layer_architectures,
-            self.criterion_config,
             self.optimizer_architecture
         )
         if saved_model_path is not None:
@@ -101,11 +97,11 @@ class ANET():
         for state in states:
             data.append(prepare_data(state))
         for visit_distribution in visit_distributions:
-            labels.append(prepare_labels(visit_distribution) if self.criterion_config != "kl_divergence" else visit_distribution)
+            labels.append(visit_distribution)
         dataset_loader = convert_dataset_to_tensors(
             self.device_type,
             data=np.asarray(data),
-            labels=np.asarray(labels, dtype=np.int64) if self.criterion_config != "kl_divergence" else np.asarray(labels)
+            labels=np.asarray(labels)
         )
         return dataset_loader
     

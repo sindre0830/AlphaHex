@@ -8,7 +8,6 @@ from functionality.model import (
     get_progressbar,
     set_progressbar_prefix,
     build_hidden_layer,
-    build_criterion,
     build_optimizer
 )
 # external libraries
@@ -25,14 +24,12 @@ class Model(torch.nn.Module):
         epochs: int,
         input_layer_architecture: dict[str, any],
         hidden_layer_architectures: list[dict[str, any]],
-        criterion_config: str,
         optimizer_architecture: dict[str, any]
     ):
         super().__init__()
         self.device = device
         self.device_type = device_type
         self.total_epochs = epochs
-        self.criterion_config = criterion_config
         self.optimizer_architecture = optimizer_architecture
         # define input layer
         self.input_layer = torch.nn.Sequential(
@@ -97,7 +94,7 @@ class Model(torch.nn.Module):
     ):
         self.training_mode()
         # set optimizer and criterion
-        criterion = build_criterion(self.criterion_config)
+        criterion = torch.nn.KLDivLoss(reduction="batchmean")
         optimizer = build_optimizer(self.parameters(), self.optimizer_architecture)
         TRAIN_SIZE = len(train_loader.dataset)
         # loop through each epoch
@@ -123,21 +120,13 @@ class Model(torch.nn.Module):
                 loss.backward()
                 # apply gradients
                 optimizer.step()
-                # remove data from device as the data is no longer needed for backpropogation
-                data.detach()
-                labels.detach()
-                output.detach()
-                loss.detach()
                 # calculate running loss
                 running_loss += loss.item()
                 total_loss += loss.item()
                 # convert output from logarithmic probability to normal probability
-                output = torch.nn.functional.softmax(output, dim=1)
+                output = output.exp()
                 # calculate accuracy
-                if self.criterion_config == "kl_divergence":
-                    correct += (torch.argmax(output, dim=1) == torch.argmax(labels, dim=1)).float().sum()
-                else:
-                    correct += (torch.argmax(output, dim=1) == labels).float().sum()
+                correct += (torch.argmax(output, dim=1) == torch.argmax(labels, dim=1)).float().sum()
                 # branch if iteration is on the last step and update information with current values
                 if i >= (TRAIN_SIZE / BATCH_SIZE) - 1:
                     validation_loss, validation_accuracy = self.validate_neural_network(criterion, validation_loader)
@@ -178,18 +167,10 @@ class Model(torch.nn.Module):
             # calculate training loss for this batch
             loss: torch.Tensor = criterion(output, labels)
             total_loss += loss.item()
-            # remove data from device as the data is no longer needed for backpropogation
-            data.detach()
-            labels.detach()
-            output.detach()
-            loss.detach()
             # convert output from logarithmic probability to normal probability
-            output = torch.nn.functional.softmax(output, dim=1)
+            output = output.exp()
             # calculate accuracy
-            if self.criterion_config == "kl_divergence":
-                correct += (torch.argmax(output, dim=1) == torch.argmax(labels, dim=1)).float().sum()
-            else:
-                correct += (torch.argmax(output, dim=1) == labels).float().sum()
+            correct += (torch.argmax(output, dim=1) == torch.argmax(labels, dim=1)).float().sum()
         # set model to train mode
         self.train()
         # calculate loss and accruacy
