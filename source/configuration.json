@@ -3,7 +3,7 @@
     "save_visualization_interval": 1,
     "actual_games_size": 5,
     "game_board_size": 5,
-    "search_games_size": 50,
+    "search_games_time_limit_seconds": 5,
     "mini_batch_size": 32,
     "epochs": 128,
     "optimizer": {

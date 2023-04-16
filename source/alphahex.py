@@ -27,7 +27,7 @@ class AlphaHex:
         self.save_visualization_interval: int = self.configuration["save_visualization_interval"]
         self.actual_games_size: int = self.configuration["actual_games_size"]
         self.game_board_size: int = self.configuration["game_board_size"]
-        self.search_games_size: int = self.configuration["search_games_size"]
+        self.search_games_time_limit_seconds: int = self.configuration["search_games_time_limit_seconds"]
         self.mini_batch_size: int = self.configuration["mini_batch_size"]
         # init objects
         self.rbuf = RBUF()
@@ -57,9 +57,10 @@ class AlphaHex:
             self.mcts.set_root_node(self.state_manager)
             while not self.state_manager.terminal():
                 self.increment_game_moves_count()
-                for search_game in range(self.search_games_size):
+                search_games_time_start = time()
+                while((time() - search_games_time_start) < self.search_games_time_limit_seconds):
                     print(
-                        f"\tSimulated game {(search_game + 1):>{len(str(self.search_games_size))}}/{self.search_games_size}, Total simulated games: {self.increment_simulated_games_count()}, Total moves: {self.game_moves_count}",
+                        f"\tTotal simulated games: {self.increment_simulated_games_count()}, Total moves: {self.game_moves_count}",
                         end="\r",
                         flush=True
                     )

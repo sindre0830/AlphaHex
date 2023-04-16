@@ -5,7 +5,7 @@ from state_manager import StateManager
 
 
 class MCTS:
-    def __init__(self, exploration_constant: float = 2.0):
+    def __init__(self, exploration_constant: float = 1.0):
         self.root_node: Node = None
         self.exploration_constant = exploration_constant
     
@@ -28,7 +28,8 @@ class MCTS:
         local_state = StateManager()
         local_state.copy_state(node.state)
         while not local_state.terminal():
-            probability_distribution = anet.predict(local_state.legal_actions(), state=(local_state.grid, local_state.player))
+            state = (local_state.grid, local_state.player)
+            probability_distribution = anet.predict(state, filter_actions=local_state.illegal_actions())
             local_state.apply_action_from_distribution(probability_distribution, deterministic=False)
         return local_state.determine_winner()
     

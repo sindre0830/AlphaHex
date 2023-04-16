@@ -53,26 +53,23 @@ class ANET():
             self.save(directory_path=DATA_PATH + "/" + save_directory_name, iteration=0)
         self.model.eval()
 
-    def predict(self, legal_actions: list[tuple[int, int]], state: tuple[np.ndarray, int]):
-        if len(legal_actions) == 1:
-            return [1]
+    def predict(self, state: tuple[np.ndarray, int], filter_actions: list[tuple[int, int]]):
         key = (state[0].tobytes(), state[1])
         # branch if prediction is cached and return cached value
-        if key in self.prediction_cache:
-            return self.prediction_cache[key]
+        #if key in self.prediction_cache:
+        #    return self.prediction_cache[key]
         # get prediction
         self.model.evaluate_mode()
-        data = prepare_data(state)
-        data = np.asarray([data])
-        board_width = len(state[0])
+        data = np.asarray([prepare_data(state)])
         tensor_data = torch.tensor(data, dtype=torch.float32)
-        prediction_output: torch.Tensor = self.model(tensor_data)
+        probability_distribution: torch.Tensor = self.model(tensor_data)
         # convert from logarithmic probability to normal probability
-        prediction_output = prediction_output.exp()
-        probability_distribution = []
-        for action in legal_actions:
-            action_index = action_to_index(action, board_width)
-            probability_distribution.append(prediction_output[0, action_index].item())
+        probability_distribution = probability_distribution.exp()
+        # convert from tensor to numpy array
+        probability_distribution = probability_distribution.detach().numpy()[0]
+        # set all illegal actions to 0 and normalize distribution
+        for action in filter_actions:
+            probability_distribution[action_to_index(action, width=len(state[0]))] = 0
         probability_distribution = normalize_array(probability_distribution)
         # cache result
         self.prediction_cache[key] = probability_distribution

@@ -47,7 +47,7 @@ class StateManager:
         if deterministic:
             action = index_to_action(np.argmax(distribution), self.grid_size)
         else:
-            action = random.choices(population=self.legal_actions(), weights=distribution, k=1)[0]
+            action = random.choices(population=self.all_actions(), weights=distribution, k=1)[0]
         self.apply_action(action)
 
     def apply_action(self, action: tuple[int, int]):
@@ -67,6 +67,9 @@ class StateManager:
         if grid_size is None:
             grid_size = self.grid_size
         return grid_size * grid_size
+    
+    def all_actions(self) -> list[tuple[int, int]]:
+        return [(row, col) for row in range(self.grid_size) for col in range(self.grid_size)]
     
     def legal_actions(self) -> list[tuple[int, int]]:
         indices = np.transpose(np.where(self.grid == EMPTY))

@@ -49,7 +49,7 @@ class TOPP:
                 # get model iteration
                 filename = os.path.basename(model_file_path)
                 name, _ = os.path.splitext(filename)
-                self.model_iterations.append(f"{alphahex_directory_names[alphahex_index]}_{name.split('-')[-1]}")
+                self.model_iterations.append(f"{alphahex_directory_names[alphahex_index]} ({name.split('-')[-1]})")
         # sort and store models and their iteration index together
         self.models = list(zip(models, self.model_iterations))
         # results
@@ -83,7 +83,7 @@ class TOPP:
     def print_score(self):
         iterations = sorted(self.model_iterations)
         for iteration in iterations:
-            print(f"Model saved at {iteration}: {self.total_score[iteration]}")
+            print(f"Model {iteration}: {self.total_score[iteration]}")
     
     def match(self, model_1: ANET, model_2: ANET):
         score: list[int] = []
@@ -91,12 +91,11 @@ class TOPP:
             state_manager = StateManager()
             state_manager.initialize_state(self.grid_size)
             while not state_manager.terminal():
-                legal_actions = state_manager.legal_actions()
                 state = (state_manager.grid, state_manager.player)
                 if state_manager.player == PLAYER_1:
-                    probability_distribution = model_1.predict(legal_actions, state)
+                    probability_distribution = model_1.predict(state, filter_actions=state_manager.illegal_actions())
                 else:
-                    probability_distribution = model_2.predict(legal_actions, state)
+                    probability_distribution = model_2.predict(state, filter_actions=state_manager.illegal_actions())
                 state_manager.apply_action_from_distribution(probability_distribution, deterministic=False)
             score.append(state_manager.determine_winner())
         return score
