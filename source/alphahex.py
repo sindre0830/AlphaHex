@@ -26,7 +26,7 @@ class AlphaHex:
         self.save_interval: int = self.configuration["save_interval"]
         self.save_visualization_interval: int = self.configuration["save_visualization_interval"]
         self.actual_games_size: int = self.configuration["actual_games_size"]
-        self.game_board_size: int = self.configuration["game_board_size"]
+        self.grid_size: int = self.configuration["grid_size"]
         self.search_games_time_limit_seconds: int = self.configuration["search_games_time_limit_seconds"]
         self.mini_batch_size: int = self.configuration["mini_batch_size"]
         # init objects
@@ -34,7 +34,7 @@ class AlphaHex:
         self.anet = ANET(
             device,
             device_type,
-            self.game_board_size,
+            self.grid_size,
             self.configuration["minimum_epoch_improvement"],
             self.configuration["input_layer"],
             self.configuration["hidden_layers"],
@@ -53,7 +53,7 @@ class AlphaHex:
         for actual_game in range(self.actual_games_size):
             print(f"Actual game {(actual_game + 1):>{len(str(self.actual_games_size))}}/{self.actual_games_size}")
             time_start = time()
-            self.state_manager.initialize_state(self.game_board_size)
+            self.state_manager.initialize_state(self.grid_size)
             self.mcts.set_root_node(self.state_manager)
             while not self.state_manager.terminal():
                 search_games_time_start = time()
@@ -75,10 +75,12 @@ class AlphaHex:
             self.reset_counts()
             print("\tTraining model")
             self.anet.train(self.rbuf.get_mini_batch(self.mini_batch_size))
-            if (actual_game + 1) % self.save_interval == 0 or actual_game == (self.actual_games_size - 1):
+            save_model = (actual_game + 1) % self.save_interval == 0 or actual_game == (self.actual_games_size - 1)
+            if save_model:
                 self.anet.save(directory_path=f"{DATA_PATH}/{self.save_directory_name}", iteration=(actual_game + 1))
                 print("\tModel saved")
-            if self.save_visualization_interval is not None and ((actual_game + 1) % self.save_visualization_interval == 0 or actual_game == (self.actual_games_size - 1) or actual_game == 0):
+            visualize_state = self.save_visualization_interval is not None and ((actual_game + 1) % self.save_visualization_interval == 0 or actual_game == (self.actual_games_size - 1) or actual_game == 0)
+            if visualize_state:
                 self.state_manager.animate(self.save_directory_name, iteration=(actual_game + 1))
                 print("\tBoard visualization saved")
             time_end = time()

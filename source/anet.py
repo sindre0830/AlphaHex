@@ -35,7 +35,6 @@ class ANET():
         self.hidden_layer_architectures = hidden_layer_architectures
         self.optimizer_architecture = optimizer_architecture
         self.model = None
-        self.prediction_cache = {}
     
     def initialize_model(self, saved_model_path: str = None, save_directory_name: str = None):
         self.model = Model(
@@ -54,10 +53,6 @@ class ANET():
         self.model.eval()
 
     def predict(self, state: tuple[np.ndarray, int], filter_actions: list[tuple[int, int]]):
-        key = (state[0].tobytes(), state[1])
-        # branch if prediction is cached and return cached value
-        #if key in self.prediction_cache:
-        #    return self.prediction_cache[key]
         # get prediction
         self.model.evaluate_mode()
         data = np.asarray([prepare_data(state)])
@@ -71,12 +66,9 @@ class ANET():
         for action in filter_actions:
             probability_distribution[action_to_index(action, width=len(state[0]))] = 0
         probability_distribution = normalize_array(probability_distribution)
-        # cache result
-        self.prediction_cache[key] = probability_distribution
         return probability_distribution
     
     def train(self, train_batch: tuple[tuple[np.ndarray, int], list[np.ndarray]]):
-        self.prediction_cache.clear()
         train_loader = self.convert_batch_to_dataset(train_batch)
         self.model.train_neural_network(train_loader)
     

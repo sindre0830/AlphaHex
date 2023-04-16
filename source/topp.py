@@ -28,8 +28,8 @@ class TOPP:
             # load config
             configuration = parse_json(working_directory_path + "/", "configuration")
             if self.grid_size is None:
-                self.grid_size = configuration["game_board_size"]
-            elif self.grid_size != configuration["game_board_size"]:
+                self.grid_size = configuration["grid_size"]
+            elif self.grid_size != configuration["grid_size"]:
                 raise Exception("The grid size needs to be the same for all models in TOPP.")
             # load models
             model_file_paths = glob.glob(f"{working_directory_path}/*.pt")
@@ -87,7 +87,7 @@ class TOPP:
     
     def match(self, model_1: ANET, model_2: ANET):
         score: list[int] = []
-        for _ in range(100):
+        for _ in range(25):
             state_manager = StateManager()
             state_manager.initialize_state(self.grid_size)
             while not state_manager.terminal():
