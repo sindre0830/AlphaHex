@@ -8,7 +8,6 @@ from functionality.board import (
     in_bounds,
     cells_between,
     get_distance_from_center,
-    illegal_actions,
     in_bound_neighbours
 )
 from functionality.game import (
@@ -107,6 +106,4 @@ def winning_edges(board: np.ndarray, player: int) -> np.ndarray:
 def center_importance(board: np.ndarray, player: int) -> np.ndarray:
     board_size = len(board)
     distance_from_center = get_distance_from_center(board_size)
-    for row, col in illegal_actions(board):
-        distance_from_center[row][col] = 0
     return distance_from_center

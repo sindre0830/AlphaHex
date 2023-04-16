@@ -2,6 +2,7 @@
 from functionality.data import (
     normalize_array
 )
+from state_manager import StateManager
 # external libraries
 import numpy as np
 
@@ -18,10 +19,10 @@ class RBUF():
         self.labels.clear()
         self.frequency_count.clear()
 
-    def add(self, state: tuple[np.ndarray, int], visit_distribution: np.ndarray):
-        self.data.append(state)
+    def add(self, state: StateManager, visit_distribution: np.ndarray):
+        self.data.append((state.grid, state.player))
         self.labels.append(visit_distribution)
-        self.frequency_count[self.key((state, visit_distribution))] = 1
+        self.frequency_count[self.key(((state.grid, state.player), visit_distribution))] = 1
 
     def get_mini_batch(self, mini_batch_size) -> tuple[tuple[tuple[np.ndarray, int], list[np.ndarray]], tuple[tuple[np.ndarray, int], list[np.ndarray]]]:
         data_size = len(self.data)

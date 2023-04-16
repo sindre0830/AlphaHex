@@ -1,7 +1,5 @@
 # internal libraries
-from functionality.board import (
-    legal_actions
-)
+from state_manager import StateManager
 # external libraries
 import numpy as np
 
@@ -16,7 +14,9 @@ def onehot_encode_cell(board: np.ndarray, target: int) -> np.ndarray:
 
 def sensibleness(board: np.ndarray) -> np.ndarray:
     feature = np.zeros_like(board, dtype=np.float32)
-    for (row, column) in legal_actions(board):
+    state = StateManager()
+    state.initialize_state(grid_size=len(board))
+    for (row, column) in state.legal_actions(board):
         feature[row][column] = 1
     return feature
 

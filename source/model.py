@@ -196,6 +196,9 @@ class Model(torch.nn.Module):
         loss = total_loss / VALIDATION_SIZE
         accuracy = correct / VALIDATION_SIZE
         return loss, accuracy
+    
+    def save(self, directory_path: str, iteration: int):
+        torch.save(self.state_dict(), f"{directory_path}/model-{iteration}.pt")
 
     def load(self, path: str):
         self.load_state_dict(torch.load(path))

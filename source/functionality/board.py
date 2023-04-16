@@ -65,23 +65,3 @@ def get_distance_from_center(board_size: int) -> np.ndarray:
         border_cells = buffer_border_cells.copy()
         buffer_border_cells = []
     return distance_from_center
-
-
-def legal_actions(board: np.ndarray) -> list[tuple[int, int]]:
-    board_size = len(board)
-    actions: list[tuple[int, int]] = []
-    for row in range(board_size):
-        for col in range(board_size):
-            if (board[row][col] == EMPTY):
-                actions.append((row, col))
-    return actions
-
-
-def illegal_actions(board: np.ndarray) -> list[tuple[int, int]]:
-    board_size = len(board)
-    actions: list[tuple[int, int]] = []
-    for row in range(board_size):
-        for col in range(board_size):
-            if (board[row][col] != EMPTY):
-                actions.append((row, col))
-    return actions

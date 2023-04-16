@@ -1,9 +1,9 @@
 {
-    "save_interval": 10,
-    "save_visualization_interval": 10,
-    "actual_games_size": 10,
+    "save_interval": 5,
+    "save_visualization_interval": 1,
+    "actual_games_size": 5,
     "game_board_size": 5,
-    "search_games_size": 256,
+    "search_games_size": 50,
     "mini_batch_size": 32,
     "epochs": 128,
     "criterion": "kl_divergence",

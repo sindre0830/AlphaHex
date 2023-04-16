@@ -1,76 +1,41 @@
 # internal libraries
-from functionality.game import (
-    opposite_player
-)
-from functionality.board import (
-    legal_actions
-)
 from node import Node
 from anet import ANET
-from game_manager import (
-    GameManager,
-    apply_action_to_board,
-    terminal
-)
-# external libraries
-import random
-import numpy as np
+from state_manager import StateManager
 
 
 class MCTS:
-    def __init__(self, exploration_constant: float = 1.0):
+    def __init__(self, exploration_constant: float = 2.0):
         self.root_node: Node = None
-        self.game_board: np.ndarray = None
         self.exploration_constant = exploration_constant
-        self.turn = 0
-        self.game_board_history: list[np.ndarray] = []
     
-    def set_root_node(self, board: np.ndarray, player: int, reset_turn = False):
-        self.root_node = Node(board, player)
-        if reset_turn:
-            self.turn = 0
-            self.game_board_history = []
-        else:
-            self.turn += 1
-        self.game_board_history.append(np.copy(board))
-    
-    def update_game_board(self, board: np.ndarray):
-        self.game_board = np.copy(board)
+    def set_root_node(self, state: StateManager):
+        self.root_node = Node(state)
     
     def tree_search(self) -> Node:
         node = self.root_node
-        while not terminal(node.board):
+        while not node.state.terminal():
             if (node.is_leaf_node()):
                 return node
             node = max(node.children_nodes, key=lambda child_node: child_node.get_score(self.exploration_constant))
-            self.update_game_board(node.board)
         return node
 
     def node_expansion(self, node: Node):
-        actions = legal_actions(node.board)
-        for action in actions:
-            next_board = np.copy(node.board)
-            apply_action_to_board(next_board, action, node.player)
-            next_player = opposite_player(node.player)
-            child_node = Node(next_board, player=next_player, parent_node=node)
-            node.add_child(child_node, action)
+        for action in node.state.legal_actions():
+            node.add_child(Node(node.state, action, parent_node=node))
     
     def leaf_evaluation(self, anet: ANET, node: Node):
-        local_game_manager = GameManager(board_size=len(node.board))
-        local_game_manager.set_state(node.board, node.player)
-        while not local_game_manager.terminal():
-            actions = local_game_manager.legal_actions()
-            state = (local_game_manager.board, local_game_manager.player)
-            probability_distribution = anet.predict(actions, state)
-            action = random.choices(population=actions, weights=probability_distribution, k=1)[0]
-            local_game_manager.play_move(action)
-        return local_game_manager.get_winner()
+        local_state = StateManager()
+        local_state.copy_state(node.state)
+        while not local_state.terminal():
+            probability_distribution = anet.predict(local_state.legal_actions(), state=(local_state.grid, local_state.player))
+            local_state.apply_action_from_distribution(probability_distribution, deterministic=False)
+        return local_state.determine_winner()
     
-    def backpropagate(self, node: Node, score: int):
+    def backpropagate(self, node: Node, winner: int):
         current_node = node
         while current_node is not None:
             current_node.visits += 1
-            if current_node.player == score:
+            if current_node.state.player == winner:
                 current_node.wins += 1
-            current_node.update_score(self.exploration_constant)
             current_node = current_node.parent_node

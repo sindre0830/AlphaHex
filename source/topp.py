@@ -1,35 +1,36 @@
 # internal libraries
 from constants import (
-    DATA_PATH
+    DATA_PATH,
+    PLAYER_1,
+    PLAYER_2
 )
 from functionality.data import (
     parse_json
 )
 from anet import ANET
-from game_manager import GameManager
+from state_manager import StateManager
 # external libraries
 import os
 import glob
 import torch
 import itertools
-import random
 
 
 class TOPP:
     def __init__(self, device: torch.cuda.device, device_type: str, alphahex_directory_names: str):
         models: list[ANET] = []
         self.model_iterations: list[str] = []
-        self.board_size = None
+        self.grid_size = None
         # remove duplicates
         alphahex_directory_names = list(dict.fromkeys(alphahex_directory_names))
         for alphahex_index in range(len(alphahex_directory_names)):
             working_directory_path = f"{DATA_PATH}/{alphahex_directory_names[alphahex_index]}"
             # load config
             configuration = parse_json(working_directory_path + "/", "configuration")
-            if self.board_size is None:
-                self.board_size = configuration["game_board_size"]
-            elif self.board_size != configuration["game_board_size"]:
-                raise Exception("The board size needs to be the same for all models.")
+            if self.grid_size is None:
+                self.grid_size = configuration["game_board_size"]
+            elif self.grid_size != configuration["game_board_size"]:
+                raise Exception("The grid size needs to be the same for all models in TOPP.")
             # load models
             model_file_paths = glob.glob(f"{working_directory_path}/*.pt")
             for model_file_path in model_file_paths:
@@ -37,7 +38,7 @@ class TOPP:
                 anet = ANET(
                     device,
                     device_type,
-                    self.board_size,
+                    self.grid_size,
                     configuration["epochs"],
                     configuration["input_layer"],
                     configuration["hidden_layers"],
@@ -73,10 +74,10 @@ class TOPP:
         for ((model_1, iteration_1), (model_2, iteration_2)) in pairings:
             scores = self.match(model_1, model_2)
             for score in scores:
-                if score == 1:
+                if score == PLAYER_1:
                     self.total_score[iteration_1]["Total"] += 1
                     self.total_score[iteration_1]["Player 1"] += 1
-                elif score == 2:
+                elif score == PLAYER_2:
                     self.total_score[iteration_2]["Total"] += 1
                     self.total_score[iteration_2]["Player 2"] += 1
     
@@ -88,16 +89,15 @@ class TOPP:
     def match(self, model_1: ANET, model_2: ANET):
         score: list[int] = []
         for _ in range(25):
-            game_manager = GameManager(self.board_size)
-            game_manager.set_state(board=game_manager.empty_board())
-            while not game_manager.terminal():
-                actions = game_manager.legal_actions()
-                state = (game_manager.board, game_manager.player)
-                if game_manager.player == 1:
-                    action_values = model_1.predict(actions, state)
+            state_manager = StateManager()
+            state_manager.initialize_state(self.grid_size)
+            while not state_manager.terminal():
+                legal_actions = state_manager.legal_actions()
+                state = (state_manager.grid, state_manager.player)
+                if state_manager.player == PLAYER_1:
+                    probability_distribution = model_1.predict(legal_actions, state)
                 else:
-                    action_values = model_2.predict(actions, state)
-                action = random.choices(population=actions, weights=action_values, k=1)[0]
-                game_manager.play_move(action)
-            score.append(game_manager.get_winner())
+                    probability_distribution = model_2.predict(legal_actions, state)
+                state_manager.apply_action_from_distribution(probability_distribution, deterministic=False)
+            score.append(state_manager.determine_winner())
         return score

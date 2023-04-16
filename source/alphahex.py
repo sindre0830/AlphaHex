@@ -6,14 +6,10 @@ from functionality.data import (
     parse_json,
     store_json
 )
-from functionality.game import (
-    action_from_visit_distribution,
-    animate_game
-)
 from rbuf import RBUF
 from anet import ANET
 from mcts import MCTS
-from game_manager import GameManager
+from state_manager import StateManager
 # external libraries
 import torch
 from time import time
@@ -45,7 +41,7 @@ class AlphaHex:
             self.configuration["criterion"],
             self.configuration["optimizer"]
         )
-        self.game_manager = GameManager(self.game_board_size)
+        self.state_manager = StateManager()
         self.mcts = MCTS()
         # create directory to store models and configuration
         self.save_directory_name = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
@@ -58,11 +54,10 @@ class AlphaHex:
         for actual_game in range(self.actual_games_size):
             print(f"Actual game {(actual_game + 1):>{len(str(self.actual_games_size))}}/{self.actual_games_size}")
             time_start = time()
-            self.game_manager.set_state(board=self.game_manager.empty_board())
-            self.mcts.set_root_node(self.game_manager.board, self.game_manager.player, reset_turn=True)
-            while not self.game_manager.terminal():
+            self.state_manager.initialize_state(self.game_board_size)
+            self.mcts.set_root_node(self.state_manager)
+            while not self.state_manager.terminal():
                 self.increment_game_moves_count()
-                self.mcts.update_game_board(self.mcts.root_node.board)
                 for search_game in range(self.search_games_size):
                     print(
                         f"\tSimulated game {(search_game + 1):>{len(str(self.search_games_size))}}/{self.search_games_size}, Total simulated games: {self.increment_simulated_games_count()}, Total moves: {self.game_moves_count}",
@@ -74,10 +69,9 @@ class AlphaHex:
                     score = self.mcts.leaf_evaluation(self.anet, leaf)
                     self.mcts.backpropagate(leaf, score)
                 visit_distribution = self.mcts.root_node.visit_distribution()
-                self.rbuf.add((self.mcts.root_node.board, self.mcts.root_node.player), visit_distribution)
-                actual_move = action_from_visit_distribution(visit_distribution, self.game_board_size)
-                self.game_manager.play_move(actual_move)
-                self.mcts.set_root_node(self.game_manager.board, self.game_manager.player)
+                self.rbuf.add(self.mcts.root_node.state, visit_distribution)
+                self.state_manager.apply_action_from_distribution(visit_distribution, deterministic=True)
+                self.mcts.set_root_node(self.state_manager)
             self.reset_counts()
             print("\tTraining model")
             self.anet.train(self.rbuf.get_mini_batch(self.mini_batch_size))
@@ -85,7 +79,7 @@ class AlphaHex:
                 self.anet.save(directory_path=f"{DATA_PATH}/{self.save_directory_name}", iteration=(actual_game + 1))
                 print("\tModel saved")
             if self.save_visualization_interval is not None and ((actual_game + 1) % self.save_visualization_interval == 0 or actual_game == (self.actual_games_size - 1) or actual_game == 0):
-                animate_game(self.save_directory_name, self.mcts.game_board_history, iteration=(actual_game + 1))
+                self.state_manager.animate(self.save_directory_name, iteration=(actual_game + 1))
                 print("\tBoard visualization saved")
             time_end = time()
             print(f"\tTime elapsed: {(time_end - time_start):0.2f} seconds")

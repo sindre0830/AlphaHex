@@ -110,4 +110,4 @@ class ANET():
         return dataset_loader
     
     def save(self, directory_path: str, iteration: int):
-        torch.save(self.model.state_dict(), f"{directory_path}/model-{iteration}.pt")
+        self.model.save(directory_path, iteration)
