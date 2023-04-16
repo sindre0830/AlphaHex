@@ -3,13 +3,9 @@ from constants import (
     DATA_PATH,
     EMPTY
 )
-from functionality.data import (
-    convert_dataset_to_tensors,
-    normalize_array,
-    action_to_index
-)
-import functionality.strategies as strategies
 from model import Model
+import functionality.data
+import functionality.strategies
 # external libraries
 import torch
 import numpy as np
@@ -67,8 +63,8 @@ class ANET():
         probability_distribution = probability_distribution.detach().numpy()[0]
         # set all illegal actions to 0 and normalize distribution
         for action in filter_actions:
-            probability_distribution[action_to_index(action, width=len(state[0]))] = 0
-        probability_distribution = normalize_array(probability_distribution)
+            probability_distribution[functionality.data.action_to_index(action, width=len(state[0]))] = 0
+        probability_distribution = functionality.data.normalize_array(probability_distribution)
         return probability_distribution
     
     def train(self, train_batch: tuple[tuple[np.ndarray, int], list[np.ndarray]]):
@@ -84,7 +80,7 @@ class ANET():
             data.append(self.get_features(state))
         for visit_distribution in visit_distributions:
             labels.append(visit_distribution)
-        dataset_loader = convert_dataset_to_tensors(
+        dataset_loader = functionality.data.convert_dataset_to_tensors(
             self.device_type,
             data=np.asarray(data),
             labels=np.asarray(labels)
@@ -117,13 +113,13 @@ class ANET():
             case "constant_plane_opponent":
                 return np.full_like(board, fill_value=opponent, dtype=np.float32)
             case "winning_edges":
-                return strategies.winning_edges(board, player, opponent)
+                return functionality.strategies.winning_edges(board, player, opponent)
             case "bridge_templates":
-                return strategies.bridge_templates(board, player, opponent)
+                return functionality.strategies.bridge_templates(board, player, opponent)
             case "critical_bridge_connections":
-                return strategies.critical_bridge_connections(board, player, opponent)
+                return functionality.strategies.critical_bridge_connections(board, player, opponent)
             case "block":
-                return strategies.block(board, player, opponent)
+                return functionality.strategies.block(board, player, opponent)
             case "_":
                 return np.full_like(board, fill_value=0, dtype=np.float32)
     

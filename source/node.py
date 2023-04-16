@@ -1,8 +1,6 @@
 # internal libraries
-from functionality.data import (
-    action_to_index
-)
 from state_manager import StateManager
+import functionality.data
 # external libraries
 import math
 import numpy as np
@@ -48,6 +46,9 @@ class Node():
         total_visits = sum(child_node.visits for child_node in self.children_nodes)
         for child_node in self.children_nodes:
             if child_node.state.action is not None:
-                action_index = action_to_index(child_node.state.action, width=self.state.grid_size)
+                action_index = functionality.data.action_to_index(
+                    child_node.state.action,
+                    width=self.state.grid_size
+                )
                 distribution[action_index] = child_node.visits / total_visits
         return distribution

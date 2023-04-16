@@ -2,14 +2,11 @@
 from constants import (
     DATA_PATH
 )
-from functionality.data import (
-    parse_json,
-    store_json
-)
 from rbuf import RBUF
 from anet import ANET
 from mcts import MCTS
 from state_manager import StateManager
+import functionality.data
 # external libraries
 import torch
 from time import time
@@ -21,7 +18,7 @@ class AlphaHex:
     def __init__(self, device: torch.cuda.device, device_type: str):
         self.simulated_games_count = 0
         # load coniguration
-        self.configuration = parse_json(file_name="configuration")
+        self.configuration = functionality.data.parse_json(file_name="configuration")
         self.save_interval: int = self.configuration["save_interval"]
         self.save_visualization_interval: int = self.configuration["save_visualization_interval"]
         self.actual_games_size: int = self.configuration["actual_games_size"]
@@ -45,7 +42,11 @@ class AlphaHex:
         # create directory to store models and configuration
         self.save_directory_name = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
         os.makedirs(f"{DATA_PATH}/{self.save_directory_name}", exist_ok=True)
-        store_json(self.configuration, directory_path=f"{DATA_PATH}/{self.save_directory_name}/", file_name="configuration")
+        functionality.data.store_json(
+            self.configuration,
+            directory_path=f"{DATA_PATH}/{self.save_directory_name}/",
+            file_name="configuration"
+        )
 
     def run(self):
         self.rbuf.clear()
@@ -71,12 +72,12 @@ class AlphaHex:
                 self.rbuf.add(self.mcts.root_node.state, visit_distribution)
                 self.state_manager.apply_action_from_distribution(visit_distribution, deterministic=True)
                 self.mcts.set_root_node(self.state_manager)
-            self.reset_counts()
+            self.reset_simulated_games_count()
             self.anet.train(self.rbuf.get_mini_batch(self.mini_batch_size))
             save_model = (actual_game + 1) % self.save_interval == 0 or actual_game == (self.actual_games_size - 1)
             if save_model:
                 self.anet.save(directory_path=f"{DATA_PATH}/{self.save_directory_name}", iteration=(actual_game + 1))
-            visualize_state = self.save_visualization_interval is not None and ((actual_game + 1) % self.save_visualization_interval == 0 or actual_game == (self.actual_games_size - 1) or actual_game == 0)
+            visualize_state = (actual_game + 1) % self.save_visualization_interval == 0 or actual_game == (self.actual_games_size - 1) or actual_game == 0
             if visualize_state:
                 self.state_manager.visualize(self.save_directory_name, iteration=(actual_game + 1))
             time_end = time()
@@ -86,6 +87,6 @@ class AlphaHex:
         self.simulated_games_count += 1
         return self.simulated_games_count
     
-    def reset_counts(self):
+    def reset_simulated_games_count(self):
         self.simulated_games_count = 0
         print()

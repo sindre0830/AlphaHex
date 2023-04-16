@@ -9,9 +9,7 @@ from constants import (
     TIE,
     DNF
 )
-from functionality.data import (
-    index_to_action
-)
+import functionality.data
 # external libraries
 import numpy as np
 import random
@@ -45,7 +43,7 @@ class StateManager:
     
     def apply_action_from_distribution(self, distribution: np.ndarray, deterministic):
         if deterministic:
-            action = index_to_action(np.argmax(distribution), self.grid_size)
+            action = functionality.data.index_to_action(np.argmax(distribution), self.grid_size)
         else:
             action = random.choices(population=self.all_actions(), weights=distribution, k=1)[0]
         self.apply_action(action)

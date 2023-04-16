@@ -4,16 +4,10 @@ from constants import (
     GPU_DEVICE,
     CPU_DEVICE
 )
-from functionality.cli import (
-    parse_arguments,
-    print_commands
-)
-from functionality.data import (
-    parse_json,
-    print_json
-)
 from alphahex import AlphaHex
 from topp import TOPP
+import functionality.cli
+import functionality.data
 # external libraries
 import sys
 import torch
@@ -29,15 +23,15 @@ device = torch.device(device_type)
 # Main program.
 def main():
     # parse arguments and branch if an error occured
-    (error, cmd, cmd_args) = parse_arguments(args=sys.argv[1:])
+    (error, cmd, cmd_args) = functionality.cli.parse_arguments(args=sys.argv[1:])
     if (error != None):
         print("Error during command parsing: '" + error + "'")
-        print_commands()
+        functionality.cli.print_commands()
         return
     # compute command given
     match cmd:
         case "--help" | "-h":
-            print_commands()
+            functionality.cli.print_commands()
             return
         case "--alphahex" | "-ah":
             print("Starting alpha hex...")
@@ -47,7 +41,7 @@ def main():
         case "--tournament" | "-t":
             if (cmd_args == None):
                 print("Tournament requires a directory name from 'data/' of which models to run.")
-                print_commands()
+                functionality.cli.print_commands()
                 return
             print("Starting tournament...")
             topp = TOPP(device, device_type, cmd_args)
@@ -58,12 +52,12 @@ def main():
             working_directory_path = ""
             if (cmd_args != None):
                 working_directory_path = f"{DATA_PATH}/{cmd_args[0]}/"
-            configuration = parse_json(working_directory_path, file_name="configuration")
-            print_json(name="configuration", data=configuration)
+            configuration = functionality.data.parse_json(working_directory_path, file_name="configuration")
+            functionality.data.print_json(name="configuration", data=configuration)
             return
         case _:
             print("Error during command matching 'Command not found'")
-            print_commands()
+            functionality.cli.print_commands()
             return
 
 

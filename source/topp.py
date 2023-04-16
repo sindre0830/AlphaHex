@@ -4,11 +4,9 @@ from constants import (
     PLAYER_1,
     PLAYER_2
 )
-from functionality.data import (
-    parse_json
-)
 from anet import ANET
 from state_manager import StateManager
+import functionality.data
 # external libraries
 import os
 import glob
@@ -26,7 +24,7 @@ class TOPP:
         for alphahex_index in range(len(alphahex_directory_names)):
             working_directory_path = f"{DATA_PATH}/{alphahex_directory_names[alphahex_index]}"
             # load config
-            configuration = parse_json(working_directory_path + "/", "configuration")
+            configuration = functionality.data.parse_json(working_directory_path + "/", "configuration")
             if self.grid_size is None:
                 self.grid_size = configuration["grid_size"]
             elif self.grid_size != configuration["grid_size"]:

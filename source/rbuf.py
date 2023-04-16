@@ -1,8 +1,6 @@
 # internal libraries
-from functionality.data import (
-    normalize_array
-)
 from state_manager import StateManager
+import functionality.data
 # external libraries
 import numpy as np
 
@@ -52,7 +50,7 @@ class RBUF():
 
     def weights(self) -> list[float]:
        weights = [1 / self.frequency_count[self.key(dataset)] for dataset in list(zip(self.data, self.labels))]
-       return normalize_array(weights)
+       return functionality.data.normalize_array(weights)
 
     def key(self, dataset: tuple[tuple[np.ndarray, int], np.ndarray]):
         return (dataset[0][0].tobytes(), dataset[0][1], dataset[1].tobytes())
