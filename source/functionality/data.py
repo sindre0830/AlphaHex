@@ -1,14 +1,8 @@
 # internal libraries
 from constants import (
     CPU_DEVICE,
-    BATCH_SIZE,
-    INPUT_CHANNELS
+    BATCH_SIZE
 )
-import functionality.strategies as strategies
-from functionality.game import (
-    opposite_player
-)
-import functionality.feature_maps as feature_maps
 # external libraries
 import json
 import numpy as np
@@ -29,25 +23,6 @@ def store_json(data: dict[str, any], directory_path: str = "", file_name: str = 
 
 def print_json(name: str, data: dict[str, any]):
     print("\n" + name + ": " + json.dumps(data, indent=4, sort_keys=True) + "\n")
-
-
-def prepare_data(state: tuple[np.ndarray, int]) -> np.ndarray:
-    board, player = state
-    opponent = opposite_player(player)
-    board_size = len(board)
-    # prepare feature maps
-    data: np.ndarray = np.zeros(shape=(INPUT_CHANNELS, board_size, board_size), dtype=np.float32)
-    # fill the first 3 feature maps with current board data
-    data[0] = feature_maps.onehot_encode_cell(board, target=player)
-    data[1] = feature_maps.onehot_encode_cell(board, target=opponent)
-    data[2] = feature_maps.onehot_encode_cell(board, target=0)
-    data[3] = feature_maps.constant_plane(board, value=1)
-    data[4] = feature_maps.strategy(strategies.winning_edges, board, player)
-    data[5] = feature_maps.strategy(strategies.bridge_templates, board, player)
-    data[6] = feature_maps.strategy(strategies.critical_bridge_connections, board, player)
-    data[7] = feature_maps.strategy(strategies.block, board, player)
-    data[8] = feature_maps.constant_plane(board, value=0)
-    return data
 
 
 def convert_dataset_to_tensors(device_type: str, data: np.ndarray, labels: np.ndarray):

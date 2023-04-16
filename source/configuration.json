@@ -6,6 +6,17 @@
     "search_games_time_limit_seconds": 2,
     "mini_batch_size": 32,
     "minimum_epoch_improvement": 10,
+    "features": [
+        {
+            "type": "onehot_encode_player"
+        },
+        {
+            "type": "onehot_encode_opponent"
+        },
+        {
+            "type": "onehot_encode_empty"
+        }
+    ],
     "optimizer": {
         "type": "adam",
         "lr": 0.001

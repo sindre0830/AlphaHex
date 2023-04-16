@@ -42,7 +42,8 @@ class TOPP:
                     configuration["minimum_epoch_improvement"],
                     configuration["input_layer"],
                     configuration["hidden_layers"],
-                    configuration["optimizer"]
+                    configuration["optimizer"],
+                    configuration["features"]
                 )
                 anet.initialize_model(saved_model_path=model_file_path)
                 models.append(anet)
@@ -87,7 +88,7 @@ class TOPP:
     
     def match(self, model_1: ANET, model_2: ANET):
         score: list[int] = []
-        for _ in range(25):
+        for _ in range(100):
             state_manager = StateManager()
             state_manager.initialize_state(self.grid_size)
             while not state_manager.terminal():

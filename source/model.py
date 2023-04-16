@@ -1,8 +1,7 @@
 # internal libraries
 from constants import (
     GPU_DEVICE,
-    BATCH_SIZE,
-    INPUT_CHANNELS
+    BATCH_SIZE
 )
 # external libraries
 import torch
@@ -16,7 +15,8 @@ class Model(torch.nn.Module):
         self,
         device: torch.cuda.device,
         device_type: str,
-        board_size: int,
+        grid_size: int,
+        input_channels: int,
         minimum_epoch_improvement: int,
         input_layer_architecture: dict[str, any],
         hidden_layer_architectures: list[dict[str, any]],
@@ -30,7 +30,7 @@ class Model(torch.nn.Module):
         # define input layer
         self.input_layer = torch.nn.Sequential(
             torch.nn.Conv2d(
-                in_channels=INPUT_CHANNELS,
+                in_channels=input_channels,
                 out_channels=input_layer_architecture["filters"],
                 kernel_size=input_layer_architecture["kernel_size"],
                 stride=input_layer_architecture["stride"],
@@ -44,7 +44,7 @@ class Model(torch.nn.Module):
             self.hidden_layers.append(self.build_hidden_layer(hidden_layer_architecture))
         # define output layer
         self.output_layer = torch.nn.Sequential(
-            torch.nn.LazyLinear(out_features=(board_size * board_size)),
+            torch.nn.LazyLinear(out_features=(grid_size * grid_size)),
             torch.nn.LogSoftmax(dim=1)
         )
         # send model to CPU

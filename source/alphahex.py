@@ -38,7 +38,8 @@ class AlphaHex:
             self.configuration["minimum_epoch_improvement"],
             self.configuration["input_layer"],
             self.configuration["hidden_layers"],
-            self.configuration["optimizer"]
+            self.configuration["optimizer"],
+            self.configuration["features"]
         )
         self.state_manager = StateManager()
         self.mcts = MCTS()
