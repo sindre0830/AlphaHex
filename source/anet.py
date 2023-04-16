@@ -52,7 +52,7 @@ class ANET():
         if saved_model_path is not None:
             self.model.load(saved_model_path)
         if save_directory_name is not None:
-            self.save(directory_path=DATA_PATH + "/" + save_directory_name, iteration=0)
+            self.save(directory_path=DATA_PATH + "/" + save_directory_name, iteration=0, verbose=False)
         self.model.eval()
 
     def predict(self, state: tuple[np.ndarray, int], filter_actions: list[tuple[int, int]]):
@@ -72,6 +72,7 @@ class ANET():
         return probability_distribution
     
     def train(self, train_batch: tuple[tuple[np.ndarray, int], list[np.ndarray]]):
+        print("\tTraining model")
         train_loader = self.convert_batch_to_dataset(train_batch)
         self.model.train_neural_network(train_loader)
     
@@ -126,5 +127,7 @@ class ANET():
             case "_":
                 return np.full_like(board, fill_value=0, dtype=np.float32)
     
-    def save(self, directory_path: str, iteration: int):
+    def save(self, directory_path: str, iteration: int, verbose=True):
+        if verbose:
+            print("\tSaving model")
         self.model.save(directory_path, iteration)

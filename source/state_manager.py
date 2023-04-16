@@ -60,6 +60,9 @@ class StateManager:
     def save_grid_to_history(self):
         self.grid_history.append(self.grid.copy())
     
+    def round(self) -> int:
+        return len(self.grid_history)
+    
     def opponent(self) -> int:
         return PLAYER_2 if self.player == PLAYER_1 else PLAYER_1
     
@@ -106,7 +109,7 @@ class StateManager:
                 return DNF
         return TIE
 
-    def animate(self, save_directory_name: str, iteration: int):
+    def visualize(self, save_directory_name: str, iteration: int):
         def generate_frame(i):
             # clear previous canvas
             ax.cla()
@@ -148,6 +151,7 @@ class StateManager:
             ax.set_ylim(-self.grid_size + size, self.grid_size - size)
             ax.axis("off")
             return [ax]
+        print("\tVisualizing state")
         # duplicate last state so it lasts longer in the gif
         final_grid = self.grid_history[-1]
         duplicates = [final_grid] * 4

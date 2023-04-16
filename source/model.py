@@ -1,6 +1,7 @@
 # internal libraries
 from constants import (
     GPU_DEVICE,
+    VERBOSE_TRAINING,
     BATCH_SIZE
 )
 # external libraries
@@ -160,7 +161,8 @@ class Model(torch.nn.Module):
             desc=f'                Epoch {(epoch + 1):>{4}}',
             ascii='░▒',
             unit=' steps',
-            colour='blue'
+            colour='blue',
+            disable=(not VERBOSE_TRAINING)
         )
         self.set_progressbar_prefix(progressbar)
         return progressbar

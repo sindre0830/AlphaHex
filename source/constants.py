@@ -2,6 +2,7 @@
 GPU_DEVICE = 'cuda:0'
 CPU_DEVICE = 'cpu'
 # parameters
+VERBOSE_TRAINING = False
 BATCH_SIZE = 32
 # paths
 DATA_PATH = "data"
