@@ -33,6 +33,8 @@ class ANET():
         self.feature_architectures = feature_architectures
         self.input_channels = len(self.feature_architectures)
         self.model = None
+        self.features_cache: dict[bytes, np.ndarray] = {}
+        self.distribution_cache: dict[bytes, np.ndarray] = {}
     
     def initialize_model(self, saved_model_path: str = None, save_directory_name: str = None):
         self.model = Model(
@@ -52,6 +54,10 @@ class ANET():
         self.model.eval()
 
     def predict(self, state: tuple[np.ndarray, int], filter_actions: list[tuple[int, int]]):
+        # branch if results are cached and return cache
+        key = state[0].tobytes()
+        if key in self.distribution_cache:
+            return self.distribution_cache[key]
         # get prediction
         self.model.evaluate_mode()
         data = np.asarray([self.get_features(state)])
@@ -65,10 +71,13 @@ class ANET():
         for action in filter_actions:
             probability_distribution[functionality.data.action_to_index(action, width=len(state[0]))] = 0
         probability_distribution = functionality.data.normalize_array(probability_distribution)
+        # store results in cache
+        self.distribution_cache[key] = probability_distribution
         return probability_distribution
     
     def train(self, train_batch: tuple[tuple[np.ndarray, int], list[np.ndarray]]):
         print("\tTraining model")
+        self.distribution_cache.clear()
         train_loader = self.convert_batch_to_dataset(train_batch)
         self.model.train_neural_network(train_loader)
     
@@ -89,10 +98,16 @@ class ANET():
     
     def get_features(self, state: tuple[np.ndarray, int]) -> np.ndarray:
         board, player = state
+        # branch if results are cached and return cache
+        cache_key = board.tobytes()
+        if cache_key in self.features_cache:
+            return self.features_cache[cache_key]
         opponent = 2 if player == 1 else 1
         features = np.zeros(shape=(self.input_channels, self.grid_size, self.grid_size), dtype=np.float32)
         for index, feature_architecture in enumerate(self.feature_architectures):
             features[index] = self.build_feature(feature_architecture, board, player, opponent)
+        # store result in cache
+        self.features_cache[cache_key] = features
         return features
     
     def build_feature(self, architecture: dict[str, any], board: np.ndarray, player: int, opponent: int) -> np.ndarray:
