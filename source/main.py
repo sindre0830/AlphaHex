@@ -1,5 +1,6 @@
 # internal libraries
 from constants import (
+    DATA_PATH,
     GPU_DEVICE,
     CPU_DEVICE
 )
@@ -54,7 +55,10 @@ def main():
             topp.print_score()
             return
         case "--config" | "-c":
-            configuration = parse_json(file_name="configuration")
+            working_directory_path = ""
+            if (cmd_args != None):
+                working_directory_path = f"{DATA_PATH}/{cmd_args[0]}/"
+            configuration = parse_json(working_directory_path, file_name="configuration")
             print_json(name="configuration", data=configuration)
             return
         case _:

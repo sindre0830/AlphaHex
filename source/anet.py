@@ -3,16 +3,12 @@ from constants import (
     DATA_PATH,
     EMPTY
 )
-from functionality.game import (
-    action_to_index,
-    opposite_player
-)
 from functionality.data import (
     convert_dataset_to_tensors,
-    normalize_array
+    normalize_array,
+    action_to_index
 )
 import functionality.strategies as strategies
-import functionality.feature_maps as feature_maps
 from model import Model
 # external libraries
 import torch
@@ -96,7 +92,7 @@ class ANET():
     
     def get_features(self, state: tuple[np.ndarray, int]) -> np.ndarray:
         board, player = state
-        opponent = opposite_player(player)
+        opponent = 2 if player == 1 else 1
         features = np.zeros(shape=(self.input_channels, self.grid_size, self.grid_size), dtype=np.float32)
         for index, feature_architecture in enumerate(self.feature_architectures):
             features[index] = self.build_feature(feature_architecture, board, player, opponent)
@@ -106,29 +102,29 @@ class ANET():
         feature_type = architecture["type"]
         match feature_type:
             case "onehot_encode_player":
-                return feature_maps.onehot_encode_cell(board, target=player)
+                return np.where(board == player, 1, 0).astype(dtype=np.float32)
             case "onehot_encode_opponent":
-                return feature_maps.onehot_encode_cell(board, target=opponent)
+                return np.where(board == opponent, 1, 0).astype(dtype=np.float32)
             case "onehot_encode_empty":
-                return feature_maps.onehot_encode_cell(board, target=EMPTY)
+                return np.where(board == EMPTY, 1, 0).astype(dtype=np.float32)
             case "onehot_encode_cell":
-                return feature_maps.onehot_encode_cell(board, architecture["target"])
+                return np.where(board == architecture["target"], 1, 0).astype(dtype=np.float32)
             case "constant_plane":
-                return feature_maps.constant_plane(board, architecture["value"])
+                return np.full_like(board, fill_value=architecture["value"], dtype=np.float32)
             case "constant_plane_player":
-                return feature_maps.constant_plane(board, value=player)
+                return np.full_like(board, fill_value=player, dtype=np.float32)
             case "constant_plane_opponent":
-                return feature_maps.constant_plane(board, value=opponent)
+                return np.full_like(board, fill_value=opponent, dtype=np.float32)
             case "winning_edges":
-                return feature_maps.strategy(strategies.winning_edges, board, player)
+                return strategies.winning_edges(board, player, opponent)
             case "bridge_templates":
-                return feature_maps.strategy(strategies.bridge_templates, board, player)
+                return strategies.bridge_templates(board, player, opponent)
             case "critical_bridge_connections":
-                return feature_maps.strategy(strategies.critical_bridge_connections, board, player)
+                return strategies.critical_bridge_connections(board, player, opponent)
             case "block":
-                return feature_maps.strategy(strategies.block, board, player)
+                return strategies.block(board, player, opponent)
             case "_":
-                return feature_maps.constant_plane(board, value=0)
+                return np.full_like(board, fill_value=0, dtype=np.float32)
     
     def save(self, directory_path: str, iteration: int):
         self.model.save(directory_path, iteration)

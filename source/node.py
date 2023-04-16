@@ -1,5 +1,5 @@
 # internal libraries
-from functionality.game import (
+from functionality.data import (
     action_to_index
 )
 from state_manager import StateManager

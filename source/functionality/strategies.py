@@ -4,20 +4,17 @@ from constants import (
     EMPTY,
     PLAYER_1
 )
-from functionality.board import (
+from functionality.hexagon import (
     in_bounds,
     cells_between,
     get_distance_from_center,
     in_bound_neighbours
 )
-from functionality.game import (
-    opposite_player
-)
 # external libraries
 import numpy as np
 
 
-def bridge_templates(board: np.ndarray, player: int) -> np.ndarray:
+def bridge_templates(board: np.ndarray, player: int, opponent: int) -> np.ndarray:
     board_size = len(board)
     bridge_actions = np.zeros_like(board, dtype=np.float32)
     for row in range(board_size):
@@ -45,9 +42,8 @@ def bridge_templates(board: np.ndarray, player: int) -> np.ndarray:
     return bridge_actions
 
 
-def critical_bridge_connections(board: np.ndarray, player: int) -> np.ndarray:
+def critical_bridge_connections(board: np.ndarray, player: int, opponent: int) -> np.ndarray:
     board_size = len(board)
-    opponent = opposite_player(player)
     feature = np.zeros_like(board, dtype=np.float32)
     for row in range(board_size):
         for col in range(board_size):
@@ -79,9 +75,8 @@ def critical_bridge_connections(board: np.ndarray, player: int) -> np.ndarray:
     return feature
 
 
-def block(board: np.ndarray, player: int) -> np.ndarray:
+def block(board: np.ndarray, player: int, opponent: int) -> np.ndarray:
     board_size = len(board)
-    opponent = opposite_player(player)
     feature = np.zeros_like(board, dtype=np.float32)
     for row in range(board_size):
         for col in range(board_size):
@@ -92,7 +87,7 @@ def block(board: np.ndarray, player: int) -> np.ndarray:
     return feature
 
 
-def winning_edges(board: np.ndarray, player: int) -> np.ndarray:
+def winning_edges(board: np.ndarray, player: int, opponent: int) -> np.ndarray:
     feature = np.zeros_like(board, dtype=np.float32)
     if player == PLAYER_1:
         feature[0] = 1
@@ -103,7 +98,7 @@ def winning_edges(board: np.ndarray, player: int) -> np.ndarray:
     return feature
 
 
-def center_importance(board: np.ndarray, player: int) -> np.ndarray:
+def center_importance(board: np.ndarray, player: int, opponent: int) -> np.ndarray:
     board_size = len(board)
     distance_from_center = get_distance_from_center(board_size)
     return distance_from_center

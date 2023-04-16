@@ -9,7 +9,7 @@ from constants import (
     TIE,
     DNF
 )
-from functionality.game import (
+from functionality.data import (
     index_to_action
 )
 # external libraries

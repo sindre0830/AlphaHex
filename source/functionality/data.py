@@ -9,6 +9,7 @@ import numpy as np
 import torch
 import torch.utils.data
 import multiprocessing
+import math
 
 
 def parse_json(directory_path: str = "", file_name: str = "configuration") -> dict[str, any]:
@@ -59,3 +60,14 @@ def normalize_array(arr: np.ndarray) -> np.ndarray:
     arr_sum = sum(arr)
     arr = [elem / arr_sum for elem in arr]
     return arr
+
+
+def action_to_index(action: tuple[int, int], width: int) -> int:
+    row, column = action
+    return (row * width) + column
+
+
+def index_to_action(index: int, width: int) -> tuple[int, int]:
+    row = math.floor(index / width)
+    column = index - (row * width)
+    return (row, column)
