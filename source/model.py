@@ -87,11 +87,7 @@ class Model(torch.nn.Module):
         x = self.output_layer(x)
         return x
     
-    def train_neural_network(
-        self,
-        train_loader: torch.utils.data.DataLoader,
-        validation_loader: torch.utils.data.DataLoader = None
-    ):
+    def train_neural_network(self, train_loader: torch.utils.data.DataLoader):
         self.training_mode()
         # set optimizer and criterion
         criterion = torch.nn.KLDivLoss(reduction="batchmean")
@@ -129,54 +125,18 @@ class Model(torch.nn.Module):
                 correct += (torch.argmax(output, dim=1) == torch.argmax(labels, dim=1)).float().sum()
                 # branch if iteration is on the last step and update information with current values
                 if i >= (TRAIN_SIZE / BATCH_SIZE) - 1:
-                    validation_loss, validation_accuracy = self.validate_neural_network(criterion, validation_loader)
                     train_loss = total_loss / TRAIN_SIZE
                     train_accuracy = correct / TRAIN_SIZE
-                    set_progressbar_prefix(progressbar, train_loss, train_accuracy, validation_loss, validation_accuracy)
+                    set_progressbar_prefix(progressbar, train_loss, train_accuracy)
                 # branch if batch size is reached and update information with current values
                 elif i % BATCH_SIZE == (BATCH_SIZE - 1):
                     train_loss = running_loss / (TRAIN_SIZE / BATCH_SIZE)
                     train_accuracy = correct / TRAIN_SIZE
-                    set_progressbar_prefix(progressbar, train_loss, train_accuracy)
                     running_loss = 0.0
-            # set model to training mode
-            self.eval()
+                    set_progressbar_prefix(progressbar, train_loss, train_accuracy)
         # empty GPU cache
         if self.device_type is GPU_DEVICE:
             torch.cuda.empty_cache()
-
-    def validate_neural_network(
-        self,
-        criterion: torch.nn.CrossEntropyLoss,
-        validation_loader: torch.utils.data.DataLoader
-    ):
-        if validation_loader is None:
-            return 0.0, 0.0
-        correct = 0.0
-        total_loss = 0.0
-        VALIDATION_SIZE = len(validation_loader.dataset)
-        # set model to evaluation mode
-        self.eval()
-        # loop through the validation dataset
-        for _, (data, labels) in enumerate(validation_loader):
-            # send validation data to device
-            data: torch.Tensor = data.to(self.device, non_blocking=True)
-            labels: torch.Tensor = labels.to(self.device, non_blocking=True)
-            # get validation results
-            output: torch.Tensor = self(data)
-            # calculate training loss for this batch
-            loss: torch.Tensor = criterion(output, labels)
-            total_loss += loss.item()
-            # convert output from logarithmic probability to normal probability
-            output = output.exp()
-            # calculate accuracy
-            correct += (torch.argmax(output, dim=1) == torch.argmax(labels, dim=1)).float().sum()
-        # set model to train mode
-        self.train()
-        # calculate loss and accruacy
-        loss = total_loss / VALIDATION_SIZE
-        accuracy = correct / VALIDATION_SIZE
-        return loss, accuracy
     
     def save(self, directory_path: str, iteration: int):
         torch.save(self.state_dict(), f"{directory_path}/model-{iteration}.pt")

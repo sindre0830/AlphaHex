@@ -12,7 +12,6 @@ class RBUF():
         self.data: list[tuple[np.ndarray, int]] = []
         self.labels: list[np.ndarray] = []
         self.frequency_count: dict[tuple[bytes, int, bytes], int] = {}
-        self.previous_training_batch: tuple[tuple[np.ndarray, int], list[np.ndarray]] = None
 
     def clear(self):
         self.data.clear()
@@ -24,7 +23,7 @@ class RBUF():
         self.labels.append(visit_distribution)
         self.frequency_count[self.key(((state.grid, state.player), visit_distribution))] = 1
 
-    def get_mini_batch(self, mini_batch_size) -> tuple[tuple[tuple[np.ndarray, int], list[np.ndarray]], tuple[tuple[np.ndarray, int], list[np.ndarray]]]:
+    def get_mini_batch(self, mini_batch_size: int) -> tuple[tuple[np.ndarray, int], list[np.ndarray]]:
         data_size = len(self.data)
         indicies = list(range(data_size))
         if (data_size <= mini_batch_size):
@@ -43,10 +42,8 @@ class RBUF():
                 train_data.append(self.data[index])
                 train_labels.append(self.labels[index])
         train_batch = (train_data, train_labels)
-        validation_batch = self.previous_training_batch
-        self.previous_training_batch = train_batch
         self.increment_frequency_count(train_batch)
-        return (train_batch, validation_batch)
+        return train_batch
 
     def increment_frequency_count(self, batch: tuple[list[tuple[np.ndarray, int]], list[np.ndarray]]):
         data, labels = batch

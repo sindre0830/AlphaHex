@@ -75,19 +75,12 @@ class ANET():
         self.prediction_cache[key] = probability_distribution
         return probability_distribution
     
-    def train(
-        self,
-        batches: tuple[tuple[tuple[np.ndarray, int], list[np.ndarray]], tuple[tuple[np.ndarray, int], list[np.ndarray]]]
-    ):
+    def train(self, train_batch: tuple[tuple[np.ndarray, int], list[np.ndarray]]):
         self.prediction_cache.clear()
-        train_batch, validate_batch = batches
         train_loader = self.convert_batch_to_dataset(train_batch)
-        validation_loader = self.convert_batch_to_dataset(validate_batch)
-        self.model.train_neural_network(train_loader, validation_loader)
+        self.model.train_neural_network(train_loader)
     
     def convert_batch_to_dataset(self, batch: tuple[tuple[np.ndarray, int], list[np.ndarray]]):
-        if (batch is None):
-            return None
         states, visit_distributions = batch
         data = []
         labels = []

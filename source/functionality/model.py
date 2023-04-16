@@ -21,21 +21,13 @@ def get_progressbar(iter: torch.utils.data.DataLoader, epoch: int, epochs: int):
     return progressbar
 
 
-def set_progressbar_prefix(
-    progressbar: tqdm.tqdm,
-    train_loss: float = 0.0,
-    train_accuracy: float = 0.0,
-    validation_loss: float = 0.0,
-    validation_accuracy: float = 0.0
-):
+def set_progressbar_prefix(progressbar: tqdm.tqdm, train_loss: float = 0.0, train_accuracy: float = 0.0):
     """
     Set prefix in progressbar and update output.
     """
-    train_loss_str = f'Train loss: {train_loss:.4f}, '
-    train_accuracy_str = f'Train acc: {train_accuracy:.4f}, '
-    validation_loss_str = f'Valid loss: {validation_loss:.4f}, '
-    validation_accuracy_str = f'Valid acc: {validation_accuracy:.4f}'
-    progressbar.set_postfix_str(train_loss_str + train_accuracy_str + validation_loss_str + validation_accuracy_str)
+    train_loss_str = f'loss: {train_loss:.4f}, '
+    train_accuracy_str = f'acc: {train_accuracy:.4f}'
+    progressbar.set_postfix_str(train_loss_str + train_accuracy_str)
 
 
 def build_hidden_layer(architecture: dict[str, any]) -> torch.nn.Sequential:
