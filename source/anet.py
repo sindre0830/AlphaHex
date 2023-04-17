@@ -66,7 +66,7 @@ class ANET():
         # convert from logarithmic probability to normal probability
         probability_distribution = probability_distribution.exp()
         # convert from tensor to numpy array
-        probability_distribution = probability_distribution.detach().numpy()[0]
+        probability_distribution: np.ndarray = probability_distribution.detach().numpy()[0]
         # set all illegal actions to 0 and normalize distribution
         for action in filter_actions:
             probability_distribution[functionality.data.action_to_index(action, width=len(state[0]))] = 0
