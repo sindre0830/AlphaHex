@@ -165,13 +165,13 @@ class Model(torch.nn.Module):
         return progressbar
 
     def set_progressbar_prefix(
-            self,
-            progressbar: tqdm.tqdm,
-            train_loss: float = 0.0,
-            train_accuracy: float = 0.0,
-            best_loss: float = 0.0,
-            best_accuracy: float = 0.0
-        ):
+        self,
+        progressbar: tqdm.tqdm,
+        train_loss: float = 0.0,
+        train_accuracy: float = 0.0,
+        best_loss: float = 0.0,
+        best_accuracy: float = 0.0
+    ):
         """
         Set prefix in progressbar and update output.
         """

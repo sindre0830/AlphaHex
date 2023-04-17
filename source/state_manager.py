@@ -99,9 +99,9 @@ class StateManager:
                 neighbour_row, neighbour_col = row + row_direction, col + col_direction
                 neighbour_cell = (neighbour_row, neighbour_col)
                 if 0 <= neighbour_row < self.grid_size \
-                    and 0 <= neighbour_col < self.grid_size \
-                    and self.grid[neighbour_row][neighbour_col] == player \
-                    and neighbour_cell not in visited:
+                        and 0 <= neighbour_col < self.grid_size \
+                        and self.grid[neighbour_row][neighbour_col] == player \
+                        and neighbour_cell not in visited:
                     if depth_first_search(player, neighbour_cell, visited):
                         return True
             return False
