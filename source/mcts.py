@@ -5,7 +5,7 @@ from state_manager import StateManager
 
 
 class MCTS:
-    def __init__(self, exploration_constant: float = 1.0):
+    def __init__(self, exploration_constant: float):
         self.root_node: Node = None
         self.exploration_constant = exploration_constant
     

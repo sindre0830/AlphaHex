@@ -56,10 +56,7 @@ def convert_dataset_to_tensors(device_type: str, data: np.ndarray, labels: np.nd
 
 
 def normalize_array(arr: np.ndarray) -> np.ndarray:
-    # divide each element by the sum
-    arr_sum = sum(arr)
-    arr = [elem / arr_sum for elem in arr]
-    return arr
+    return np.true_divide(arr, np.sum(arr))
 
 
 def action_to_index(action: tuple[int, int], width: int) -> int:

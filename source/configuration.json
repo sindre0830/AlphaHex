@@ -1,9 +1,10 @@
 {
-    "save_interval": 10,
-    "save_visualization_interval": 10,
-    "actual_games_size": 300,
+    "save_interval": 5,
+    "save_visualization_interval": 1,
+    "actual_games_size": 5,
     "grid_size": 5,
     "search_games_time_limit_seconds": 2,
+    "exploration_constant": 5,
     "mini_batch_size": 32,
     "minimum_epoch_improvement": 10,
     "features": [

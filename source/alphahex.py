@@ -38,7 +38,7 @@ class AlphaHex:
             self.configuration["features"]
         )
         self.state_manager = StateManager()
-        self.mcts = MCTS()
+        self.mcts = MCTS(self.configuration["exploration_constant"])
         # create directory to store models and configuration
         if save_directory_name is None:
             self.save_directory_name = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
