@@ -5,9 +5,14 @@ from state_manager import StateManager
 
 
 class MCTS:
-    def __init__(self, exploration_constant: float):
+    def __init__(self, exploration_constant: float, greedy_epsilon: float = None):
         self.root_node: Node = None
         self.exploration_constant = exploration_constant
+        self.greedy_epsilon = greedy_epsilon
+    
+    def dynamic_greedy_epsilon(self, iteration: int, max_iterations: int, max_epsilon: float, min_epsilon: float):
+        if self.greedy_epsilon is not None:
+            self.greedy_epsilon = max_epsilon - (max_epsilon - min_epsilon) * (iteration / max_iterations)
     
     def set_root_node(self, state: StateManager):
         self.root_node = Node(state)
@@ -30,7 +35,11 @@ class MCTS:
         while not local_state.terminal():
             state = (local_state.grid, local_state.player)
             probability_distribution = anet.predict(state, filter_actions=local_state.illegal_actions())
-            local_state.apply_action_from_distribution(probability_distribution, deterministic=False)
+            local_state.apply_action_from_distribution(
+                probability_distribution,
+                deterministic=False, 
+                greedy_epsilon=self.greedy_epsilon
+            )
         return local_state.determine_winner()
     
     def backpropagate(self, node: Node, winner: int):

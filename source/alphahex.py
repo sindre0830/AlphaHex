@@ -25,20 +25,22 @@ class AlphaHex:
         self.grid_size: int = self.configuration["grid_size"]
         self.search_games_time_limit_seconds: int = self.configuration["search_games_time_limit_seconds"]
         self.mini_batch_size: int = self.configuration["mini_batch_size"]
+        self.dynamic_epsilon: bool = self.configuration["dynamic_epsilon"]
         # init objects
         self.rbuf = RBUF()
         self.anet = ANET(
             device,
             device_type,
             self.grid_size,
-            self.configuration["minimum_epoch_improvement"],
+            self.configuration["max_epochs"],
             self.configuration["input_layer"],
             self.configuration["hidden_layers"],
             self.configuration["optimizer"],
-            self.configuration["features"]
+            self.configuration["features"],
+            self.configuration["criterion"]
         )
         self.state_manager = StateManager()
-        self.mcts = MCTS(self.configuration["exploration_constant"])
+        self.mcts = MCTS(self.configuration["exploration_constant"], self.configuration["greedy_epsilon"])
         # create directory to store models and configuration
         if save_directory_name is None:
             self.save_directory_name = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
@@ -62,6 +64,13 @@ class AlphaHex:
             time_start = time()
             self.state_manager.initialize_state(self.grid_size)
             self.mcts.set_root_node(self.state_manager)
+            if self.dynamic_epsilon:
+                self.mcts.dynamic_greedy_epsilon(
+                    iteration=actual_game,
+                    max_iterations=self.actual_games_size,
+                    max_epsilon=1.0,
+                    min_epsilon=0.1
+                )
             while not self.state_manager.terminal():
                 search_games_time_start = time()
                 while((time() - search_games_time_start) < self.search_games_time_limit_seconds):

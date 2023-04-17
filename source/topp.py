@@ -40,11 +40,12 @@ class TOPP:
                     device,
                     device_type,
                     self.grid_size,
-                    configuration["minimum_epoch_improvement"],
+                    configuration["max_epochs"],
                     configuration["input_layer"],
                     configuration["hidden_layers"],
                     configuration["optimizer"],
-                    configuration["features"]
+                    configuration["features"],
+                    configuration["criterion"]
                 )
                 anet.initialize_model(saved_model_path=model_file_path)
                 models.append(anet)
@@ -100,7 +101,11 @@ class TOPP:
                     probability_distribution = model_1.predict(state, filter_actions=state_manager.illegal_actions())
                 else:
                     probability_distribution = model_2.predict(state, filter_actions=state_manager.illegal_actions())
-                state_manager.apply_action_from_distribution(probability_distribution, deterministic=False)
+                state_manager.apply_action_from_distribution(
+                    probability_distribution,
+                    deterministic=True,
+                    greedy_epsilon=None
+                )
             score.append(state_manager.determine_winner())
             if TOURNAMENT_VISUALIZATION:
                 state_manager.visualize(

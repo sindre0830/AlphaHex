@@ -17,19 +17,21 @@ class ANET():
         device: torch.cuda.device,
         device_type: str,
         grid_size: int,
-        minimum_epoch_improvement: int,
+        max_epochs: int,
         input_layer_architecture: dict[str, any],
         hidden_layer_architectures: list[dict[str, any]],
         optimizer_architecture: dict[str, any],
-        feature_architectures: list[dict[str, any]]
+        feature_architectures: list[dict[str, any]],
+        criterion_type: str
     ):
         self.device = device
         self.device_type = device_type
         self.grid_size = grid_size
-        self.minimum_epoch_improvement = minimum_epoch_improvement
+        self.max_epochs = max_epochs
         self.input_layer_architecture = input_layer_architecture
         self.hidden_layer_architectures = hidden_layer_architectures
         self.optimizer_architecture = optimizer_architecture
+        self.criterion_type = criterion_type
         self.feature_architectures = feature_architectures
         self.input_channels = len(self.feature_architectures)
         self.model = None
@@ -42,10 +44,11 @@ class ANET():
             self.device_type,
             self.grid_size,
             self.input_channels,
-            self.minimum_epoch_improvement,
+            self.max_epochs,
             self.input_layer_architecture,
             self.hidden_layer_architectures,
-            self.optimizer_architecture
+            self.optimizer_architecture,
+            self.criterion_type
         )
         if saved_model_path is not None:
             self.model.load(saved_model_path)
@@ -141,4 +144,4 @@ class ANET():
     def save(self, directory_path: str, iteration: int, verbose=True):
         if verbose:
             print("\tSaving model")
-        self.model.save(directory_path, iteration)
+        self.model.save(directory_path, filename=f"model-{iteration}")

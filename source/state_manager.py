@@ -41,11 +41,17 @@ class StateManager:
         self.action = state.action
         self.grid_history = state.grid_history.copy()
     
-    def apply_action_from_distribution(self, distribution: np.ndarray, deterministic):
+    def apply_action_from_distribution(self, distribution: np.ndarray, deterministic: bool, greedy_epsilon=None):
         if deterministic:
             action = functionality.data.index_to_action(np.argmax(distribution), self.grid_size)
         else:
-            action = random.choices(population=self.all_actions(), weights=distribution, k=1)[0]
+            if greedy_epsilon is not None:
+                if random.random() < greedy_epsilon:
+                    action = random.choices(population=self.legal_actions(), k=1)[0]
+                else:
+                    action = functionality.data.index_to_action(np.argmax(distribution), self.grid_size)
+            else:
+                action = random.choices(population=self.all_actions(), weights=distribution, k=1)[0]
         self.apply_action(action)
 
     def apply_action(self, action: tuple[int, int]):

@@ -6,7 +6,9 @@
     "search_games_time_limit_seconds": 2,
     "exploration_constant": 5,
     "mini_batch_size": 32,
-    "minimum_epoch_improvement": 10,
+    "max_epochs": 32,
+    "greedy_epsilon": null,
+    "dynamic_epsilon": false,
     "features": [
         {
             "type": "onehot_encode_player"
@@ -18,6 +20,7 @@
             "type": "onehot_encode_empty"
         }
     ],
+    "criterion": "kl_div",
     "optimizer": {
         "type": "adam",
         "lr": 0.001

@@ -1,5 +1,6 @@
 # internal libraries
 from constants import (
+    TMP_PATH,
     GPU_DEVICE,
     VERBOSE_TRAINING,
     BATCH_SIZE
@@ -9,6 +10,7 @@ import torch
 import torch.utils.data
 import tqdm
 from typing import Iterator
+import os
 
 
 class Model(torch.nn.Module):
@@ -18,16 +20,20 @@ class Model(torch.nn.Module):
         device_type: str,
         grid_size: int,
         input_channels: int,
-        minimum_epoch_improvement: int,
+        max_epochs: int,
         input_layer_architecture: dict[str, any],
         hidden_layer_architectures: list[dict[str, any]],
-        optimizer_architecture: dict[str, any]
+        optimizer_architecture: dict[str, any],
+        criterion_type: str
     ):
         super().__init__()
         self.device = device
         self.device_type = device_type
-        self.minimum_epoch_improvement = minimum_epoch_improvement
+        self.max_epochs = max_epochs
         self.optimizer_architecture = optimizer_architecture
+        self.criterion_type = criterion_type
+        # create tmp folder for temporary model saving
+        os.makedirs(TMP_PATH, exist_ok=True)
         # define input layer
         self.input_layer = torch.nn.Sequential(
             torch.nn.Conv2d(
@@ -87,22 +93,17 @@ class Model(torch.nn.Module):
     def train_neural_network(self, train_loader: torch.utils.data.DataLoader):
         self.training_mode()
         # set optimizer and criterion
-        criterion = torch.nn.KLDivLoss(reduction="batchmean")
+        criterion = self.build_criterion(self.criterion_type)
         optimizer = self.build_optimizer(self.parameters(), self.optimizer_architecture)
         TRAIN_SIZE = len(train_loader.dataset)
         # loop through each epoch
-        epoch = 0
-        epochs_since_improvement = 0
         best_loss = float("inf")
         best_accuracy = -float("inf")
-        while epochs_since_improvement <= self.minimum_epoch_improvement:
-            epoch += 1
-            epochs_since_improvement += 1
+        for epoch in range(self.max_epochs):
             correct = 0.0
-            running_loss = 0.0
             total_loss = 0.0
             # define the progressbar
-            progressbar = self.get_progressbar(train_loader, epoch)
+            progressbar = self.get_progressbar(train_loader, epoch, self.max_epochs)
             # set model to training mode
             self.train()
             # loop through the dataset
@@ -115,16 +116,15 @@ class Model(torch.nn.Module):
                 # get results
                 output: torch.Tensor = self(data)
                 # compute gradients through backpropagation
-                loss: torch.Tensor = criterion(output, labels)
+                targets = labels.argmax(dim=1) if self.criterion_type == "cross_entropy" else labels
+                loss: torch.Tensor = criterion(output, targets)
                 loss.backward()
                 # apply gradients
                 optimizer.step()
-                # calculate running loss
-                running_loss += loss.item()
-                total_loss += loss.item()
                 # convert output from logarithmic probability to normal probability
                 output = output.exp()
-                # calculate accuracy
+                # calculate total loss and accuracy
+                total_loss += loss.item()
                 correct += (torch.argmax(output, dim=1) == torch.argmax(labels, dim=1)).float().sum()
                 # branch if iteration is on the last step and update information with current values
                 if i >= (TRAIN_SIZE / BATCH_SIZE) - 1:
@@ -133,32 +133,29 @@ class Model(torch.nn.Module):
                     if train_loss <= best_loss:
                         best_loss = train_loss
                         best_accuracy = train_accuracy
-                        if best_loss > 0.001:
-                            epochs_since_improvement = 0
+                        # save best model
+                        self.save(TMP_PATH, filename="tmp_model")
                     self.set_progressbar_prefix(progressbar, train_loss, train_accuracy, best_loss, best_accuracy)
-                # branch if batch size is reached and update information with current values
-                elif i % BATCH_SIZE == (BATCH_SIZE - 1):
-                    train_loss = running_loss / (TRAIN_SIZE / BATCH_SIZE)
-                    train_accuracy = correct / TRAIN_SIZE
-                    running_loss = 0.0
-                    self.set_progressbar_prefix(progressbar, train_loss, train_accuracy, best_loss, best_accuracy)
+        # load best model from training
+        self.load(path=f"{TMP_PATH}/tmp_model.pt")
         # empty GPU cache
         if self.device_type is GPU_DEVICE:
             torch.cuda.empty_cache()
     
-    def save(self, directory_path: str, iteration: int):
-        torch.save(self.state_dict(), f"{directory_path}/model-{iteration}.pt")
+    def save(self, directory_path: str, filename: str):
+        torch.save(self.state_dict(), f"{directory_path}/{filename}.pt")
 
     def load(self, path: str):
         self.load_state_dict(torch.load(path))
 
-    def get_progressbar(self, iter: torch.utils.data.DataLoader, epoch: int):
+    def get_progressbar(self, iter: torch.utils.data.DataLoader, epoch: int, max_epochs: int) -> tqdm.tqdm:
         """
         Generates progressbar for iterable used in model training.
         """
+        width = len(str(max_epochs))
         progressbar = tqdm.tqdm(
             iterable=iter,
-            desc=f'                Epoch {(epoch + 1):>{4}}',
+            desc=f'                Epoch {(epoch + 1):>{width}}/{max_epochs}',
             ascii='░▒',
             unit=' steps',
             colour='blue',
@@ -183,6 +180,15 @@ class Model(torch.nn.Module):
         best_loss_str = f'best loss: {best_loss:.4f}, '
         best_accuracy_str = f'best acc: {best_accuracy:.4f}'
         progressbar.set_postfix_str(train_loss_str + train_accuracy_str + best_loss_str + best_accuracy_str)
+    
+    def build_criterion(self, criterion_type: str):
+        match criterion_type:
+            case "kl_div":
+                return torch.nn.KLDivLoss(reduction="batchmean")
+            case "cross_entropy":
+                return torch.nn.CrossEntropyLoss()
+            case _:
+                return torch.nn.CrossEntropyLoss()
 
     def build_optimizer(self, parameters: Iterator[torch.nn.Parameter], architecture: dict[str, any]) -> torch.optim.Optimizer:
         optimizer_type = architecture["type"]
