@@ -57,7 +57,7 @@ class Model(torch.nn.Module):
         # send model to CPU
         self.training_flag = None
         self.evaluate_mode()
-    
+
     def evaluate_mode(self):
         if self.training_flag is False:
             return
@@ -67,7 +67,7 @@ class Model(torch.nn.Module):
         self.cpu()
         for hidden_layer in self.hidden_layers:
             hidden_layer.cpu()
-    
+
     def training_mode(self):
         if self.training_flag is True:
             return
@@ -78,7 +78,7 @@ class Model(torch.nn.Module):
             self.cuda(self.device)
             for hidden_layer in self.hidden_layers:
                 hidden_layer.to(self.device)
-    
+
     # Defines model layout.
     def forward(self, x):
         # input layer
@@ -89,7 +89,7 @@ class Model(torch.nn.Module):
         # output layer
         x = self.output_layer(x)
         return x
-    
+
     def train_neural_network(self, train_loader: torch.utils.data.DataLoader):
         self.training_mode()
         # set optimizer and criterion
@@ -141,7 +141,7 @@ class Model(torch.nn.Module):
         # empty GPU cache
         if self.device_type is GPU_DEVICE:
             torch.cuda.empty_cache()
-    
+
     def save(self, directory_path: str, filename: str):
         torch.save(self.state_dict(), f"{directory_path}/{filename}.pt")
 
@@ -180,7 +180,7 @@ class Model(torch.nn.Module):
         best_loss_str = f'best loss: {best_loss:.4f}, '
         best_accuracy_str = f'best acc: {best_accuracy:.4f}'
         progressbar.set_postfix_str(train_loss_str + train_accuracy_str + best_loss_str + best_accuracy_str)
-    
+
     def build_criterion(self, criterion_type: str):
         match criterion_type:
             case "kl_div":

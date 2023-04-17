@@ -17,13 +17,13 @@ class Node():
         self.score = 0.0
         self.wins = 0
         self.visits = 0
-    
+
     def is_leaf_node(self) -> bool:
         return len(self.children_nodes) == 0
 
     def add_child(self, node):
         self.children_nodes.append(node)
-    
+
     def get_score(self, exploration_constant: float) -> float:
         self.update_score(exploration_constant)
         return self.score
@@ -35,7 +35,7 @@ class Node():
         if (self.visits == 0):
             return 0
         return self.wins / self.visits
-    
+
     def get_u(self, exploration_constant: float) -> float:
         if self.parent_node is None or self.visits == 0 or self.parent_node.visits == 0:
             return float('inf')

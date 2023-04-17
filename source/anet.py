@@ -37,7 +37,7 @@ class ANET():
         self.model = None
         self.features_cache: dict[bytes, np.ndarray] = {}
         self.distribution_cache: dict[bytes, np.ndarray] = {}
-    
+
     def initialize_model(self, saved_model_path: str = None, save_directory_name: str = None):
         self.model = Model(
             self.device,
@@ -77,13 +77,13 @@ class ANET():
         # store results in cache
         self.distribution_cache[key] = probability_distribution
         return probability_distribution
-    
+
     def train(self, train_batch: tuple[tuple[np.ndarray, int], list[np.ndarray]]):
         print("\tTraining model")
         self.distribution_cache.clear()
         train_loader = self.convert_batch_to_dataset(train_batch)
         self.model.train_neural_network(train_loader)
-    
+
     def convert_batch_to_dataset(self, batch: tuple[tuple[np.ndarray, int], list[np.ndarray]]):
         states, visit_distributions = batch
         data = []
@@ -98,7 +98,7 @@ class ANET():
             labels=np.asarray(labels)
         )
         return dataset_loader
-    
+
     def get_features(self, state: tuple[np.ndarray, int]) -> np.ndarray:
         board, player = state
         # branch if results are cached and return cache
@@ -112,7 +112,7 @@ class ANET():
         # store result in cache
         self.features_cache[cache_key] = features
         return features
-    
+
     def build_feature(self, architecture: dict[str, any], board: np.ndarray, player: int, opponent: int) -> np.ndarray:
         feature_type = architecture["type"]
         match feature_type:
@@ -140,7 +140,7 @@ class ANET():
                 return functionality.strategies.block(board, player, opponent)
             case "_":
                 return np.full_like(board, fill_value=0, dtype=np.float32)
-    
+
     def save(self, directory_path: str, iteration: int, verbose=True):
         if verbose:
             print("\tSaving model")

@@ -83,12 +83,12 @@ class TOPP:
                 elif score == PLAYER_2:
                     self.total_score[iteration_2]["Total"] += 1
                     self.total_score[iteration_2]["Player 2"] += 1
-    
+
     def print_score(self):
         iterations = sorted(self.model_iterations)
         for iteration in iterations:
             print(f"Model {iteration}: {self.total_score[iteration]}")
-    
+
     def match(self, pairings: tuple[tuple[ANET, str], tuple[ANET, str]]):
         ((model_1, iteration_1), (model_2, iteration_2)) = pairings
         score: list[int] = []

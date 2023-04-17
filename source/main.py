@@ -26,7 +26,7 @@ torch.manual_seed(0)
 def main():
     # parse arguments and branch if an error occured
     (error, cmd, cmd_args) = functionality.cli.parse_arguments(args=sys.argv[1:])
-    if (error != None):
+    if error is not None:
         print("Error during command parsing: '" + error + "'")
         functionality.cli.print_commands()
         return
@@ -44,7 +44,7 @@ def main():
             alpha_hex.run()
             return
         case "--tournament" | "-t":
-            if cmd_args == None:
+            if cmd_args is None:
                 print("Tournament requires a directory name from 'data/' of which models to run.")
                 functionality.cli.print_commands()
                 return
@@ -55,7 +55,7 @@ def main():
             return
         case "--config" | "-c":
             working_directory_path = ""
-            if cmd_args != None:
+            if cmd_args is not None:
                 working_directory_path = f"{DATA_PATH}/{cmd_args[0]}/"
             configuration = functionality.data.parse_json(working_directory_path, file_name="configuration")
             functionality.data.print_json(name="configuration", data=configuration)

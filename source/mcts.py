@@ -9,14 +9,14 @@ class MCTS:
         self.root_node: Node = None
         self.exploration_constant = exploration_constant
         self.greedy_epsilon = greedy_epsilon
-    
+
     def dynamic_greedy_epsilon(self, iteration: int, max_iterations: int, max_epsilon: float, min_epsilon: float):
         if self.greedy_epsilon is not None:
             self.greedy_epsilon = max_epsilon - (max_epsilon - min_epsilon) * (iteration / max_iterations)
-    
+
     def set_root_node(self, state: StateManager):
         self.root_node = Node(state)
-    
+
     def tree_search(self) -> Node:
         node = self.root_node
         while not node.state.terminal():
@@ -28,7 +28,7 @@ class MCTS:
     def node_expansion(self, node: Node):
         for action in node.state.legal_actions():
             node.add_child(Node(node.state, action, parent_node=node))
-    
+
     def leaf_evaluation(self, anet: ANET, node: Node):
         local_state = StateManager()
         local_state.copy_state(node.state)
@@ -37,11 +37,11 @@ class MCTS:
             probability_distribution = anet.predict(state, filter_actions=local_state.illegal_actions())
             local_state.apply_action_from_distribution(
                 probability_distribution,
-                deterministic=False, 
+                deterministic=False,
                 greedy_epsilon=self.greedy_epsilon
             )
         return local_state.determine_winner()
-    
+
     def backpropagate(self, node: Node, winner: int):
         current_node = node
         while current_node is not None:

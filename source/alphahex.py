@@ -73,7 +73,7 @@ class AlphaHex:
                 )
             while not self.state_manager.terminal():
                 search_games_time_start = time()
-                while((time() - search_games_time_start) < self.search_games_time_limit_seconds):
+                while ((time() - search_games_time_start) < self.search_games_time_limit_seconds):
                     leaf = self.mcts.tree_search()
                     self.mcts.node_expansion(leaf)
                     score = self.mcts.leaf_evaluation(self.anet, leaf)
@@ -92,7 +92,9 @@ class AlphaHex:
             save_model = (actual_game + 1) % self.save_interval == 0 or actual_game == (self.actual_games_size - 1)
             if save_model:
                 self.anet.save(directory_path=f"{DATA_PATH}/{self.save_directory_name}", iteration=(actual_game + 1))
-            visualize_state = (actual_game + 1) % self.save_visualization_interval == 0 or actual_game == (self.actual_games_size - 1) or actual_game == 0
+            visualize_state = (actual_game + 1) % self.save_visualization_interval == 0 \
+                or actual_game == (self.actual_games_size - 1) \
+                or actual_game == 0
             if visualize_state:
                 self.state_manager.visualize(self.save_directory_name, iteration=(actual_game + 1))
             time_end = time()
@@ -101,7 +103,7 @@ class AlphaHex:
     def increment_simulated_games_count(self) -> int:
         self.simulated_games_count += 1
         return self.simulated_games_count
-    
+
     def reset_simulated_games_count(self):
         self.simulated_games_count = 0
         print()
