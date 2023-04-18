@@ -3,7 +3,7 @@
     "actual_games_size": 10,
     "grid_size": 5,
     "search_games_time_limit_seconds": 2,
-    "exploration_constant": 5,
+    "exploration_constant": 2,
     "mini_batch_size": 10,
     "max_epochs": 10,
     "greedy_epsilon": null,
@@ -32,54 +32,54 @@
         "bias": true
     },
     "hidden_layers": [
-            {
-                "type": "relu"
-            },
+        {
+            "type": "relu"
+        },
 
-            {
-                "type": "conv",
-                "filters": 64,
-                "kernel_size": 2,
-                "stride": 1,
-                "padding": 1,
-                "bias": true
-            },
-            {
-                "type": "relu"
-            },
+        {
+            "type": "conv",
+            "filters": 64,
+            "kernel_size": 2,
+            "stride": 1,
+            "padding": 1,
+            "bias": true
+        },
+        {
+            "type": "relu"
+        },
 
-            {
-                "type": "conv",
-                "filters": 64,
-                "kernel_size": 1,
-                "stride": 1,
-                "padding": 1,
-                "bias": true
-            },
-            {
-                "type": "relu"
-            },
+        {
+            "type": "conv",
+            "filters": 64,
+            "kernel_size": 1,
+            "stride": 1,
+            "padding": 1,
+            "bias": true
+        },
+        {
+            "type": "relu"
+        },
 
-            {
-                "type": "flatten"
-            },
+        {
+            "type": "flatten"
+        },
 
-            {
-                "type": "linear",
-                "filters": 16,
-                "bias": true
-            },
-            {
-                "type": "relu"
-            },
+        {
+            "type": "linear",
+            "filters": 16,
+            "bias": true
+        },
+        {
+            "type": "relu"
+        },
 
-            {
-                "type": "linear",
-                "filters": 32,
-                "bias": true
-            },
-            {
-                "type": "relu"
-            }
-        ]
+        {
+            "type": "linear",
+            "filters": 32,
+            "bias": true
+        },
+        {
+            "type": "relu"
+        }
+    ]
 }

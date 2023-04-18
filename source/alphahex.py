@@ -72,12 +72,15 @@ class AlphaHex:
                     min_epsilon=0.1
                 )
             while not self.state_manager.terminal():
+                self.mcts.dynamic_depth(self.state_manager.round())
                 search_games_time_start = time()
                 while ((time() - search_games_time_start) < self.search_games_time_limit_seconds):
-                    leaf = self.mcts.tree_search()
+                    leaf, early_stop = self.mcts.tree_search()
+                    if early_stop:
+                        break
                     self.mcts.node_expansion(leaf)
-                    score = self.mcts.leaf_evaluation(self.anet, leaf)
-                    self.mcts.backpropagate(leaf, score)
+                    node, score, round = self.mcts.leaf_evaluation(self.anet, leaf)
+                    self.mcts.backpropagate(node, score, round)
                     print(
                         f"\tTotal simulated games: {self.increment_simulated_games_count()}, Total moves: {self.state_manager.round()}",
                         end="\r",

@@ -15,7 +15,7 @@ class Node():
         self.parent_node: Node = parent_node
         self.children_nodes: list[Node] = []
         self.score = 0.0
-        self.wins = 0
+        self.wins = 0.0
         self.visits = 0
 
     def is_leaf_node(self) -> bool:
@@ -52,3 +52,11 @@ class Node():
                 )
                 distribution[action_index] = child_node.visits / total_visits
         return distribution
+    
+    def depth(self) -> int:
+        node = self
+        depth = 0
+        while node.parent_node is not None:
+            depth += 1
+            node = node.parent_node
+        return depth
