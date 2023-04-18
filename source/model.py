@@ -146,7 +146,7 @@ class Model(torch.nn.Module):
         torch.save(self.state_dict(), f"{directory_path}/{filename}.pt")
 
     def load(self, path: str):
-        self.load_state_dict(torch.load(path))
+        self.load_state_dict(torch.load(path, map_location=self.device))
 
     def get_progressbar(self, iter: torch.utils.data.DataLoader, epoch: int, max_epochs: int) -> tqdm.tqdm:
         """
