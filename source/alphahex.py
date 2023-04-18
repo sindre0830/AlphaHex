@@ -19,8 +19,7 @@ class AlphaHex:
         self.simulated_games_count = 0
         # load coniguration
         self.configuration = functionality.data.parse_json(file_name="configuration")
-        self.save_interval: int = self.configuration["save_interval"]
-        self.save_visualization_interval: int = self.configuration["save_visualization_interval"]
+        self.total_saves: int = self.configuration["saves"]
         self.actual_games_size: int = self.configuration["actual_games_size"]
         self.grid_size: int = self.configuration["grid_size"]
         self.search_games_time_limit_seconds: int = self.configuration["search_games_time_limit_seconds"]
@@ -58,6 +57,7 @@ class AlphaHex:
 
     def run(self):
         self.rbuf.clear()
+        save_interval = self.actual_games_size / self.total_saves
         self.anet.initialize_model(save_directory_name=self.save_directory_name)
         for actual_game in range(self.actual_games_size):
             print(f"Actual game {(actual_game + 1):>{len(str(self.actual_games_size))}}/{self.actual_games_size}")
@@ -89,13 +89,8 @@ class AlphaHex:
                 self.mcts.set_root_node(self.state_manager)
             self.reset_simulated_games_count()
             self.anet.train(self.rbuf.get_mini_batch(self.mini_batch_size))
-            save_model = (actual_game + 1) % self.save_interval == 0 or actual_game == (self.actual_games_size - 1)
-            if save_model:
+            if (actual_game + 1) % save_interval == 0 or actual_game == (self.actual_games_size - 1):
                 self.anet.save(directory_path=f"{DATA_PATH}/{self.save_directory_name}", iteration=(actual_game + 1))
-            visualize_state = (actual_game + 1) % self.save_visualization_interval == 0 \
-                or actual_game == (self.actual_games_size - 1) \
-                or actual_game == 0
-            if visualize_state:
                 self.state_manager.visualize(self.save_directory_name, iteration=(actual_game + 1))
             time_end = time()
             print(f"\tTime elapsed: {(time_end - time_start):0.2f} seconds")

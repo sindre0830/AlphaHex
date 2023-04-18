@@ -1,6 +1,5 @@
 {
-    "save_interval": 20,
-    "save_visualization_interval": 20,
+    "saves": 5,
     "actual_games_size": 200,
     "grid_size": 5,
     "search_games_time_limit_seconds": 5,
