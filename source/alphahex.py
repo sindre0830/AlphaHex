@@ -57,7 +57,7 @@ class AlphaHex:
 
     def run(self):
         self.rbuf.clear()
-        save_interval = self.actual_games_size / self.total_saves
+        save_interval = self.actual_games_size // self.total_saves
         self.anet.initialize_model(save_directory_name=self.save_directory_name)
         for actual_game in range(self.actual_games_size):
             print(f"Actual game {(actual_game + 1):>{len(str(self.actual_games_size))}}/{self.actual_games_size}")
