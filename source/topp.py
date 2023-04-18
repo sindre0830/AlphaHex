@@ -85,9 +85,9 @@ class TOPP:
                     self.total_score[iteration_2]["Player 2"] += 1
 
     def print_score(self):
-        iterations = sorted(self.model_iterations)
-        for iteration in iterations:
-            print(f"Model {iteration}: {self.total_score[iteration]}")
+        sorted_scores = sorted(self.total_score.items(), key=lambda x: x[1]['Total'], reverse=True)
+        for model, scores in sorted_scores:
+            print(f"{model}: {scores}")
 
     def match(self, pairings: tuple[tuple[ANET, str], tuple[ANET, str]]):
         ((model_1, iteration_1), (model_2, iteration_2)) = pairings
