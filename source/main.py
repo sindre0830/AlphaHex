@@ -1,5 +1,6 @@
 # internal libraries
 from constants import (
+    SEED,
     DATA_PATH,
     GPU_DEVICE,
     CPU_DEVICE
@@ -20,7 +21,7 @@ warnings.filterwarnings('ignore')
 device_type = GPU_DEVICE if torch.cuda.is_available() else CPU_DEVICE
 device = torch.device(device_type)
 # set pytorch seed
-torch.manual_seed(0)
+torch.manual_seed(SEED)
 
 
 # Main program.

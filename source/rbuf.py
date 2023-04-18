@@ -1,4 +1,7 @@
 # internal libraries
+from constants import (
+    SEED
+)
 from state_manager import StateManager
 import functionality.data
 # external libraries
@@ -27,7 +30,8 @@ class RBUF():
         if (data_size <= mini_batch_size):
             train_indicies = indicies
         else:
-            train_indicies = np.random.choice(
+            rng = np.random.default_rng(seed=SEED)
+            train_indicies = rng.choice(
                 indicies,
                 size=mini_batch_size,
                 replace=False,
