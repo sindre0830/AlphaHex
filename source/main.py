@@ -12,6 +12,7 @@ import functionality.data
 import sys
 import torch
 import warnings
+from time import time
 
 # ignore warnings, this was added due to PyTorch LazyLayers spamming warnings
 warnings.filterwarnings('ignore')
@@ -37,11 +38,13 @@ def main():
             return
         case "--alphahex" | "-ah":
             print("Starting alpha hex...")
+            time_start = time()
             save_directory_name = None
             if cmd_args is not None:
                 save_directory_name = cmd_args[0]
             alpha_hex = AlphaHex(device, device_type, save_directory_name)
             alpha_hex.run()
+            print(f"\nTime elapsed: {(time() - time_start):0.2f} seconds")
             return
         case "--tournament" | "-t":
             if cmd_args is None:
@@ -49,9 +52,11 @@ def main():
                 functionality.cli.print_commands()
                 return
             print("Starting tournament...")
+            time_start = time()
             topp = TOPP(device, device_type, cmd_args)
             topp.run()
             topp.print_score()
+            print(f"\nTime elapsed: {(time() - time_start):0.2f} seconds")
             return
         case "--config" | "-c":
             working_directory_path = ""
