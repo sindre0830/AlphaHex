@@ -1,14 +1,14 @@
 {
-    "save_interval": 20,
-    "save_visualization_interval": 20,
-    "actual_games_size": 200,
+    "save_interval": 5,
+    "save_visualization_interval": 5,
+    "actual_games_size": 10,
     "grid_size": 5,
-    "search_games_time_limit_seconds": 5,
+    "search_games_time_limit_seconds": 2,
     "exploration_constant": 5,
-    "mini_batch_size": 32,
-    "max_epochs": 32,
-    "greedy_epsilon": 0.1,
-    "dynamic_epsilon": true,
+    "mini_batch_size": 10,
+    "max_epochs": 10,
+    "greedy_epsilon": null,
+    "dynamic_epsilon": false,
     "features": [
         {
             "type": "onehot_encode_player"
@@ -20,13 +20,13 @@
             "type": "onehot_encode_empty"
         }
     ],
-    "criterion": "cross_entropy",
+    "criterion": "kl_div",
     "optimizer": {
         "type": "adam",
-        "lr": 0.001
+        "lr": 0.01
     },
     "input_layer": {
-        "filters": 16,
+        "filters": 32,
         "kernel_size": 3,
         "stride": 1,
         "padding": 1,
@@ -34,52 +34,16 @@
     },
     "hidden_layers": [
             {
-                "type": "batch_norm_2d"
-            },
-            {
                 "type": "relu"
             },
 
             {
                 "type": "conv",
-                "filters": 16,
-                "kernel_size": 3,
+                "filters": 64,
+                "kernel_size": 2,
                 "stride": 1,
                 "padding": 1,
                 "bias": true
-            },
-            {
-                "type": "batch_norm_2d"
-            },
-            {
-                "type": "relu"
-            },
-
-            {
-                "type": "conv",
-                "filters": 32,
-                "kernel_size": 3,
-                "stride": 1,
-                "padding": 1,
-                "bias": true
-            },
-            {
-                "type": "batch_norm_2d"
-            },
-            {
-                "type": "relu"
-            },
-
-            {
-                "type": "conv",
-                "filters": 32,
-                "kernel_size": 3,
-                "stride": 1,
-                "padding": 1,
-                "bias": true
-            },
-            {
-                "type": "batch_norm_2d"
             },
             {
                 "type": "relu"
@@ -88,28 +52,10 @@
             {
                 "type": "conv",
                 "filters": 64,
-                "kernel_size": 3,
+                "kernel_size": 1,
                 "stride": 1,
                 "padding": 1,
                 "bias": true
-            },
-            {
-                "type": "batch_norm_2d"
-            },
-            {
-                "type": "relu"
-            },
-
-            {
-                "type": "conv",
-                "filters": 64,
-                "kernel_size": 3,
-                "stride": 1,
-                "padding": 1,
-                "bias": true
-            },
-            {
-                "type": "batch_norm_2d"
             },
             {
                 "type": "relu"
@@ -121,7 +67,16 @@
 
             {
                 "type": "linear",
-                "filters": 128,
+                "filters": 16,
+                "bias": true
+            },
+            {
+                "type": "relu"
+            },
+
+            {
+                "type": "linear",
+                "filters": 32,
                 "bias": true
             },
             {
