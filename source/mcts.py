@@ -31,13 +31,13 @@ class MCTS:
     def set_root_node(self, state: StateManager):
         self.root_node = Node(state)
 
-    def tree_search(self) -> tuple[Node, bool]:
+    def tree_search(self) -> Node:
         node = self.root_node
         while not node.state.terminal():
             if (node.is_leaf_node() or node.depth() >= self.max_depth):
-                return node, False
+                return node
             node = max(node.children_nodes, key=lambda child_node: child_node.get_score(self.exploration_constant))
-        return node, True
+        return node
 
     def node_expansion(self, node: Node):
         if node.depth() >= self.max_depth:
@@ -46,7 +46,7 @@ class MCTS:
             node.add_child(Node(node.state, action, parent_node=node))
 
     def leaf_evaluation(self, anet: ANET, leaf: Node) -> tuple[Node, int]:
-        if leaf.depth() >= self.max_depth:
+        if leaf.depth() >= self.max_depth or leaf.state.terminal():
             node = leaf
         else:
             state = (leaf.state.grid, leaf.state.player)
@@ -76,5 +76,6 @@ class MCTS:
         while current_node is not None:
             current_node.visits += 1
             if current_node.state.player == winner:
-                current_node.wins += (round - min_rounds) / (max_rounds - min_rounds) * (0.5 - 1.5) + 1.5
+                # current_node.wins += (round - min_rounds) / (max_rounds - min_rounds) * (0.5 - 1.5) + 1.5
+                current_node.wins += 1
             current_node = current_node.parent_node

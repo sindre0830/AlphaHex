@@ -1,6 +1,6 @@
 {
     "saves": 5,
-    "actual_games_size": 10,
+    "actual_games_size": 100,
     "grid_size": 5,
     "search_games_time_limit_seconds": 2,
     "exploration_constant": 2,
