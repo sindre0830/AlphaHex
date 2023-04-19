@@ -2,10 +2,10 @@
     "saves": 5,
     "actual_games_size": 100,
     "grid_size": 5,
-    "search_games_time_limit_seconds": 2,
+    "search_games_time_limit_seconds": 10,
     "exploration_constant": 2,
-    "mini_batch_size": 10,
-    "max_epochs": 10,
+    "mini_batch_size": 32,
+    "max_epochs": 16,
     "greedy_epsilon": null,
     "dynamic_epsilon": false,
     "features": [
@@ -25,7 +25,7 @@
         "lr": 0.01
     },
     "input_layer": {
-        "filters": 32,
+        "filters": 16,
         "kernel_size": 3,
         "stride": 1,
         "padding": 1,
@@ -33,16 +33,22 @@
     },
     "hidden_layers": [
         {
+            "type": "batch_norm_2d"
+        },
+        {
             "type": "relu"
         },
 
         {
             "type": "conv",
-            "filters": 64,
+            "filters": 32,
             "kernel_size": 2,
             "stride": 1,
             "padding": 1,
             "bias": true
+        },
+        {
+            "type": "batch_norm_2d"
         },
         {
             "type": "relu"
@@ -57,6 +63,9 @@
             "bias": true
         },
         {
+            "type": "batch_norm_2d"
+        },
+        {
             "type": "relu"
         },
 
@@ -66,7 +75,7 @@
 
         {
             "type": "linear",
-            "filters": 16,
+            "filters": 128,
             "bias": true
         },
         {
@@ -75,7 +84,7 @@
 
         {
             "type": "linear",
-            "filters": 32,
+            "filters": 64,
             "bias": true
         },
         {

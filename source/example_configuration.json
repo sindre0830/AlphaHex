@@ -1,13 +1,13 @@
 {
     "saves": 5,
-    "actual_games_size": 200,
+    "actual_games_size": 100,
     "grid_size": 5,
-    "search_games_time_limit_seconds": 5,
-    "exploration_constant": 5,
+    "search_games_time_limit_seconds": 10,
+    "exploration_constant": 2,
     "mini_batch_size": 32,
-    "max_epochs": 32,
-    "greedy_epsilon": 0.1,
-    "dynamic_epsilon": true,
+    "max_epochs": 16,
+    "greedy_epsilon": null,
+    "dynamic_epsilon": false,
     "features": [
         {
             "type": "onehot_encode_player"
@@ -19,10 +19,10 @@
             "type": "onehot_encode_empty"
         }
     ],
-    "criterion": "cross_entropy",
+    "criterion": "kl_div",
     "optimizer": {
         "type": "adam",
-        "lr": 0.001
+        "lr": 0.01
     },
     "input_layer": {
         "filters": 16,
@@ -32,99 +32,63 @@
         "bias": true
     },
     "hidden_layers": [
-            {
-                "type": "batch_norm_2d"
-            },
-            {
-                "type": "relu"
-            },
+        {
+            "type": "batch_norm_2d"
+        },
+        {
+            "type": "relu"
+        },
 
-            {
-                "type": "conv",
-                "filters": 16,
-                "kernel_size": 3,
-                "stride": 1,
-                "padding": 1,
-                "bias": true
-            },
-            {
-                "type": "batch_norm_2d"
-            },
-            {
-                "type": "relu"
-            },
+        {
+            "type": "conv",
+            "filters": 32,
+            "kernel_size": 2,
+            "stride": 1,
+            "padding": 1,
+            "bias": true
+        },
+        {
+            "type": "batch_norm_2d"
+        },
+        {
+            "type": "relu"
+        },
 
-            {
-                "type": "conv",
-                "filters": 32,
-                "kernel_size": 3,
-                "stride": 1,
-                "padding": 1,
-                "bias": true
-            },
-            {
-                "type": "batch_norm_2d"
-            },
-            {
-                "type": "relu"
-            },
+        {
+            "type": "conv",
+            "filters": 64,
+            "kernel_size": 1,
+            "stride": 1,
+            "padding": 1,
+            "bias": true
+        },
+        {
+            "type": "batch_norm_2d"
+        },
+        {
+            "type": "relu"
+        },
 
-            {
-                "type": "conv",
-                "filters": 32,
-                "kernel_size": 3,
-                "stride": 1,
-                "padding": 1,
-                "bias": true
-            },
-            {
-                "type": "batch_norm_2d"
-            },
-            {
-                "type": "relu"
-            },
+        {
+            "type": "flatten"
+        },
 
-            {
-                "type": "conv",
-                "filters": 64,
-                "kernel_size": 3,
-                "stride": 1,
-                "padding": 1,
-                "bias": true
-            },
-            {
-                "type": "batch_norm_2d"
-            },
-            {
-                "type": "relu"
-            },
+        {
+            "type": "linear",
+            "filters": 128,
+            "bias": true
+        },
+        {
+            "type": "relu"
+        },
 
-            {
-                "type": "conv",
-                "filters": 64,
-                "kernel_size": 3,
-                "stride": 1,
-                "padding": 1,
-                "bias": true
-            },
-            {
-                "type": "batch_norm_2d"
-            },
-            {
-                "type": "relu"
-            },
-
-            {
-                "type": "flatten"
-            },
-
-            {
-                "type": "linear",
-                "filters": 128,
-                "bias": true
-            },
-            {
-                "type": "relu"
-            }
-        ]
+        {
+            "type": "linear",
+            "filters": 64,
+            "bias": true
+        },
+        {
+            "type": "relu"
+        }
+    ]
 }
