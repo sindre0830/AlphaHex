@@ -1,14 +1,4 @@
 # AlphaHex
-### Info
-The feature maps consists of:
-1. onehot-encoding for player cells
-2. onehot-encoding for opponent cells
-3. onehot-encoding for empty cells
-4. constant plane filled with 1
-5. onehot-encoding of legal moves that would create a fork for the current player
-6. onehot-encoding of legal moves
-7. constant plane filled with 0
-
 ### Run program
 0. Install required python version **3.10**
 1. Install required packages `pip install -r source/requirements.txt` (We recommend using virtual environment, follow guide under **Virtual Environment Setup** below and skip this step)
@@ -24,21 +14,18 @@ The feature maps consists of:
 
 ### Project
 #### Tasks
-- Add main loop (T)
-- Add Hex game manager (T)
+- Add main loop
+- Add Hex game manager
 - Add hidden layers based parameter
 - Add activation function based on parameter
 - Add optimizer function based on parameter
-- Move parameters to JSON file and load them on startup (T)
-- Add model save interval (S)
-- Add RBUF (S)
-- Add model visualization (S)
+- Move parameters to JSON file and load them on startup
+- Add model save interval
+- Add RBUF
 - Add tournament program between the different models
     - The aim is to see a gradual improvement from the first save to the last save
-
-- Add game state visualization (S)
+- Add game state visualization
     - Used to verify the final game state
-- Find out what we actually need for the project (S, T)
 
 #### Variables
 I_s = Save interval
@@ -85,24 +72,3 @@ Tree policy = Upper confidence bound
         - Save ANET's current parameters for later use in tournament play.
 5. next G_a
 ```
-
-#### Explanation (not entirely correct)
-1. Initialization: At the start of the game, the AI agent initializes a Monte Carlo (MC) tree with the root node representing the current game state. The root node has a visit count of 0 and a value of 0.
-
-2. MCTS simulation: The AI agent starts the Monte Carlo Tree Search (MCTS) algorithm to simulate potential moves. The MCTS algorithm consists of four steps:
-
-a. Selection: The AI agent selects a node in the MC tree using the Upper Confidence Bound (UCB) algorithm. The UCB algorithm balances exploration and exploitation by choosing nodes with high values and high uncertainty (i.e., high visit count). The AI agent continues selecting nodes until it reaches a leaf node in the MC tree.
-
-b. Expansion: The AI agent expands the selected leaf node by adding child nodes representing each possible action from that node. Each child node is initialized with a visit count of 0 and a value of 0.
-
-c. Simulation: The AI agent simulates a random game (i.e., rollout) from each child node until it reaches a final game state. The rollout policy is determined by the ANET, which makes the AI agent choose actions that maximize the chance of winning the game. The AI agent then calculates a reward signal based on the outcome of the game (win, loss, or draw).
-
-d. Backpropagation: The AI agent backpropagates the reward signal from the final game state back to the root node, updating the visit count and value of each node along the path taken during the simulation.
-
-3. Actual move: After performing a certain number of MCTS simulations, the AI agent chooses an actual move to make based on the MC tree. The AI agent chooses the child node with the highest visit count as the next move. This move is then played in the actual game.
-
-4. Updating target policy: After playing the actual move, the AI agent updates the target policy by using supervised learning. The training cases are pairs (s,D), where s is a game state and D is a probability distribution over the possible actions in that state. The probability distribution is derived from the normalized visit counts of the child nodes of the root node in the MC tree. The AI agent stores these training cases in a Replay Buffer.
-
-5. Training ANET: At the end of each game (episode), the AI agent randomly selects a minibatch of training cases from the Replay Buffer and trains the ANET using supervised learning. The ANET learns to predict the probability distribution D from a given game state.
-
-6. x|Repeat: The AI agent repeats steps 2-5 for each subsequent move until the game is over. At the end of the game, the AI agent updates the MC tree with the outcome of the game and resets it to the initial state for the next game.
