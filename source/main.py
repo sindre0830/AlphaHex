@@ -38,7 +38,7 @@ def main():
             functionality.cli.print_commands()
             return
         case "--alphahex" | "-ah":
-            print("Starting alpha hex...")
+            print(f"Starting alpha hex on device {device_type}...")
             time_start = time()
             save_directory_name = None
             if cmd_args is not None:
