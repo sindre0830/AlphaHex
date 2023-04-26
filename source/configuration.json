@@ -1,12 +1,12 @@
 {
-    "saves": 5,
-    "actual_games_size": 10,
+    "saves": 10,
+    "actual_games_size": 100,
     "grid_size": 7,
-    "search_games_time_limit_seconds": 4,
+    "search_games_time_limit_seconds": 10,
     "exploration_constant": 2,
-    "mini_batch_size": 32,
-    "max_epochs": 16,
-    "greedy_epsilon": null,
+    "mini_batch_size": 64,
+    "max_epochs": 32,
+    "greedy_epsilon": 0.1,
     "dynamic_epsilon": false,
     "features": [
         {
@@ -19,13 +19,13 @@
             "type": "onehot_encode_empty"
         }
     ],
-    "criterion": "kl_div",
+    "criterion": "cross_entropy",
     "optimizer": {
         "type": "adam",
         "lr": 0.01
     },
     "input_layer": {
-        "filters": 16,
+        "filters": 32,
         "kernel_size": 3,
         "stride": 1,
         "padding": 1,
@@ -41,7 +41,7 @@
 
         {
             "type": "conv",
-            "filters": 32,
+            "filters": 64,
             "kernel_size": 2,
             "stride": 1,
             "padding": 1,
@@ -56,7 +56,7 @@
 
         {
             "type": "conv",
-            "filters": 64,
+            "filters": 128,
             "kernel_size": 1,
             "stride": 1,
             "padding": 1,

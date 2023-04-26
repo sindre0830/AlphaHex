@@ -103,7 +103,7 @@ class TOPP:
                     probability_distribution = model_2.predict(state, filter_actions=state_manager.illegal_actions())
                 state_manager.apply_action_from_distribution(
                     probability_distribution,
-                    deterministic=False,
+                    deterministic=True,
                     greedy_epsilon=None
                 )
             score.append(state_manager.determine_winner())
