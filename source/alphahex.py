@@ -93,9 +93,6 @@ class AlphaHex:
             if (actual_game + 1) % save_interval == 0 or actual_game == (self.actual_games_size - 1):
                 self.anet.save(directory_path=f"{DATA_PATH}/{self.save_directory_name}", iteration=(actual_game + 1))
                 self.state_manager.visualize(self.save_directory_name, iteration=(actual_game + 1))
-                self.rbuf.clear()
-                self.anet.features_cache.clear()
-                self.anet.distribution_cache.clear()
             print(f"\tTime elapsed: {(time() - time_start):0.2f} seconds")
 
     def increment_simulated_games_count(self) -> int:

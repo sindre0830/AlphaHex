@@ -10,19 +10,18 @@ import numpy as np
 class MCTS:
     def __init__(self, exploration_constant: float, greedy_epsilon: float = None):
         self.root_node: Node = None
-        self.max_depth = 1
+        self.max_depth = 9999
         self.exploration_constant = exploration_constant
         self.greedy_epsilon = greedy_epsilon
 
     def dynamic_depth(self, round: int):
-        if round >= 20:
-            self.max_depth = 5
-        elif round >= 15:
-            self.max_depth = 4
-        elif round >= 10:
-            self.max_depth = 3
-        else:
-            self.max_depth = 2
+        pass
+        #if round >= 42:
+        #    self.max_depth = 4
+        #elif round >= 35:
+        #    self.max_depth = 3
+        #else:
+        #    self.max_depth = 2
 
     def dynamic_greedy_epsilon(self, iteration: int, max_iterations: int, max_epsilon: float, min_epsilon: float):
         if self.greedy_epsilon is not None:
@@ -71,8 +70,8 @@ class MCTS:
 
     def backpropagate(self, node: Node, winner: int, round: int):
         current_node = node
-        min_rounds = 1 + node.state.grid_size * 2
-        max_rounds = 1 + node.state.total_possible_moves()
+        min_rounds = node.state.grid_size * 2
+        max_rounds = node.state.total_possible_moves()
         while current_node is not None:
             current_node.visits += 1
             if current_node.state.player == winner:

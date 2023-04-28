@@ -5,7 +5,7 @@
     "search_games_time_limit_seconds": 10,
     "exploration_constant": 2,
     "mini_batch_size": 64,
-    "max_epochs": 32,
+    "max_epochs": 25,
     "greedy_epsilon": 0.1,
     "dynamic_epsilon": false,
     "features": [

@@ -65,7 +65,7 @@ class StateManager:
         self.grid_history.append(self.grid.copy())
 
     def round(self) -> int:
-        return len(self.grid_history)
+        return len(self.grid_history) - 1
 
     def opponent(self) -> int:
         return PLAYER_2 if self.player == PLAYER_1 else PLAYER_1
