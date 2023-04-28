@@ -27,8 +27,8 @@ from functionality.data import (
     parse_json,
     index_to_action
 )
-MODEL_NAME = "oht5"
-MODEL_ITERATION = 100
+MODEL_NAME = "brave-new-world"
+MODEL_ITERATION = 77
 working_directory_path = f"../source/data/" + MODEL_NAME
 # load config
 configuration = parse_json(working_directory_path + "/", "configuration")

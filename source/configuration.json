@@ -2,7 +2,7 @@
     "saves": 10,
     "actual_games_size": 100,
     "grid_size": 7,
-    "search_games_time_limit_seconds": 0.5,
+    "search_games_time_limit_seconds": 10,
     "exploration_constant": 2,
     "mini_batch_size": 64,
     "max_epochs": 300,
