@@ -5,7 +5,7 @@ import random
 def random_match(anet: ANET, grid_size: int):
     wins_player1 = 0
     wins_player2 = 0
-    total_games = 25
+    total_games = 200
     # as player 1
     for _ in range(total_games):
         local_state = StateManager()

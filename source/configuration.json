@@ -1,22 +1,27 @@
 {
     "saves": 10,
     "actual_games_size": 100,
-    "grid_size": 7,
-    "search_games_time_limit_seconds": 2,
+    "grid_size": 4,
+    "search_games_time_limit_seconds": 0.5,
     "exploration_constant": 2,
-    "mini_batch_size": 20,
-    "max_epochs": 20,
-    "greedy_epsilon": 0.2,
+    "mini_batch_size": 64,
+    "max_epochs": 300,
+    "greedy_epsilon": 0,
     "dynamic_epsilon": false,
     "features": [
         {
-            "type": "onehot_encode_player"
+            "type": "onehot_encode_cell",
+            "target": 1
         },
         {
-            "type": "onehot_encode_opponent"
+            "type": "onehot_encode_cell",
+            "target": 2
         },
         {
             "type": "onehot_encode_empty"
+        },
+        {
+            "type": "constant_plane_player"
         }
     ],
     "criterion": "cross_entropy",
@@ -33,44 +38,51 @@
     },
     "hidden_layers": [
         {
-            "type": "batch_norm_2d"
-        },
-        {
-            "type": "relu"
+            "type": "tanh"
         },
 
         {
             "type": "conv",
             "filters": 64,
-            "kernel_size": 2,
+            "kernel_size": 3,
             "stride": 1,
             "padding": 1,
             "bias": true
         },
         {
-            "type": "batch_norm_2d"
-        },
-        {
-            "type": "relu"
+            "type": "tanh"
         },
 
         {
             "type": "conv",
-            "filters": 128,
+            "filters": 64,
+            "kernel_size": 3,
+            "stride": 1,
+            "padding": 1,
+            "bias": true
+        },
+        {
+            "type": "tanh"
+        },
+
+        {
+            "type": "conv",
+            "filters": 64,
             "kernel_size": 1,
             "stride": 1,
             "padding": 1,
             "bias": true
         },
         {
-            "type": "batch_norm_2d"
-        },
-        {
-            "type": "relu"
+            "type": "tanh"
         },
 
         {
             "type": "flatten"
+        },
+        {
+            "type": "dropout",
+            "p": 0.25
         },
 
         {
@@ -79,16 +91,11 @@
             "bias": true
         },
         {
-            "type": "relu"
-        },
-
-        {
-            "type": "linear",
-            "filters": 64,
-            "bias": true
+            "type": "tanh"
         },
         {
-            "type": "relu"
+            "type": "dropout",
+            "p": 0.25
         }
     ]
 }

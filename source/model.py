@@ -99,7 +99,10 @@ class Model(torch.nn.Module):
         # loop through each epoch
         best_loss = float("inf")
         best_accuracy = -float("inf")
+        epochs_since_best = 0
         for epoch in range(self.max_epochs):
+            if epochs_since_best >= 8:
+                break
             correct = 0.0
             total_loss = 0.0
             # define the progressbar
@@ -133,8 +136,11 @@ class Model(torch.nn.Module):
                     if train_loss <= best_loss:
                         best_loss = train_loss
                         best_accuracy = train_accuracy
+                        epochs_since_best = 0
                         # save best model
                         self.save(TMP_PATH, filename="tmp_model")
+                    else:
+                        epochs_since_best += 1
                     self.set_progressbar_prefix(progressbar, train_loss, train_accuracy, best_loss, best_accuracy)
         # load best model from training
         self.load(path=f"{TMP_PATH}/tmp_model.pt")
