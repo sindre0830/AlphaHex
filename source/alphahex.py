@@ -7,6 +7,7 @@ from anet import ANET
 from mcts import MCTS
 from state_manager import StateManager
 import functionality.data
+from functionality.match import random_match
 # external libraries
 import torch
 from time import time
@@ -90,7 +91,8 @@ class AlphaHex:
                 self.mcts.set_root_node(self.state_manager)
             self.reset_simulated_games_count()
             self.anet.train(self.rbuf.get_mini_batch(self.mini_batch_size))
-            if (actual_game + 1) % save_interval == 0 or actual_game == (self.actual_games_size - 1):
+            winrate = random_match(self.anet, self.state_manager.grid_size)
+            if (actual_game + 1) % save_interval == 0 or actual_game == (self.actual_games_size - 1) or winrate >= 0.6:
                 self.anet.save(directory_path=f"{DATA_PATH}/{self.save_directory_name}", iteration=(actual_game + 1))
                 self.state_manager.visualize(self.save_directory_name, iteration=(actual_game + 1))
             print(f"\tTime elapsed: {(time() - time_start):0.2f} seconds")
