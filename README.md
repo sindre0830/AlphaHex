@@ -1,4 +1,6 @@
 # AlphaHex
+AlphaHex is an implementation of the architecture used in AlphaGo, but adapted for the game Hex. This repository offers a deep reinforcement learning approach to playing Hex by combining deep neural networks with Monte Carlo Tree Search (MCTS).
+
 ### Run program
 0. Install required python version **3.10**
 1. Install required packages `pip install -r source/requirements.txt` (We recommend using virtual environment, follow guide under **Virtual Environment Setup** below and skip this step)
@@ -13,6 +15,8 @@
 3. Install the packages required by this project `pip install -r source/requirements.txt`
 
 ### Project
+This was a project for the IT3105 course at NTNU.
+
 #### Tasks
 - Add main loop
 - Add Hex game manager
