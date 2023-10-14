@@ -77,5 +77,5 @@ class MCTS:
             current_node.visits += 1
             if current_node.state.player == winner:
                 # current_node.wins += (round - min_rounds) / (max_rounds - min_rounds) * (0.5 - 1.5) + 1.5
-                current_node.wins += 1
+                current_node.wins -= 1
             current_node = current_node.parent_node
