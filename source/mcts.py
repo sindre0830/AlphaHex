@@ -71,8 +71,8 @@ class MCTS:
 
     def backpropagate(self, node: Node, winner: int, round: int):
         current_node = node
-        min_rounds = 1 + node.state.grid_size * 2
-        max_rounds = 1 + node.state.total_possible_moves()
+        # min_rounds = 1 + node.state.grid_size * 2
+        # max_rounds = 1 + node.state.total_possible_moves()
         while current_node is not None:
             current_node.visits += 1
             if current_node.state.player == winner:

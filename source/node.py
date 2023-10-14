@@ -52,7 +52,7 @@ class Node():
                 )
                 distribution[action_index] = child_node.visits / total_visits
         return distribution
-    
+
     def depth(self) -> int:
         node = self
         depth = 0
