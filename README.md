@@ -32,21 +32,21 @@ This was a project for the IT3105 course at NTNU.
     - Used to verify the final game state
 
 #### Variables
-I_s = Save interval
-B_a = Actual game board
-B_mc = Monte Carlo game board
-S_init = Starting board state
-S_s = Successor state
-G_a = Game (actual)
-G_s = Search game
-P_t = Tree policy
-L = Leaf node
-F = Final state node
-D = Distribution of visit counts along all arcs emanating from root
-RBUF = Replay buffer used to train the NN
-M_a = Actual move
-Default policy = ANET
-Tree policy = Upper confidence bound
+- I_s = Save interval
+- B_a = Actual game board
+- B_mc = Monte Carlo game board
+- S_init = Starting board state
+- S_s = Successor state
+- G_a = Game (actual)
+- G_s = Search game
+- P_t = Tree policy
+- L = Leaf node
+- F = Final state node
+- D = Distribution of visit counts along all arcs emanating from root
+- RBUF = Replay buffer used to train the NN
+- M_a = Actual move
+- Default policy = ANET
+- Tree policy = Upper confidence bound
 
 #### Pseudocode
 ```
